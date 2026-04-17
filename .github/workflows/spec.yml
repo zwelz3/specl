@@ -1,0 +1,15 @@
+name: spec
+on: [push, pull_request]
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: pip install rdflib pyshacl
+      - run: python spec_to_rdf.py enterprise-kg-app-spec.md spec.ttl
+      - run: python validate_spec.py validate spec.ttl ekga-spec-shapes.ttl --explain --json report.json
+      - run: python validate_spec.py badge spec.ttl ekga-spec-shapes.ttl --out spec-badge.svg
+      - uses: actions/upload-artifact@v4
+        with: {name: spec-report, path: "report.json spec-badge.svg"}

@@ -1,0 +1,27 @@
+[project]
+name = "specl"
+version = "0.2.0"
+description = "RDF-native, SHACL-validated specifications for spec-driven AI development"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Zachary" }]
+dependencies = [
+    "rdflib>=7.0",
+    "pyshacl>=0.25",
+]
+
+[project.scripts]
+specl-translate = "specl.spec_to_rdf:main"
+specl-validate  = "specl.validate_spec:main"
+specl-assist    = "specl.spec_assistant:main"
+
+[project.optional-dependencies]
+assist = []  # ollama via stdlib urllib, no extra deps
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.package-data]
+specl = ["shapes.ttl", "core.ttl", "explorer.html"]

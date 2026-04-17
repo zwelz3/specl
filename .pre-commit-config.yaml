@@ -1,0 +1,9 @@
+repos:
+  - repo: local
+    hooks:
+      - id: ekga-spec-validate
+        name: EKGA spec validate
+        entry: bash -c 'python spec_to_rdf.py enterprise-kg-app-spec.md spec.ttl && python validate_spec.py validate spec.ttl ekga-spec-shapes.ttl --explain'
+        language: system
+        files: '(enterprise-kg-app-spec\.md|ekga-spec-shapes\.ttl|spec_to_rdf\.py)$'
+        pass_filenames: false

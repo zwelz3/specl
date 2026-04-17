@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>specl explorer</title>
+<style>
+:root{--bg:#0f1115;--panel:#161a22;--border:#262b36;--text:#e6e8ee;--muted:#8a92a6;
+--accent:#4ea1ff;--good:#3fb950;--warn:#d29922;--bad:#f85149;
+--req:#3fb950;--us:#4ea1ff;--issue:#d29922;--adr:#a371f7;--note:#8a92a6}
+*{box-sizing:border-box}
+body{margin:0;font:14px/1.5 -apple-system,system-ui,sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column}
+header{padding:12px 20px;background:var(--panel);border-bottom:1px solid var(--border);display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+header h1{margin:0;font-size:16px;font-weight:600}
+.status{padding:2px 8px;border-radius:3px;background:var(--border);font-size:11px;text-transform:uppercase;letter-spacing:.5px}
+.meta{color:var(--muted);font-size:12px}
+.maturity{display:flex;align-items:center;gap:8px;margin-left:auto}
+.bar{width:160px;height:8px;background:var(--border);border-radius:4px;overflow:hidden}
+.bar>div{height:100%;transition:width .3s,background .3s}
+main{flex:1;display:grid;grid-template-columns:320px 1fr;overflow:hidden;min-height:0}
+aside{border-right:1px solid var(--border);overflow-y:auto;background:var(--panel);display:flex;flex-direction:column}
+aside input{width:100%;padding:10px 14px;background:var(--bg);color:var(--text);border:none;border-bottom:1px solid var(--border);font:inherit;outline:none}
+aside input:focus{border-bottom-color:var(--accent)}
+#list{flex:1;overflow-y:auto}
+.group{padding:8px 0}
+.group-label{padding:6px 16px;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.item{padding:8px 16px 8px 24px;cursor:pointer;border-left:3px solid transparent;outline:none}
+.item:hover,.item:focus{background:var(--bg)}
+.item.active{background:var(--bg);border-left-color:var(--accent)}
+.item .id{font-weight:500;font-size:13px}
+.item .preview{color:var(--muted);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.item.req .id::before{content:"●";color:var(--req);margin-right:6px}
+.item.us .id::before{content:"●";color:var(--us);margin-right:6px}
+.item.issue .id::before{content:"●";color:var(--issue);margin-right:6px}
+.item.adr .id::before{content:"●";color:var(--adr);margin-right:6px}
+.item.note .id::before{content:"●";color:var(--note);margin-right:6px}
+section{overflow-y:auto;padding:24px 32px;min-width:0}
+.tabs{display:flex;gap:4px;margin-bottom:20px;border-bottom:1px solid var(--border)}
+.tabs button{padding:8px 16px;background:none;border:none;color:var(--muted);cursor:pointer;font:inherit;border-bottom:2px solid transparent}
+.tabs button.active{color:var(--text);border-bottom-color:var(--accent)}
+h2{margin:0 0 4px;font-size:20px}
+.type{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:16px}
+dl{display:grid;grid-template-columns:160px 1fr;gap:10px 20px;margin:0}
+dt{color:var(--muted);font-size:12px;padding-top:2px;text-transform:uppercase;letter-spacing:.3px}
+dd{margin:0;word-wrap:break-word;white-space:pre-wrap}
+.missing{color:var(--warn);font-style:italic;opacity:.8}
+pre{background:var(--panel);padding:16px;border-radius:6px;overflow-x:auto;font:12px/1.5 ui-monospace,Menlo,monospace;border:1px solid var(--border);white-space:pre}
+.k{color:#ff7b72}.p{color:#79c0ff}.s{color:#a5d6ff}.c{color:#8b949e}
+.empty{color:var(--muted);text-align:center;padding:60px 20px}
+.empty.error{color:var(--bad)}
+.chips{display:flex;gap:8px;margin:12px 0 20px;flex-wrap:wrap}
+.chip{padding:3px 10px;border-radius:12px;font-size:11px;background:var(--border)}
+.chip.good{background:rgba(63,185,80,.15);color:var(--good)}
+.chip.warn{background:rgba(210,153,34,.15);color:var(--warn)}
+.drop-overlay{position:fixed;inset:0;background:rgba(78,161,255,.1);border:3px dashed var(--accent);display:none;align-items:center;justify-content:center;font-size:18px;color:var(--accent);z-index:100;pointer-events:none}
+.drop-overlay.active{display:flex}
+</style></head><body>
+<header>
+  <h1 id="title">specl explorer</h1>
+  <span class="status" id="status">no spec</span>
+  <span class="meta" id="version"></span>
+  <div class="maturity"><span class="meta" id="mat-label">maturity —</span><div class="bar"><div id="bar" style="width:0"></div></div></div>
+</header>
+<main>
+  <aside>
+    <input type="file" id="file" accept=".ttl" aria-label="Load spec.ttl">
+    <input type="text" id="filter" placeholder="filter items..." aria-label="Filter items">
+    <div id="list"></div>
+  </aside>
+  <section>
+    <div class="tabs" role="tablist">
+      <button class="active" data-tab="detail">Detail</button>
+      <button data-tab="ttl">Raw Turtle</button>
+      <button data-tab="summary">Summary</button>
+    </div>
+    <div id="panel" class="empty">Drop a spec.ttl file to begin.</div>
+  </section>
+</main>
+<div class="drop-overlay" id="overlay">Drop spec.ttl to load</div>
+<script>
+const MAT_LOW=50,MAT_HIGH=85;
+const TYPES={Requirement:{cls:'req',label:'Requirements'},UserStory:{cls:'us',label:'User Stories'},
+OpenIssue:{cls:'issue',label:'Open Issues'},DecisionRecord:{cls:'adr',label:'Decisions'},
+DesignNote:{cls:'note',label:'Design Notes'},Comment:{cls:'note',label:'Comments'}};
+const PROD=['priority','acceptanceCriterion','verifiedBy','constrains'];
+const FIELDS={
+  Requirement:[['description','Description'],['priority','Priority'],['acceptanceCriterion','Acceptance'],['verifiedBy','Verified by'],['constrains','Constrains']],
+  UserStory:[['description','Description'],['asA','As a'],['iWant','I want'],['soThat','So that'],['acceptanceCriterion','Acceptance']],
+  OpenIssue:[['description','Description'],['recommendation','Recommendation'],['owner','Owner'],['resolutionStatus','Status']],
+  DecisionRecord:[['description','Description'],['decisionStatus','Status'],['rationale','Rationale'],['affects','Affects']],
+  DesignNote:[['description','Description']],Comment:[['description','Description']]};
+let S={raw:'',spec:null,items:[],selected:null,tab:'detail',error:null};
+
+function parse(text){
+  const body=text.split('\n').filter(l=>!l.trim().startsWith('@prefix')&&!l.trim().startsWith('#')).join('\n');
+  const stmts=body.split(/\s\.\s*(?=\n|$)/).map(s=>s.trim()).filter(Boolean);
+  const items=[];let spec=null;
+  for(const stmt of stmts){
+    try{
+      const m=stmt.match(/^(\S+)\s+a\s+ekga:(\w+)\s*;?([\s\S]*)$/);
+      if(!m)continue;
+      const props={};
+      for(const p of m[3].split(/\s;\s*/)){
+        const pm=p.trim().match(/^(\S+)\s+([\s\S]+)$/);
+        if(!pm)continue;
+        let v=pm[2].trim();
+        const tq=v.match(/^"""([\s\S]*?)"""/),sq=v.match(/^"((?:[^"\\]|\\.)*)"/);
+        if(tq)v=tq[1];else if(sq)v=sq[1].replace(/\\"/g,'"');
+        const k=pm[1].includes(':')?pm[1].split(':')[1]:pm[1];
+        props[k]=v;
+      }
+      const item={iri:m[1],id:m[1].replace(/^spec:/,''),type:m[2],props};
+      if(m[2]==='Specification')spec=item;else items.push(item);
+    }catch(e){console.warn('parse skip:',e)}
+  }
+  return{spec,items};
+}
+
+function maturity(items){
+  const r=items.filter(i=>i.type==='Requirement');
+  if(!r.length)return null;
+  return Math.round(100*r.filter(x=>PROD.every(p=>x.props[p])).length/r.length);
+}
+
+function hl(t){
+  return t.replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/(@prefix[^.]*\.)/g,'<span class="c">$1</span>')
+    .replace(/("""[\s\S]*?"""|"[^"]*")/g,'<span class="s">$1</span>')
+    .replace(/(spec:[\w.-]+)/g,'<span class="k">$1</span>')
+    .replace(/\b(a)\b|((?:ekga|dct|xsd|prov|rdfs|owl):\w+)/g,(_,a,b)=>`<span class="p">${a||b}</span>`);
+}
+
+function render(){
+  const panel=document.getElementById('panel');
+  if(S.error){panel.className='empty error';panel.textContent=S.error;return}
+  if(!S.spec){panel.className='empty';panel.textContent='Drop a spec.ttl file to begin.';return}
+  const sp=S.spec.props;
+  document.getElementById('title').textContent=sp.title||'Untitled';
+  document.getElementById('status').textContent=sp.status||'—';
+  document.getElementById('version').textContent=sp.hasVersion?'v'+sp.hasVersion:'';
+  const m=maturity(S.items);
+  document.getElementById('mat-label').textContent='maturity '+(m===null?'—':m+'%');
+  const bar=document.getElementById('bar');
+  bar.style.width=(m||0)+'%';
+  bar.style.background=m===null?'var(--border)':m<MAT_LOW?'var(--bad)':m<MAT_HIGH?'var(--warn)':'var(--good)';
+
+  const f=document.getElementById('filter').value.toLowerCase();
+  const groups={};
+  for(const it of S.items){
+    if(f&&!(it.id+' '+(it.props.description||'')).toLowerCase().includes(f))continue;
+    (groups[it.type]=groups[it.type]||[]).push(it);
+  }
+  const list=document.getElementById('list');list.innerHTML='';
+  for(const[type,info]of Object.entries(TYPES)){
+    const g=groups[type];if(!g||!g.length)continue;
+    g.sort((a,b)=>a.id.localeCompare(b.id,undefined,{numeric:true}));
+    const gd=document.createElement('div');gd.className='group';
+    gd.innerHTML=`<div class="group-label">${info.label} (${g.length})</div>`;
+    for(const it of g){
+      const d=document.createElement('div');
+      d.className='item '+info.cls+(S.selected&&S.selected.iri===it.iri?' active':'');
+      d.tabIndex=0;
+      d.innerHTML=`<div class="id">${it.id}</div><div class="preview">${(it.props.description||'').slice(0,70)}</div>`;
+      d.onclick=()=>{S.selected=it;render()};
+      d.onkeydown=e=>{
+        if(e.key==='Enter'||e.key===' '){e.preventDefault();d.click()}
+        else if(e.key==='ArrowDown'){e.preventDefault();
+          const all=[...document.querySelectorAll('.item')];const i=all.indexOf(d);
+          if(i<all.length-1)all[i+1].focus()}
+        else if(e.key==='ArrowUp'){e.preventDefault();
+          const all=[...document.querySelectorAll('.item')];const i=all.indexOf(d);
+          if(i>0)all[i-1].focus()}};
+      gd.appendChild(d);
+    }
+    list.appendChild(gd);
+  }
+  if(!S.items.length)list.innerHTML='<div class="empty">No items found in this file.</div>';
+
+  panel.className='';
+  if(S.tab==='summary'){
+    const counts={};S.items.forEach(i=>counts[i.type]=(counts[i.type]||0)+1);
+    const reqs=S.items.filter(i=>i.type==='Requirement').length;
+    const ready=S.items.filter(i=>i.type==='Requirement'&&PROD.every(p=>i.props[p])).length;
+    panel.innerHTML=`<h2>${sp.title||'Spec'}</h2><div class="type">Summary</div>
+      <div class="chips"><span class="chip">${S.items.length} total items</span>
+      ${Object.entries(counts).map(([k,v])=>`<span class="chip">${v} ${k}</span>`).join('')}
+      ${reqs?`<span class="chip ${ready===reqs?'good':'warn'}">${ready}/${reqs} production-ready</span>`:''}</div>
+      <dl><dt>Intent</dt><dd>${sp.intent||'<span class="missing">not set</span>'}</dd>
+      <dt>Purpose</dt><dd>${sp.purpose||'<span class="missing">not set</span>'}</dd></dl>`;
+  }else if(S.tab==='ttl'){
+    let src=S.raw,head='<h2>Full Turtle</h2><div class="type">raw source</div>';
+    if(S.selected){
+      const esc=S.selected.iri.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+      const re=new RegExp(esc+'[\\s\\S]*?\\s\\.\\s*(?:\\n|$)','m');
+      const mm=S.raw.match(re);if(mm)src=mm[0];
+      head=`<h2>${S.selected.id}</h2><div class="type">${S.selected.type} · raw turtle</div>`;
+    }
+    panel.innerHTML=head+`<pre>${hl(src)}</pre>`;
+  }else{
+    if(!S.selected){panel.className='empty';panel.textContent='Select an item from the sidebar to view its detail.';return}
+    const it=S.selected,p=it.props;
+    const fields=FIELDS[it.type]||[['description','Description']];
+    let chip='';
+    if(it.type==='Requirement'){
+      const r=PROD.every(k=>p[k]);
+      chip=`<span class="chip ${r?'good':'warn'}">${r?'production-ready':'needs work'}</span>`;
+    }
+    const dl=fields.map(([k,l])=>`<dt>${l}</dt><dd>${p[k]?p[k].replace(/</g,'&lt;'):'<span class="missing">not set</span>'}</dd>`).join('');
+    panel.innerHTML=`<h2>${it.id}</h2><div class="type">${it.type} ${chip}</div><dl>${dl}</dl>`;
+  }
+}
+
+function load(text){
+  S.raw=text;S.error=null;
+  const{spec,items}=parse(text);
+  if(!spec){S.error='No ekga:Specification found. Expected a specl-generated spec.ttl file. See the specl README for the required format.';S.spec=null;S.items=[];render();return}
+  S.spec=spec;S.items=items;S.selected=null;render();
+}
+
+document.getElementById('file').onchange=async e=>{const f=e.target.files[0];if(f)load(await f.text())};
+document.getElementById('filter').oninput=render;
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');S.tab=b.dataset.tab;render();
+});
+const ov=document.getElementById('overlay');let dc=0;
+window.addEventListener('dragenter',e=>{e.preventDefault();dc++;ov.classList.add('active')});
+window.addEventListener('dragleave',e=>{e.preventDefault();if(--dc<=0)ov.classList.remove('active')});
+window.addEventListener('dragover',e=>e.preventDefault());
+window.addEventListener('drop',async e=>{e.preventDefault();dc=0;ov.classList.remove('active');
+  const f=e.dataTransfer.files[0];if(f)load(await f.text())});
+</script></body></html>
