@@ -15,26 +15,26 @@ pip install -e .
 ## Quick start
 
 ```bash
-# Translate the EKGA spec to Turtle
-specl-translate specs/ekga/spec.md specs/ekga/spec.ttl
+# Translate the specl_explorer spec to Turtle
+specl-translate specs/specl_explorer/spec.md specs/specl_explorer/spec.ttl
 
 # Validate with explanations
-specl-validate validate specs/ekga/spec.ttl src/specl/shapes.ttl --explain
+specl-validate validate specs/specl_explorer/spec.ttl src/specl/shapes.ttl --explain
 
 # Maturity score
-specl-validate score specs/ekga/spec.ttl src/specl/shapes.ttl
+specl-validate score specs/specl_explorer/spec.ttl src/specl/shapes.ttl
 
 # Diff two versions (auto-appends CHANGELOG.spec.md)
 specl-validate diff old.ttl new.ttl
 
 # Badge
-specl-validate badge specs/ekga/spec.ttl src/specl/shapes.ttl --out badge.svg
+specl-validate badge specs/specl_explorer/spec.ttl src/specl/shapes.ttl --out badge.svg
 
 # LLM gap interrogator (requires local Ollama)
-specl-assist gaps specs/ekga/spec.ttl src/specl/shapes.ttl --model llama3.1
+specl-assist gaps specs/specl_explorer/spec.ttl src/specl/shapes.ttl --model llama3.1
 
 # Consistency check
-specl-assist check specs/ekga/spec.ttl --model llama3.1
+specl-assist check specs/specl_explorer/spec.ttl --model llama3.1
 ```
 
 ## Severity tiers
