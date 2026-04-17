@@ -1,3 +1,5 @@
+![specl](./static/logo-sm.png)
+
 # specl
 
 RDF-native, SHACL-validated specifications for spec-driven AI development.

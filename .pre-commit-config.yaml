@@ -1,9 +1,17 @@
 repos:
   - repo: local
     hooks:
-      - id: ekga-spec-validate
-        name: EKGA spec validate
-        entry: bash -c 'python spec_to_rdf.py enterprise-kg-app-spec.md spec.ttl && python validate_spec.py validate spec.ttl ekga-spec-shapes.ttl --explain'
+      - id: specl-validate
+        name: specl translate and validate
+        entry: bash -c '
+          set -e
+          for spec_dir in specs/*/; do
+            name=$(basename "$spec_dir")
+            [ -f "$spec_dir/spec.md" ] || continue
+            specl-translate "$spec_dir/spec.md" "$spec_dir/spec.ttl" --strict
+            specl-validate validate "$spec_dir/spec.ttl" src/specl/shapes.ttl --explain
+          done
+        '
         language: system
-        files: '(enterprise-kg-app-spec\.md|ekga-spec-shapes\.ttl|spec_to_rdf\.py)$'
+        files: '(specs/.*\.md|src/specl/shapes\.ttl|src/specl/spec_to_rdf\.py)$'
         pass_filenames: false
