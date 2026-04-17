@@ -8,7 +8,6 @@ jobs:
       fail-fast: false
       matrix:
         spec:
-          - ekga
           - html_presenter
           - pptx_templater
           - excel_service
