@@ -73,7 +73,3 @@ Open `src/specl/explorer.html` in a browser and drop a generated `spec.ttl` file
 ## Authoring
 
 Write specs in markdown under `specs/<name>/spec.md`. Use ID-bulleted lists for requirements (`R1.1`), user stories (`US1`), and open issues. The spec file itself carries YAML frontmatter with `spec_id`, `title`, `version`, and `status`. See `specs/ekga/spec.md` for the reference example.
-
-## Deferred features
-
-See `specs/ekga/ISSUES.md` for traceability registries, domain extension patterns, and other items scheduled for future iterations.
