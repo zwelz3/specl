@@ -5,7 +5,7 @@ description = "RDF-native, SHACL-validated specifications for spec-driven AI dev
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
-authors = [{ name = "Zachary" }]
+authors = [{ name = "Zachary Welz" }]
 dependencies = [
     "rdflib>=7.0",
     "pyshacl>=0.25",
