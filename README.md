@@ -2,6 +2,9 @@
 
 # specl
 
+[![PyPI](https://img.shields.io/pypi/v/specl)](https://pypi.org/project/specl/)
+[![spec maturity](https://zwelz3.github.io/specl/badges/specl_tool.svg)](https://zwelz3.github.io/specl/explorer.html)
+
 RDF-native, SHACL-validated specifications for spec-driven AI development.
 
 Specs are authored in markdown with stable IDs (`R1.2`, `US3`), translated to RDF, validated against a tiered SHACL shapes graph, and scored for maturity. Designed to be the durable source of truth that AI coding agents read before they write.
@@ -9,8 +12,10 @@ Specs are authored in markdown with stable IDs (`R1.2`, `US3`), translated to RD
 ## Install
 
 ```bash
-pip install -e .
+pip install specl
 ```
+
+> **conda** — a conda-forge recipe is in progress. Track it at [zwelz3/specl#issues](https://github.com/zwelz3/specl/issues).
 
 ## Quick start
 
@@ -71,10 +76,11 @@ specl/
 │   ├── core.ttl            # specl-core ontology stub
 │   └── explorer.html       # lightweight read-only spec viewer
 ├── specs/
-│   ├── specl_explorer/               # Enterprise Knowledge Graph App (WIP)
-│   ├── html_presenter/     # Interactive HTML presentations
-│   ├── pptx_templater/     # PowerPoint corporate template filler
-│   └── excel_service/      # Excel generation service
+│   ├── specl_tool/          # SPECL tool itself (dogfood)
+│   ├── specl_explorer/      # Spec explorer component
+│   ├── html_presenter/      # Interactive HTML presentations
+│   ├── pptx_templater/      # PowerPoint corporate template filler
+│   └── excel_service/       # Excel generation service
 ├── .github/workflows/      # CI validation
 └── .pre-commit-config.yaml
 ```

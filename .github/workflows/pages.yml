@@ -7,6 +7,7 @@ on:
       - 'src/specl/core.ttl'
       - 'src/specl/shapes.ttl'
       - 'src/specl/explorer.html'
+      - 'specs/**'
       - '.github/workflows/pages.yml'
   workflow_dispatch:
 
@@ -25,9 +26,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install specl
+        run: pip install -e .
+
       - name: Build pages site
         run: |
-          mkdir -p _site
+          mkdir -p _site/badges
 
           # Ontology — served as ns.ttl for content-negotiated requests
           cp src/specl/core.ttl _site/ns.ttl
@@ -38,8 +46,14 @@ jobs:
           # Explorer
           cp src/specl/explorer.html _site/explorer.html
 
-          # Extract version from core.ttl for the landing page
-          VERSION=$(grep -oP 'owl:versionInfo "\K[^"]+' src/specl/core.ttl || echo "dev")
+          # Generate maturity badges for every spec
+          for spec_dir in specs/*/; do
+            name=$(basename "$spec_dir")
+            [ -f "$spec_dir/spec.md" ] || continue
+            specl-translate "$spec_dir/spec.md" "/tmp/$name.ttl" 2>/dev/null || continue
+            specl-validate badge "/tmp/$name.ttl" src/specl/shapes.ttl --out "_site/badges/$name.svg" 2>/dev/null || true
+            echo "badge: $name"
+          done
 
           # Generate vocabulary landing page
           cat > _site/index.html <<'ENDHTML'

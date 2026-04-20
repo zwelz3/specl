@@ -8,10 +8,11 @@ jobs:
       fail-fast: false
       matrix:
         spec:
+          - specl_tool
+          - specl_explorer
           - html_presenter
           - pptx_templater
           - excel_service
-          - specl_explorer
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
