@@ -3,11 +3,6 @@ name: pages
 on:
   push:
     branches: [main]
-    paths:
-      - 'src/specl/core.ttl'
-      - 'src/specl/shapes.ttl'
-      - 'src/specl/explorer.html'
-      - '.github/workflows/pages.yml'
   workflow_dispatch:
 
 env:
