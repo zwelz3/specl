@@ -22,8 +22,8 @@ Replace the current drag-and-drop viewer (which only lists subject IDs and short
 
 ## R2 Input and Parsing
 - R2.1 The explorer must accept a `spec.ttl` file via a file input control and via drag-and-drop onto the window.
-- R2.2 It must include a minimal Turtle parser sufficient for the specl output format (subject + indented predicates, `@prefix` declarations, `"..."` and `"""..."""` string literals, IRIs with `spec:` and `ekga:` prefixes).
-- R2.3 The parser must extract all `ekga:Specification`, `ekga:Requirement`, `ekga:UserStory`, `ekga:OpenIssue`, `ekga:DecisionRecord`, `ekga:DesignNote`, and `ekga:Comment` individuals with their full property sets.
+- R2.2 It must include a minimal Turtle parser sufficient for the specl output format (subject + indented predicates, `@prefix` declarations, `"..."` and `"""..."""` string literals, IRIs with `spec:` and `specl:` prefixes).
+- R2.3 The parser must extract all `specl:Specification`, `specl:Requirement`, `specl:UserStory`, `specl:OpenIssue`, `specl:DecisionRecord`, `specl:DesignNote`, and `specl:Comment` individuals with their full property sets.
 - R2.4 Parse failures on individual statements must not crash the tool; log to console and skip the malformed statement.
 - R2.5 The raw file text must be retained in memory so the Raw Turtle tab can display it exactly as loaded.
 
@@ -43,8 +43,8 @@ Replace the current drag-and-drop viewer (which only lists subject IDs and short
 - R4.6 Clicking a sidebar item selects it, highlights the row, and updates the main panel. The selection must persist across tab changes.
 
 ## R5 Header and Maturity
-- R5.1 The header must display the spec's `dct:title`, `dct:hasVersion`, and `ekga:status` properties.
-- R5.2 A maturity score must be computed client-side as the percentage of `ekga:Requirement` individuals that carry all four production properties: `ekga:priority`, `ekga:acceptanceCriterion`, `ekga:verifiedBy`, and `ekga:constrains`.
+- R5.1 The header must display the spec's `dct:title`, `dct:hasVersion`, and `specl:status` properties.
+- R5.2 A maturity score must be computed client-side as the percentage of `specl:Requirement` individuals that carry all four production properties: `specl:priority`, `specl:acceptanceCriterion`, `specl:verifiedBy`, and `specl:constrains`.
 - R5.3 The score must render as both a numeric percentage and a horizontal progress bar.
 - R5.4 The bar color must shift: red below 50%, amber from 50% to 84%, green at 85% and above. Thresholds must be declared as constants at the top of the script for easy tuning.
 - R5.5 If the loaded spec has zero requirements, the maturity score displays as "—" and the bar is empty, not zero.
@@ -69,7 +69,7 @@ Replace the current drag-and-drop viewer (which only lists subject IDs and short
 
 ## R8 Summary Tab
 - R8.1 Shows total item count, requirement count, and production-ready ratio (e.g., "3/8 production-ready") as chips.
-- R8.2 Shows the spec's `ekga:intent` and `ekga:purpose` prose in full.
+- R8.2 Shows the spec's `specl:intent` and `specl:purpose` prose in full.
 - R8.3 Shows a per-type breakdown (how many requirements, stories, open issues, etc.).
 - R8.4 Must render regardless of whether a sidebar item is selected.
 
@@ -102,6 +102,7 @@ Replace the current drag-and-drop viewer (which only lists subject IDs and short
 
 # Open Questions and Gaps
 
+- Whether to support slash namespaces (`/`) as an alternative to the current hash namespaces (`#`) for spec instances. Hash namespaces resolve all terms to a single document and are the right default for specs authored as a unit. Slash namespaces (as used by Schema.org, where `https://schema.org/Person` returns a dedicated page) would let specs host each requirement, story, or decision at its own dereferenceable URL. This matters for large, multi-team specs where individual elements need independent linking, versioning, or API-driven resolution. Recommendation: support a `namespace_style: hash | slash` front-matter key in a future release; default to `hash`; document the tradeoffs in SYNTAX.md.
 - Whether to support loading the companion `spec.md` alongside the `.ttl` for side-by-side reading. Recommendation: defer to v2.
 - Whether to render Mermaid diagrams embedded in description strings. Recommendation: defer; out of scope for a read-only viewer.
 - Whether to show SHACL validation results inline by also loading a `shapes.ttl`. Recommendation: defer to v2 as a separate "Validation" tab.

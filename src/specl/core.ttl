@@ -1,41 +1,41 @@
-@prefix ekga: <https://example.org/ekga/ns#> .
+@prefix specl: <https://w3id.org/specl/ns#> .
 @prefix owl:  <http://www.w3.org/2002/07/owl#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix dct:  <http://purl.org/dc/terms/> .
 @prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
 
-<https://example.org/ekga/ns> a owl:Ontology ;
-    dct:title "EKGA Core Ontology" ;
+<https://w3id.org/specl/ns> a owl:Ontology ;
+    dct:title "SPECL Core Ontology" ;
     owl:versionInfo "0.1.0" .
 
 # --- Classes ---
-ekga:Specification   a owl:Class ; rdfs:label "Specification" .
-ekga:Requirement     a owl:Class ; rdfs:label "Requirement" .
-ekga:UserStory       a owl:Class ; rdfs:label "User Story" .
-ekga:DesignNote      a owl:Class ; rdfs:label "Design Note" .
-ekga:Comment         a owl:Class ; rdfs:label "Comment" .
-ekga:OpenIssue       a owl:Class ; rdfs:label "Open Issue" .
-ekga:DecisionRecord  a owl:Class ; rdfs:label "Decision Record (ADR)" .
-ekga:Component       a owl:Class ; rdfs:label "Component" .
-ekga:Test            a owl:Class ; rdfs:label "Verification Artifact" .
+specl:Specification   a owl:Class ; rdfs:label "Specification" .
+specl:Requirement     a owl:Class ; rdfs:label "Requirement" .
+specl:UserStory       a owl:Class ; rdfs:label "User Story" .
+specl:DesignNote      a owl:Class ; rdfs:label "Design Note" .
+specl:Comment         a owl:Class ; rdfs:label "Comment" .
+specl:OpenIssue       a owl:Class ; rdfs:label "Open Issue" .
+specl:DecisionRecord  a owl:Class ; rdfs:label "Decision Record (ADR)" .
+specl:Component       a owl:Class ; rdfs:label "Component" .
+specl:Test            a owl:Class ; rdfs:label "Verification Artifact" .
 
 # --- Object properties ---
-ekga:partOf       a owl:ObjectProperty ; rdfs:domain ekga:Requirement ; rdfs:range ekga:Specification .
-ekga:verifiedBy   a owl:ObjectProperty ; rdfs:range ekga:Test .
-ekga:constrains   a owl:ObjectProperty ; rdfs:range ekga:Component .
-ekga:affects      a owl:ObjectProperty .
+specl:partOf       a owl:ObjectProperty ; rdfs:domain specl:Requirement ; rdfs:range specl:Specification .
+specl:verifiedBy   a owl:ObjectProperty ; rdfs:range specl:Test .
+specl:constrains   a owl:ObjectProperty ; rdfs:range specl:Component .
+specl:affects      a owl:ObjectProperty .
 
 # --- Datatype properties ---
-ekga:intent              a owl:DatatypeProperty ; rdfs:range xsd:string .
-ekga:purpose             a owl:DatatypeProperty ; rdfs:range xsd:string .
-ekga:status              a owl:DatatypeProperty ; rdfs:range xsd:string .
-ekga:priority            a owl:DatatypeProperty ; rdfs:range xsd:string .
-ekga:acceptanceCriterion a owl:DatatypeProperty ; rdfs:range xsd:string .
-ekga:asA                 a owl:DatatypeProperty ; rdfs:range xsd:string .
-ekga:iWant               a owl:DatatypeProperty ; rdfs:range xsd:string .
-ekga:soThat              a owl:DatatypeProperty ; rdfs:range xsd:string .
-ekga:recommendation      a owl:DatatypeProperty ; rdfs:range xsd:string .
-ekga:owner               a owl:DatatypeProperty ; rdfs:range xsd:string .
-ekga:resolutionStatus    a owl:DatatypeProperty ; rdfs:range xsd:string .
-ekga:decisionStatus      a owl:DatatypeProperty ; rdfs:range xsd:string .
-ekga:rationale           a owl:DatatypeProperty ; rdfs:range xsd:string .
+specl:intent              a owl:DatatypeProperty ; rdfs:range xsd:string .
+specl:purpose             a owl:DatatypeProperty ; rdfs:range xsd:string .
+specl:status              a owl:DatatypeProperty ; rdfs:range xsd:string .
+specl:priority            a owl:DatatypeProperty ; rdfs:range xsd:string .
+specl:acceptanceCriterion a owl:DatatypeProperty ; rdfs:range xsd:string .
+specl:asA                 a owl:DatatypeProperty ; rdfs:range xsd:string .
+specl:iWant               a owl:DatatypeProperty ; rdfs:range xsd:string .
+specl:soThat              a owl:DatatypeProperty ; rdfs:range xsd:string .
+specl:recommendation      a owl:DatatypeProperty ; rdfs:range xsd:string .
+specl:owner               a owl:DatatypeProperty ; rdfs:range xsd:string .
+specl:resolutionStatus    a owl:DatatypeProperty ; rdfs:range xsd:string .
+specl:decisionStatus      a owl:DatatypeProperty ; rdfs:range xsd:string .
+specl:rationale           a owl:DatatypeProperty ; rdfs:range xsd:string .

@@ -23,7 +23,7 @@ maturity without external tooling.
 - **DecisionRecord support**. New section `# Decisions` recognized,
   with `D`-prefixed IDs and sub-bullet annotations (`status`,
   `rationale`, `affects`). `status:` is context-sensitive and maps to
-  `ekga:decisionStatus` for decisions, `ekga:resolutionStatus` for
+  `specl:decisionStatus` for decisions, `specl:resolutionStatus` for
   open issues.
 - **Front-matter comment block** `<!--specl ... -->` for
   spec-level metadata that does not belong in YAML front-matter. First

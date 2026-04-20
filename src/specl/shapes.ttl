@@ -1,12 +1,12 @@
-@prefix ekga: <https://example.org/ekga/ns#> .
-@prefix spec: <https://example.org/ekga/spec/> .
+@prefix specl: <https://w3id.org/specl/ns#> .
+@prefix spec: <https://w3id.org/specl/spec#> .
 @prefix sh:   <http://www.w3.org/ns/shacl#> .
 @prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
 @prefix dct:  <http://purl.org/dc/terms/> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 
 # =============================================================================
-# EKGA Spec Shapes
+# SPECL Spec Shapes
 # -----------------------------------------------------------------------------
 # Two-tier severity so the spec can evolve from prototype to production:
 #
@@ -18,11 +18,11 @@
 #                   and that is fine.
 #
 # A CI gate can fail on Violations only during prototype, then tighten to
-# fail on Warnings once the spec is declared `ekga:status "production"`.
+# fail on Warnings once the spec is declared `specl:status "production"`.
 # =============================================================================
 
-ekga:SpecificationShape a sh:NodeShape ;
-    sh:targetClass ekga:Specification ;
+specl:SpecificationShape a sh:NodeShape ;
+    sh:targetClass specl:Specification ;
 
     # --- Violations: the spec must at least identify itself ----------------
     sh:property [
@@ -36,7 +36,7 @@ ekga:SpecificationShape a sh:NodeShape ;
         sh:severity sh:Violation ;
         sh:message "Specification must declare a version." ] ;
     sh:property [
-        sh:path ekga:status ;
+        sh:path specl:status ;
         sh:minCount 1 ;
         sh:in ( "draft" "prototype" "review" "production" ) ;
         sh:severity sh:Violation ;
@@ -44,12 +44,12 @@ ekga:SpecificationShape a sh:NodeShape ;
 
     # --- Warnings: things a production spec should have --------------------
     sh:property [
-        sh:path ekga:intent ;
+        sh:path specl:intent ;
         sh:minCount 1 ;
         sh:severity sh:Warning ;
         sh:message "Specification should declare its intent." ] ;
     sh:property [
-        sh:path ekga:purpose ;
+        sh:path specl:purpose ;
         sh:minCount 1 ;
         sh:severity sh:Warning ;
         sh:message "Specification should declare the application purpose." ] ;
@@ -60,8 +60,8 @@ ekga:SpecificationShape a sh:NodeShape ;
         sh:message "Specification should record a creation date." ] .
 
 
-ekga:RequirementShape a sh:NodeShape ;
-    sh:targetClass ekga:Requirement ;
+specl:RequirementShape a sh:NodeShape ;
+    sh:targetClass specl:Requirement ;
 
     # --- Violations: every requirement is identified and attached ---------
     sh:property [
@@ -71,37 +71,37 @@ ekga:RequirementShape a sh:NodeShape ;
         sh:severity sh:Violation ;
         sh:message "Requirement needs a description of at least 10 characters." ] ;
     sh:property [
-        sh:path ekga:partOf ;
-        sh:minCount 1 ; sh:class ekga:Specification ;
+        sh:path specl:partOf ;
+        sh:minCount 1 ; sh:class specl:Specification ;
         sh:severity sh:Violation ;
-        sh:message "Requirement must be linked to its parent Specification via ekga:partOf." ] ;
+        sh:message "Requirement must be linked to its parent Specification via specl:partOf." ] ;
 
     # --- Warnings: production-grade requirements need more --------------
     sh:property [
-        sh:path ekga:priority ;
+        sh:path specl:priority ;
         sh:in ( "MUST" "SHOULD" "COULD" "WONT" ) ;
         sh:maxCount 1 ;
         sh:severity sh:Warning ;
         sh:message "Requirement should carry a MoSCoW priority (MUST/SHOULD/COULD/WONT)." ] ;
     sh:property [
-        sh:path ekga:acceptanceCriterion ;
+        sh:path specl:acceptanceCriterion ;
         sh:minCount 1 ; sh:datatype xsd:string ;
         sh:severity sh:Warning ;
         sh:message "Requirement should have at least one acceptance criterion." ] ;
     sh:property [
-        sh:path ekga:verifiedBy ;
+        sh:path specl:verifiedBy ;
         sh:minCount 1 ;
         sh:severity sh:Warning ;
-        sh:message "Requirement should point to a test or verification artifact via ekga:verifiedBy." ] ;
+        sh:message "Requirement should point to a test or verification artifact via specl:verifiedBy." ] ;
     sh:property [
-        sh:path ekga:constrains ;
+        sh:path specl:constrains ;
         sh:minCount 1 ;
         sh:severity sh:Warning ;
         sh:message "Requirement should link to at least one component it constrains." ] .
 
 
-ekga:UserStoryShape a sh:NodeShape ;
-    sh:targetClass ekga:UserStory ;
+specl:UserStoryShape a sh:NodeShape ;
+    sh:targetClass specl:UserStory ;
 
     sh:property [
         sh:path dct:description ;
@@ -109,31 +109,31 @@ ekga:UserStoryShape a sh:NodeShape ;
         sh:severity sh:Violation ;
         sh:message "User story needs a description." ] ;
     sh:property [
-        sh:path ekga:partOf ;
-        sh:minCount 1 ; sh:class ekga:Specification ;
+        sh:path specl:partOf ;
+        sh:minCount 1 ; sh:class specl:Specification ;
         sh:severity sh:Violation ;
         sh:message "User story must be linked to its parent Specification." ] ;
 
     # Warnings: the As/I want/So that triad and a linked persona
     sh:property [
-        sh:path ekga:asA ;
+        sh:path specl:asA ;
         sh:minCount 1 ;
         sh:severity sh:Warning ;
-        sh:message "User story should declare a persona via ekga:asA." ] ;
+        sh:message "User story should declare a persona via specl:asA." ] ;
     sh:property [
-        sh:path ekga:soThat ;
+        sh:path specl:soThat ;
         sh:minCount 1 ;
         sh:severity sh:Warning ;
-        sh:message "User story should declare the outcome/benefit via ekga:soThat." ] ;
+        sh:message "User story should declare the outcome/benefit via specl:soThat." ] ;
     sh:property [
-        sh:path ekga:acceptanceCriterion ;
+        sh:path specl:acceptanceCriterion ;
         sh:minCount 1 ;
         sh:severity sh:Warning ;
         sh:message "User story should have at least one Given/When/Then acceptance criterion." ] .
 
 
-ekga:OpenIssueShape a sh:NodeShape ;
-    sh:targetClass ekga:OpenIssue ;
+specl:OpenIssueShape a sh:NodeShape ;
+    sh:targetClass specl:OpenIssue ;
 
     sh:property [
         sh:path dct:description ;
@@ -143,17 +143,17 @@ ekga:OpenIssueShape a sh:NodeShape ;
 
     # Warnings: as the spec matures, open issues should resolve or be owned
     sh:property [
-        sh:path ekga:recommendation ;
+        sh:path specl:recommendation ;
         sh:minCount 1 ;
         sh:severity sh:Warning ;
         sh:message "Open issue should carry a recommendation." ] ;
     sh:property [
-        sh:path ekga:owner ;
+        sh:path specl:owner ;
         sh:minCount 1 ;
         sh:severity sh:Warning ;
         sh:message "Open issue should have a named owner." ] ;
     sh:property [
-        sh:path ekga:resolutionStatus ;
+        sh:path specl:resolutionStatus ;
         sh:in ( "open" "in-review" "resolved" "deferred" ) ;
         sh:maxCount 1 ;
         sh:severity sh:Warning ;
@@ -161,26 +161,26 @@ ekga:OpenIssueShape a sh:NodeShape ;
 
 
 # Decision records: optional in prototype, encouraged in production.
-ekga:DecisionRecordShape a sh:NodeShape ;
-    sh:targetClass ekga:DecisionRecord ;
+specl:DecisionRecordShape a sh:NodeShape ;
+    sh:targetClass specl:DecisionRecord ;
     sh:property [
         sh:path dct:title ;
         sh:minCount 1 ;
         sh:severity sh:Violation ;
         sh:message "Decision record needs a title." ] ;
     sh:property [
-        sh:path ekga:decisionStatus ;
+        sh:path specl:decisionStatus ;
         sh:in ( "proposed" "accepted" "superseded" "rejected" ) ;
         sh:maxCount 1 ;
         sh:severity sh:Warning ;
         sh:message "Decision record should declare status." ] ;
     sh:property [
-        sh:path ekga:rationale ;
+        sh:path specl:rationale ;
         sh:minCount 1 ;
         sh:severity sh:Warning ;
         sh:message "Decision record should capture rationale." ] ;
     sh:property [
-        sh:path ekga:affects ;
+        sh:path specl:affects ;
         sh:minCount 1 ;
         sh:severity sh:Warning ;
         sh:message "Decision record should link to the requirements or components it affects." ] .

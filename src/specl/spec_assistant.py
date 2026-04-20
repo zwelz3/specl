@@ -1,4 +1,4 @@
-"""spec_assistant.py — LLM helpers for the EKGA spec. Ollama only.
+"""spec_assistant.py — LLM helpers for the SPECL spec. Ollama only.
 
   python spec_assistant.py gaps   spec.ttl shapes.ttl [--model llama3.1]
   python spec_assistant.py check  spec.ttl            [--model llama3.1]
@@ -45,7 +45,7 @@ def cmd_check(args):
     g = load(args.data)
     reqs = []
     for r in g.subjects(__import__("rdflib").RDF.type,
-                        __import__("rdflib").URIRef("https://example.org/ekga/ns#Requirement")):
+                        __import__("rdflib").URIRef("https://w3id.org/specl/ns#Requirement")):
         desc = g.value(r, __import__("rdflib").URIRef("http://purl.org/dc/terms/description"))
         reqs.append(f"{str(r).split('/')[-1]}: {desc}")
     corpus = "\n".join(reqs)

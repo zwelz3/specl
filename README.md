@@ -42,9 +42,22 @@ specl-assist check specs/specl_explorer/spec.ttl --model llama3.1
 SHACL shapes are split two ways so specs can evolve:
 
 - **Violations** — structural. Always fail. A spec that violates these is broken.
-- **Warnings** — production-readiness. Accumulate during prototyping, block only when `ekga:status "production"`.
+- **Warnings** — production-readiness. Accumulate during prototyping, block only when `specl:status "production"`.
 
 The gate reads status from the spec itself, so no CI reconfiguration is needed as the spec matures.
+
+## Namespaces
+
+SPECL uses permanent w3id.org identifiers so IRIs survive hosting changes:
+
+| Prefix | URI | Purpose |
+|--------|-----|---------|
+| `specl:` | `https://w3id.org/specl/ns#` | Vocabulary (classes, properties) |
+| `spec:` | `https://w3id.org/specl/spec#` | Spec instances (requirements, stories) |
+
+Both use **hash namespaces** (`#`). This means every term in a namespace resolves to a single document — one HTTP request returns the full ontology or the full spec. This is the right choice when terms are defined together and make sense as a unit (the way SHACL uses `https://www.w3.org/ns/shacl#`).
+
+The alternative is **slash namespaces** (`/`), where each term is its own URL and can return its own document. This is the pattern Schema.org uses (`https://schema.org/Person`, `https://schema.org/Organization`) so each concept has a dedicated page. SPECL may support slash namespaces in a future release for specs that want per-element hosting — see the roadmap in the SPECL spec.
 
 ## Layout
 
@@ -55,10 +68,10 @@ specl/
 │   ├── validate_spec.py    # validate / diff / score / badge
 │   ├── spec_assistant.py   # LLM gap interrogator + consistency checker
 │   ├── shapes.ttl          # tiered SHACL shapes
-│   ├── core.ttl            # ekga-core ontology stub
+│   ├── core.ttl            # specl-core ontology stub
 │   └── explorer.html       # lightweight read-only spec viewer
 ├── specs/
-│   ├── ekga/               # Enterprise Knowledge Graph App (WIP)
+│   ├── specl_explorer/               # Enterprise Knowledge Graph App (WIP)
 │   ├── html_presenter/     # Interactive HTML presentations
 │   ├── pptx_templater/     # PowerPoint corporate template filler
 │   └── excel_service/      # Excel generation service
@@ -72,8 +85,8 @@ Open `src/specl/explorer.html` in a browser and drop a generated `spec.ttl` file
 
 ## Authoring
 
-Write specs in markdown under `specs/<name>/spec.md`. Use ID-bulleted lists for requirements (`R1.1`), user stories (`US1`), and open issues. The spec file itself carries YAML frontmatter with `spec_id`, `title`, `version`, and `status`. See `specs/ekga/spec.md` for the reference example.
+Write specs in markdown under `specs/<name>/spec.md`. Use ID-bulleted lists for requirements (`R1.1`), user stories (`US1`), and open issues. The spec file itself carries YAML frontmatter with `spec_id`, `title`, `version`, and `status`. See `specs/specl_explorer/spec.md` for the reference example.
 
 ## Deferred features
 
-See `specs/ekga/ISSUES.md` for traceability registries, domain extension patterns, and other items scheduled for future iterations.
+See `specs/specl_explorer/ISSUES.md` for traceability registries, domain extension patterns, and other items scheduled for future iterations.

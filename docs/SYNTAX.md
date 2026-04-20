@@ -70,7 +70,7 @@ Two mechanisms, used for different purposes:
   - constrains: HolonicDataset, HolonicStore, Backend
 ```
 
-produces three separate `ekga:constrains` triples.
+produces three separate `specl:constrains` triples.
 
 **Multiple sub-bullets** (prose keys: `acceptance`, `verifiedBy`, or
 any key where commas appear naturally in the value):
@@ -80,28 +80,28 @@ any key where commas appear naturally in the value):
   - acceptance: Given an existing holon, when add_holon is called again, then the duplicate is rejected.
 ```
 
-produces two separate `ekga:acceptanceCriterion` triples, with commas
+produces two separate `specl:acceptanceCriterion` triples, with commas
 inside each value preserved.
 
 ## Annotation key reference
 
 | Key | RDF property | Classes | Multi-value |
 |-----|--------------|---------|-------------|
-| `priority` | `ekga:priority` | Requirement | single |
-| `acceptance` | `ekga:acceptanceCriterion` | Requirement, UserStory | multiple sub-bullets |
-| `verifiedBy` | `ekga:verifiedBy` | Requirement | multiple sub-bullets |
-| `constrains` | `ekga:constrains` | Requirement | comma-split |
-| `asA` | `ekga:asA` | UserStory | single |
-| `soThat` | `ekga:soThat` | UserStory | single |
-| `owner` | `ekga:owner` | OpenIssue, DecisionRecord | single |
-| `recommendation` | `ekga:recommendation` | OpenIssue | single |
-| `status` | `ekga:resolutionStatus` or `ekga:decisionStatus` | OpenIssue / DecisionRecord | single |
-| `rationale` | `ekga:rationale` | DecisionRecord | single |
-| `affects` | `ekga:affects` | DecisionRecord | comma-split |
+| `priority` | `specl:priority` | Requirement | single |
+| `acceptance` | `specl:acceptanceCriterion` | Requirement, UserStory | multiple sub-bullets |
+| `verifiedBy` | `specl:verifiedBy` | Requirement | multiple sub-bullets |
+| `constrains` | `specl:constrains` | Requirement | comma-split |
+| `asA` | `specl:asA` | UserStory | single |
+| `soThat` | `specl:soThat` | UserStory | single |
+| `owner` | `specl:owner` | OpenIssue, DecisionRecord | single |
+| `recommendation` | `specl:recommendation` | OpenIssue | single |
+| `status` | `specl:resolutionStatus` or `specl:decisionStatus` | OpenIssue / DecisionRecord | single |
+| `rationale` | `specl:rationale` | DecisionRecord | single |
+| `affects` | `specl:affects` | DecisionRecord | comma-split |
 
 `status:` is context-sensitive. On an `OQ`-prefixed bullet it maps to
-`ekga:resolutionStatus` (enum: `open`, `in-review`, `resolved`,
-`deferred`). On a `D`-prefixed bullet it maps to `ekga:decisionStatus`
+`specl:resolutionStatus` (enum: `open`, `in-review`, `resolved`,
+`deferred`). On a `D`-prefixed bullet it maps to `specl:decisionStatus`
 (enum: `proposed`, `accepted`, `superseded`, `rejected`).
 
 ## Backward compatibility

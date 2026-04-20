@@ -1,4 +1,4 @@
-"""validate_spec.py — validate, diff, score, and badge the EKGA spec.
+"""validate_spec.py — validate, diff, score, and badge the SPECL spec.
 
 Usage:
   python validate_spec.py validate spec.ttl shapes.ttl [--explain] [--json out.json]
@@ -6,7 +6,7 @@ Usage:
   python validate_spec.py score spec.ttl shapes.ttl
   python validate_spec.py badge spec.ttl shapes.ttl --out badge.svg
 
-Severity gate is driven by ekga:status in the data graph:
+Severity gate is driven by specl:status in the data graph:
   draft|prototype -> fail only on Violations
   review          -> report Warnings, do not fail
   production      -> fail on Warnings too
@@ -16,14 +16,14 @@ import sys, json, argparse
 from rdflib import Graph, Namespace, RDF
 from pyshacl import validate
 
-EKGA = Namespace("https://example.org/ekga/ns#")
+SPECL = Namespace("https://w3id.org/specl/ns#")
 SH = Namespace("http://www.w3.org/ns/shacl#")
 
 def load(p): g = Graph(); g.parse(p, format="turtle"); return g
 
 def spec_status(g):
-    for s in g.subjects(RDF.type, EKGA.Specification):
-        v = g.value(s, EKGA.status)
+    for s in g.subjects(RDF.type, SPECL.Specification):
+        v = g.value(s, SPECL.status)
         if v: return str(v).lower()
     return "draft"
 
@@ -64,7 +64,7 @@ def cmd_validate(args):
 
 def _req_map(g):
     out = {}
-    for r in g.subjects(RDF.type, EKGA.Requirement):
+    for r in g.subjects(RDF.type, SPECL.Requirement):
         out[str(r)] = {str(p).split("#")[-1]: str(o) for p, o in g.predicate_objects(r)}
     return out
 
@@ -93,7 +93,7 @@ def cmd_diff(args):
 def cmd_score(args):
     g, s = load(args.data), load(args.shapes)
     _, results, _ = run_shacl(g, s)
-    reqs = list(g.subjects(RDF.type, EKGA.Requirement))
+    reqs = list(g.subjects(RDF.type, SPECL.Requirement))
     n = len(reqs) or 1
     bad = {r["focus"] for r in results}
     good = sum(1 for r in reqs if str(r) not in bad)

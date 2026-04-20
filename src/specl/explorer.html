@@ -93,7 +93,7 @@ function parse(text){
   const items=[];let spec=null;
   for(const stmt of stmts){
     try{
-      const m=stmt.match(/^(\S+)\s+a\s+ekga:(\w+)\s*;?([\s\S]*)$/);
+      const m=stmt.match(/^(\S+)\s+a\s+specl:(\w+)\s*;?([\s\S]*)$/);
       if(!m)continue;
       const props={};
       for(const p of m[3].split(/\s;\s*/)){
@@ -123,7 +123,7 @@ function hl(t){
     .replace(/(@prefix[^.]*\.)/g,'<span class="c">$1</span>')
     .replace(/("""[\s\S]*?"""|"[^"]*")/g,'<span class="s">$1</span>')
     .replace(/(spec:[\w.-]+)/g,'<span class="k">$1</span>')
-    .replace(/\b(a)\b|((?:ekga|dct|xsd|prov|rdfs|owl):\w+)/g,(_,a,b)=>`<span class="p">${a||b}</span>`);
+    .replace(/\b(a)\b|((?:specl|dct|xsd|prov|rdfs|owl):\w+)/g,(_,a,b)=>`<span class="p">${a||b}</span>`);
 }
 
 function render(){
@@ -209,7 +209,7 @@ function render(){
 function load(text){
   S.raw=text;S.error=null;
   const{spec,items}=parse(text);
-  if(!spec){S.error='No ekga:Specification found. Expected a specl-generated spec.ttl file. See the specl README for the required format.';S.spec=null;S.items=[];render();return}
+  if(!spec){S.error='No specl:Specification found. Expected a specl-generated spec.ttl file. See the specl README for the required format.';S.spec=null;S.items=[];render();return}
   S.spec=spec;S.items=items;S.selected=null;render();
 }
 

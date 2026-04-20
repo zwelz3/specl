@@ -22,10 +22,10 @@ from __future__ import annotations
 import re, sys, hashlib, datetime as dt, argparse
 from pathlib import Path
 
-NS = "https://example.org/ekga/ns#"
-SPEC = "https://example.org/ekga/spec/"
+NS = "https://w3id.org/specl/ns#"
+SPEC = "https://w3id.org/specl/spec#"
 
-HEADER = f"""@prefix ekga: <{NS}> .
+HEADER = f"""@prefix specl: <{NS}> .
 @prefix spec: <{SPEC}> .
 @prefix prov: <http://www.w3.org/ns/prov#> .
 @prefix dct:  <http://purl.org/dc/terms/> .
@@ -140,8 +140,8 @@ def parse_bullets(lines, warnings):
 
 
 def _emit_item(iri, cls, description, annotations, spec_iri):
-    body = [f"{iri} a ekga:{cls} ;",
-            f"    ekga:partOf {spec_iri} ;",
+    body = [f"{iri} a specl:{cls} ;",
+            f"    specl:partOf {spec_iri} ;",
             f'    dct:description "{esc(description)}"']
     triples = []
     for key, values in annotations.items():
@@ -152,7 +152,7 @@ def _emit_item(iri, cls, description, annotations, spec_iri):
         if not prop:
             continue
         for v in values:
-            triples.append(f'    ekga:{prop} "{esc(v)}"')
+            triples.append(f'    specl:{prop} "{esc(v)}"')
     if triples:
         body[-1] = body[-1] + " ;"
         for i, t in enumerate(triples):
@@ -168,13 +168,13 @@ def emit(front, sections, fm_comments, warnings):
     created = fm_comments.get("created", dt.date.today().isoformat())
     intent = " ".join(sections.get("Intent", [])).strip()
     purpose = " ".join(sections.get("Purpose", [])).strip()
-    out.append(f"""{spec_iri} a ekga:Specification ;
+    out.append(f"""{spec_iri} a specl:Specification ;
     dct:title "{esc(front.get('title', 'Untitled'))}" ;
     dct:hasVersion "{front.get('version', '0.1.0')}" ;
-    ekga:status "{front.get('status', 'draft')}" ;
+    specl:status "{front.get('status', 'draft')}" ;
     dct:created "{created}"^^xsd:date ;
-    ekga:intent \"\"\"{esc(intent)}\"\"\" ;
-    ekga:purpose \"\"\"{esc(purpose)}\"\"\" .
+    specl:intent \"\"\"{esc(intent)}\"\"\" ;
+    specl:purpose \"\"\"{esc(purpose)}\"\"\" .
 
 """)
     for section_name, cls, prefixes in SECTION_MAP:
