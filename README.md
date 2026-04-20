@@ -9,7 +9,7 @@ Specs are authored in markdown with stable IDs (`R1.2`, `US3`), translated to RD
 ## Install
 
 ```bash
-pip install specl
+pip install -e .
 ```
 
 ## Quick start

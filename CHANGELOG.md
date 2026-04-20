@@ -1,6 +1,6 @@
 # specl changelog
 
-## 0.2.1
+## 0.2.0
 
 Parser extension for structured per-item annotations. Addresses the
 core limitation that prototype-status specs could not reach non-zero
@@ -35,7 +35,7 @@ maturity without external tooling.
 ### Changed
 
 - Turtle output now uses one-property-per-line formatting (added in
-  0.1.x, reconfirmed in 0.2.1 for readability and clean git diffs).
+  0.1.x, reconfirmed in 0.2.0 for readability and clean git diffs).
 - Section `# Open Issues` is now recognized alongside
   `# Open Questions` and `# Open Questions and Gaps (flag for follow-up)`.
 
