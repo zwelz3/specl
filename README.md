@@ -3,7 +3,7 @@
 # specl
 
 [![PyPI](https://img.shields.io/pypi/v/specl)](https://pypi.org/project/specl/)
-[![spec maturity](https://zwelz3.github.io/specl/badges/specl_tool.svg)](https://zwelz3.github.io/specl/explorer.html)
+[![spec maturity](https://raw.githubusercontent.com/zwelz3/specl/main/static/badges/specl_tool.svg)](https://github.com/zwelz3/specl/blob/main/specs/specl_tool/spec.md)
 
 RDF-native, SHACL-validated specifications for spec-driven AI development.
 

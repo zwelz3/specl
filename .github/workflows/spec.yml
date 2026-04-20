@@ -1,5 +1,11 @@
 name: spec
-on: [push, pull_request]
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   validate:
@@ -14,10 +20,10 @@ jobs:
           - pptx_templater
           - excel_service
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
         with:
-          python-version: '3.11'
+          python-version: '3.12'
       - name: Install specl
         run: pip install -e .
       - name: Translate ${{ matrix.spec }}
@@ -27,11 +33,35 @@ jobs:
       - name: Score ${{ matrix.spec }}
         run: specl-validate score specs/${{ matrix.spec }}/spec.ttl src/specl/shapes.ttl
       - name: Badge ${{ matrix.spec }}
-        run: specl-validate badge specs/${{ matrix.spec }}/spec.ttl src/specl/shapes.ttl --out specs/${{ matrix.spec }}/badge.svg
+        run: |
+          mkdir -p static/badges
+          specl-validate badge specs/${{ matrix.spec }}/spec.ttl src/specl/shapes.ttl --out static/badges/${{ matrix.spec }}.svg
       - uses: actions/upload-artifact@v4
         with:
           name: spec-report-${{ matrix.spec }}
           path: |
             specs/${{ matrix.spec }}/spec.ttl
             specs/${{ matrix.spec }}/report.json
-            specs/${{ matrix.spec }}/badge.svg
+            static/badges/${{ matrix.spec }}.svg
+
+  commit-badges:
+    needs: validate
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+      - name: Download all badges
+        uses: actions/download-artifact@v4
+        with:
+          pattern: spec-report-*
+          merge-multiple: true
+      - name: Commit badges
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add static/badges/*.svg
+          git diff --staged --quiet && echo "No badge changes" && exit 0
+          git commit -m "ci: update maturity badges [skip ci]"
+          git push

@@ -7,9 +7,11 @@ on:
       - 'src/specl/core.ttl'
       - 'src/specl/shapes.ttl'
       - 'src/specl/explorer.html'
-      - 'specs/**'
       - '.github/workflows/pages.yml'
   workflow_dispatch:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 permissions:
   contents: read
@@ -24,20 +26,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      - name: Install specl
-        run: pip install -e .
+      - uses: actions/checkout@v6
 
       - name: Build pages site
         run: |
-          mkdir -p _site/badges
+          mkdir -p _site
 
-          # Ontology — served as ns.ttl for content-negotiated requests
+          # Ontology
           cp src/specl/core.ttl _site/ns.ttl
 
           # Shapes
@@ -46,108 +41,82 @@ jobs:
           # Explorer
           cp src/specl/explorer.html _site/explorer.html
 
-          # Generate maturity badges for every spec
-          for spec_dir in specs/*/; do
-            name=$(basename "$spec_dir")
-            [ -f "$spec_dir/spec.md" ] || continue
-            specl-translate "$spec_dir/spec.md" "/tmp/$name.ttl" 2>/dev/null || continue
-            specl-validate badge "/tmp/$name.ttl" src/specl/shapes.ttl --out "_site/badges/$name.svg" 2>/dev/null || true
-            echo "badge: $name"
-          done
+          # Badges (committed by spec workflow)
+          if [ -d static/badges ]; then
+            cp -r static/badges _site/badges
+          fi
 
           # Generate vocabulary landing page
           cat > _site/index.html <<'ENDHTML'
-          <!DOCTYPE html>
-          <html lang="en">
-          <head>
-          <meta charset="utf-8">
-          <title>SPECL Vocabulary</title>
-          <style>
-            body { font-family: system-ui, sans-serif; max-width: 720px; margin: 3em auto; padding: 0 1.5em; color: #222; line-height: 1.6; }
-            h1 { border-bottom: 2px solid #333; padding-bottom: .3em; }
-            code { background: #f4f4f4; padding: 2px 6px; border-radius: 3px; font-size: 0.9em; }
-            table { border-collapse: collapse; width: 100%; margin: 1.5em 0; }
-            th, td { border: 1px solid #ddd; padding: 8px 12px; text-align: left; }
-            th { background: #f8f8f8; }
-            a { color: #0366d6; }
-            .ns { font-family: ui-monospace, monospace; font-size: 0.85em; }
-          </style>
-          </head>
-          <body>
-          <h1>SPECL Vocabulary</h1>
-          <p>
-            RDF-native, SHACL-validated spec language for spec-driven AI development.
-          </p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>SPECL Vocabulary</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 720px; margin: 3em auto; padding: 0 1.5em; color: #222; line-height: 1.6; }
+  h1 { border-bottom: 2px solid #333; padding-bottom: .3em; }
+  code { background: #f4f4f4; padding: 2px 6px; border-radius: 3px; font-size: 0.9em; }
+  table { border-collapse: collapse; width: 100%; margin: 1.5em 0; }
+  th, td { border: 1px solid #ddd; padding: 8px 12px; text-align: left; }
+  th { background: #f8f8f8; }
+  a { color: #0366d6; }
+  .ns { font-family: ui-monospace, monospace; font-size: 0.85em; }
+</style>
+</head>
+<body>
+<h1>SPECL Vocabulary</h1>
+<p>RDF-native, SHACL-validated spec language for spec-driven AI development.</p>
 
-          <h2>Namespaces</h2>
-          <table>
-            <tr><th>Prefix</th><th>URI</th><th>Description</th></tr>
-            <tr>
-              <td><code>specl:</code></td>
-              <td class="ns"><a href="https://w3id.org/specl/ns#">https://w3id.org/specl/ns#</a></td>
-              <td>Classes and properties (OWL ontology)</td>
-            </tr>
-            <tr>
-              <td><code>spec:</code></td>
-              <td class="ns"><a href="https://w3id.org/specl/spec#">https://w3id.org/specl/spec#</a></td>
-              <td>Spec instances (requirements, stories, decisions)</td>
-            </tr>
-          </table>
+<h2>Namespaces</h2>
+<table>
+  <tr><th>Prefix</th><th>URI</th><th>Description</th></tr>
+  <tr><td><code>specl:</code></td><td class="ns"><a href="https://w3id.org/specl/ns#">https://w3id.org/specl/ns#</a></td><td>Classes and properties (OWL ontology)</td></tr>
+  <tr><td><code>spec:</code></td><td class="ns"><a href="https://w3id.org/specl/spec#">https://w3id.org/specl/spec#</a></td><td>Spec instances (requirements, stories, decisions)</td></tr>
+</table>
 
-          <h2>Resources</h2>
-          <table>
-            <tr><th>Resource</th><th>Format</th><th>Link</th></tr>
-            <tr>
-              <td>Core ontology</td>
-              <td>Turtle</td>
-              <td><a href="ns.ttl">ns.ttl</a></td>
-            </tr>
-            <tr>
-              <td>SHACL shapes</td>
-              <td>Turtle</td>
-              <td><a href="shapes.ttl">shapes.ttl</a></td>
-            </tr>
-            <tr>
-              <td>Spec explorer</td>
-              <td>HTML</td>
-              <td><a href="explorer.html">explorer.html</a></td>
-            </tr>
-          </table>
+<h2>Resources</h2>
+<table>
+  <tr><th>Resource</th><th>Format</th><th>Link</th></tr>
+  <tr><td>Core ontology</td><td>Turtle</td><td><a href="ns.ttl">ns.ttl</a></td></tr>
+  <tr><td>SHACL shapes</td><td>Turtle</td><td><a href="shapes.ttl">shapes.ttl</a></td></tr>
+  <tr><td>Spec explorer</td><td>HTML</td><td><a href="explorer.html">explorer.html</a></td></tr>
+</table>
 
-          <h2>Classes</h2>
-          <table>
-            <tr><th>Class</th><th>Description</th></tr>
-            <tr><td><code>specl:Specification</code></td><td>A versioned spec document with intent, purpose, and status</td></tr>
-            <tr><td><code>specl:Requirement</code></td><td>A tracked requirement with priority, acceptance criteria, and verification</td></tr>
-            <tr><td><code>specl:UserStory</code></td><td>A user story with persona, goal, and acceptance criteria</td></tr>
-            <tr><td><code>specl:OpenIssue</code></td><td>An unresolved question with owner and recommendation</td></tr>
-            <tr><td><code>specl:DecisionRecord</code></td><td>An architectural decision with rationale and affected requirements</td></tr>
-            <tr><td><code>specl:DesignNote</code></td><td>A design consideration</td></tr>
-            <tr><td><code>specl:Comment</code></td><td>A general comment</td></tr>
-            <tr><td><code>specl:Component</code></td><td>A system component that requirements constrain</td></tr>
-            <tr><td><code>specl:Test</code></td><td>A verification artifact linked from requirements</td></tr>
-          </table>
+<h2>Classes</h2>
+<table>
+  <tr><th>Class</th><th>Description</th></tr>
+  <tr><td><code>specl:Specification</code></td><td>A versioned spec document with intent, purpose, and status</td></tr>
+  <tr><td><code>specl:Requirement</code></td><td>A tracked requirement with priority, acceptance criteria, and verification</td></tr>
+  <tr><td><code>specl:UserStory</code></td><td>A user story with persona, goal, and acceptance criteria</td></tr>
+  <tr><td><code>specl:OpenIssue</code></td><td>An unresolved question with owner and recommendation</td></tr>
+  <tr><td><code>specl:DecisionRecord</code></td><td>An architectural decision with rationale and affected requirements</td></tr>
+  <tr><td><code>specl:DesignNote</code></td><td>A design consideration</td></tr>
+  <tr><td><code>specl:Comment</code></td><td>A general comment</td></tr>
+  <tr><td><code>specl:Component</code></td><td>A system component that requirements constrain</td></tr>
+  <tr><td><code>specl:Test</code></td><td>A verification artifact linked from requirements</td></tr>
+</table>
 
-          <h2>Key Properties</h2>
-          <table>
-            <tr><th>Property</th><th>Domain</th><th>Description</th></tr>
-            <tr><td><code>specl:partOf</code></td><td>Requirement</td><td>Links an item to its parent Specification</td></tr>
-            <tr><td><code>specl:priority</code></td><td>Requirement</td><td>MoSCoW priority (MUST, SHOULD, COULD, WONT)</td></tr>
-            <tr><td><code>specl:acceptanceCriterion</code></td><td>Requirement, UserStory</td><td>Given/When/Then acceptance test</td></tr>
-            <tr><td><code>specl:verifiedBy</code></td><td>Requirement</td><td>Path to a test or verification artifact</td></tr>
-            <tr><td><code>specl:constrains</code></td><td>Requirement</td><td>Component this requirement governs</td></tr>
-            <tr><td><code>specl:status</code></td><td>Specification</td><td>Maturity gate (draft, prototype, review, production)</td></tr>
-          </table>
+<h2>Key Properties</h2>
+<table>
+  <tr><th>Property</th><th>Domain</th><th>Description</th></tr>
+  <tr><td><code>specl:partOf</code></td><td>Requirement</td><td>Links an item to its parent Specification</td></tr>
+  <tr><td><code>specl:priority</code></td><td>Requirement</td><td>MoSCoW priority (MUST, SHOULD, COULD, WONT)</td></tr>
+  <tr><td><code>specl:acceptanceCriterion</code></td><td>Requirement, UserStory</td><td>Given/When/Then acceptance test</td></tr>
+  <tr><td><code>specl:verifiedBy</code></td><td>Requirement</td><td>Path to a test or verification artifact</td></tr>
+  <tr><td><code>specl:constrains</code></td><td>Requirement</td><td>Component this requirement governs</td></tr>
+  <tr><td><code>specl:status</code></td><td>Specification</td><td>Maturity gate (draft, prototype, review, production)</td></tr>
+</table>
 
-          <h2>Links</h2>
-          <p>
-            <a href="https://github.com/zwelz3/specl">GitHub repository</a> ·
-            <a href="https://pypi.org/project/specl/">PyPI package</a> ·
-            <a href="https://github.com/zwelz3/specl/blob/main/docs/SYNTAX.md">Authoring syntax</a>
-          </p>
-          </body>
-          </html>
-          ENDHTML
+<h2>Links</h2>
+<p>
+  <a href="https://github.com/zwelz3/specl">GitHub repository</a> ·
+  <a href="https://pypi.org/project/specl/">PyPI package</a> ·
+  <a href="https://github.com/zwelz3/specl/blob/main/docs/SYNTAX.md">Authoring syntax</a>
+</p>
+</body>
+</html>
+ENDHTML
 
           echo "Site contents:"
           ls -la _site/
