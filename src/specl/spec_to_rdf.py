@@ -6,7 +6,7 @@ Parses markdown with YAML front-matter, H1 sections, ID-bulleted items
 (R1.1, US3, OQ1, D2), and optional indented sub-bullet annotations that
 populate the structured RDF properties the shapes graph asks for.
 
-Sub-bullet annotation syntax (Phase 1, specl 0.2.0):
+Sub-bullet annotation syntax (Phase 1, specl 0.2.1):
 
     - R1.1 The library MUST create holons addressable by IRI.
       - priority: MUST
