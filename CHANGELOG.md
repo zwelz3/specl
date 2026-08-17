@@ -10,6 +10,18 @@ its release is tagged.
 The second and final graph-breaking release. Graphs move from contract 1 to
 contract 2 with `specl-migrate contract`.
 
+### Badges
+- Badge text colour is derived from the background's relative luminance rather
+  than fixed at white. White on the old yellow measured 1.98:1 against a WCAG
+  floor of 4.5:1, so a badge reading 55% was unreadable.
+- Muted palette: rose, amber, and sage, each paired with the text colour that is
+  legible on it. Every pairing measures above 5:1.
+- The badge sizes itself to its text, so `failing` no longer overflows a width
+  chosen for a percentage, and carries `role` and `aria-label`.
+- `tests/test_badge.py` measures contrast at every colour and score boundary,
+  including a test that the old pairing was genuinely bad, so the threshold is
+  justified rather than asserted.
+
 ### Build correctness
 - The contract 1 vocabulary and shapes are frozen files in `published/` rather
   than reconstructed with `git show v0.10.0:`. The tag does not exist in every
@@ -88,6 +100,18 @@ contract 2 with `specl-migrate contract`.
 - `docs/decisions/0009-what-1.0-means.md` recasts 1.0 as a change in who may
   change the specification, replacing criteria that asked for adoption evidence
   as a precondition for the release that makes adoption reasonable.
+
+### Badges
+- Badge text colour is derived from the background's relative luminance rather
+  than fixed at white. White on the old yellow measured 1.98:1 against a WCAG
+  floor of 4.5:1, so a badge reading 55% was unreadable.
+- Muted palette: rose, amber, and sage, each paired with the text colour that is
+  legible on it. Every pairing measures above 5:1.
+- The badge sizes itself to its text, so `failing` no longer overflows a width
+  chosen for a percentage, and carries `role` and `aria-label`.
+- `tests/test_badge.py` measures contrast at every colour and score boundary,
+  including a test that the old pairing was genuinely bad, so the threshold is
+  justified rather than asserted.
 
 ### Build correctness
 - The contract 1 vocabulary and shapes are frozen files in `published/` rather

@@ -688,6 +688,65 @@ def _badge_link(graph, override):
     return str(spec) if spec else None
 
 
+# Muted rather than saturated, and each paired with the text colour that is
+# actually legible on it. White on the old yellow measured 1.98:1, well under
+# the 4.5:1 WCAG floor for normal text, so a 55% badge was unreadable.
+BADGE_LABEL_FILL = "#5b6169"
+BADGE_LABEL_TEXT = "#ffffff"
+BADGE_COLOURS = {
+    "low": "#c98b8b",      # rose
+    "mid": "#d9b46a",      # amber
+    "high": "#8fb996",     # sage
+    "failing": "#b08585",  # deeper rose, so a failing gate reads as failing
+}
+
+
+def _relative_luminance(colour: str) -> float:
+    """WCAG relative luminance, so the text colour is derived rather than
+    guessed. Picking by eye is how white ended up on yellow."""
+    value = colour.lstrip("#")
+    if len(value) == 3:
+        value = "".join(c * 2 for c in value)
+    channels = []
+    for index in (0, 2, 4):
+        part = int(value[index:index + 2], 16) / 255
+        channels.append(part / 12.92 if part <= 0.03928 else ((part + 0.055) / 1.055) ** 2.4)
+    red, green, blue = channels
+    return 0.2126 * red + 0.7152 * green + 0.0722 * blue
+
+
+def contrast_ratio(a: str, b: str) -> float:
+    high, low = sorted((_relative_luminance(a), _relative_luminance(b)), reverse=True)
+    return (high + 0.05) / (low + 0.05)
+
+
+def readable_text(background: str) -> str:
+    """Near-black or white, whichever the background actually supports."""
+    dark, light = "#1a1a1a", "#ffffff"
+    return dark if contrast_ratio(background, dark) >= contrast_ratio(background, light) else light
+
+
+def badge_svg(label: str, background: str) -> str:
+    width = max(46, 9 + 7 * len(label))
+    text = readable_text(background)
+    return (
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{80 + width}" height="20" '
+        f'role="img" aria-label="spec maturity: {label}">\n'
+        f'<rect width="80" height="20" rx="3" fill="{BADGE_LABEL_FILL}"/>'
+        f'<rect x="80" width="{width}" height="20" rx="3" fill="{background}"/>\n'
+        f'<text x="40" y="14" fill="{BADGE_LABEL_TEXT}" font-family="Verdana" '
+        f'font-size="11" text-anchor="middle">spec maturity</text>\n'
+        f'<text x="{80 + width // 2}" y="14" fill="{text}" font-family="Verdana" '
+        f'font-size="11" text-anchor="middle">{label}</text>\n</svg>'
+    )
+
+
+def badge_background(score):
+    if score is None:
+        return BADGE_COLOURS["failing"]
+    return BADGE_COLOURS["low" if score < 50 else "mid" if score < 85 else "high"]
+
+
 def cmd_badge(args):
     # A rendering of an assessment rather than the only artifact. With a
     # history, the badge shows what was last recorded; without one it scores now.
@@ -702,17 +761,8 @@ def cmd_badge(args):
     # A badge is a public claim, so it says "failing" rather than a number when
     # the gate fails. A green badge over a failing gate is the disagreement this
     # is here to prevent.
-    if score is None:
-        label, color, width = "failing", "red", 60
-    else:
-        label = f"{score}%"
-        color = "red" if score < 50 else "yellow" if score < 85 else "brightgreen"
-        width = 60
-    svg = f'''<svg xmlns="http://www.w3.org/2000/svg" width="{80 + width}" height="20">
-<rect width="80" height="20" fill="#555"/><rect x="80" width="{width}" height="20" fill="{color}"/>
-<text x="40" y="14" fill="#fff" font-family="Verdana" font-size="11" text-anchor="middle">spec maturity</text>
-<text x="{80 + width // 2}" y="14" fill="#fff" font-family="Verdana" font-size="11" text-anchor="middle">{label}</text>
-</svg>'''
+    label = "failing" if score is None else f"{score}%"
+    svg = badge_svg(label, badge_background(score))
     open(args.out, "w", encoding="utf-8").write(svg)
     print(f"wrote {args.out}")
     _print_markdown(args, load(args.data))
@@ -733,13 +783,7 @@ def _print_markdown(args, graph):
 
 
 def _write_badge(out, score):
-    color = "red" if score < 50 else "yellow" if score < 85 else "brightgreen"
-    svg = f'''<svg xmlns="http://www.w3.org/2000/svg" width="140" height="20">
-<rect width="80" height="20" fill="#555"/><rect x="80" width="60" height="20" fill="{color}"/>
-<text x="40" y="14" fill="#fff" font-family="Verdana" font-size="11" text-anchor="middle">spec maturity</text>
-<text x="110" y="14" fill="#fff" font-family="Verdana" font-size="11" text-anchor="middle">{score}%</text>
-</svg>'''
-    open(out, "w", encoding="utf-8").write(svg)
+    open(out, "w", encoding="utf-8").write(badge_svg(f"{score}%", badge_background(score)))
     print(f"wrote {out}")
 
 
