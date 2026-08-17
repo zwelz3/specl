@@ -128,6 +128,18 @@ def check_w3id_targets() -> list[str]:
                 f"tools/w3id/specl.htaccess: redirects to {target!r}, which is not in the tree"
             )
     for asset in sorted(set(SITE_RE.findall(text))):
+        # Badges are written by a loop over specs/, so the build guarantees one
+        # per specification and nothing else. Exempting the whole directory
+        # would let a badge URL for a specification that does not exist pass.
+        if asset.startswith("badges/") and "_site/badges" in pages:
+            name = asset[len("badges/"):].removesuffix(".svg")
+            if (ROOT / "specs" / name / "spec.md").exists():
+                continue
+            failures.append(
+                f"tools/w3id/specl.htaccess: badge {asset!r} names no "
+                "specification under specs/"
+            )
+            continue
         if f"_site/{asset}" not in pages:
             failures.append(
                 f"tools/w3id/specl.htaccess: redirects to site asset {asset!r}, "
@@ -240,6 +252,8 @@ def main() -> int:
             "the extraction pattern is stale and the subcommand check is not running"
         )
 
+    # README badge URLs are site assets too, and the same rule applies: a
+    # published URL the build does not produce is a broken image.
     for doc in sorted(ROOT.rglob("*.md")):
         rel = doc.relative_to(ROOT).as_posix()
         if ".git" in doc.parts or rel in EXCLUDE:
@@ -257,6 +271,15 @@ def main() -> int:
             candidate = (doc.parent / match).resolve()
             if not candidate.exists() and not (ROOT / match).exists():
                 failures.append(f"{rel}: references missing path {match!r}")
+
+        for asset in sorted(set(SITE_RE.findall(text))):
+            if not asset.startswith("badges/"):
+                continue
+            name = asset[len("badges/"):].removesuffix(".svg")
+            if not (ROOT / "specs" / name / "spec.md").exists():
+                failures.append(
+                    f"{rel}: badge {asset!r} names no specification under specs/"
+                )
 
         for cmd in set(CMD_RE.findall(text)):
             if cmd not in scripts and cmd not in planned_scripts:

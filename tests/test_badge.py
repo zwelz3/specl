@@ -71,3 +71,23 @@ def test_the_badge_carries_an_accessible_label():
     svg = badge_svg("55%", BADGE_COLOURS["mid"])
     assert 'role="img"' in svg
     assert 'aria-label="spec maturity: 55%"' in svg
+
+
+def test_no_badge_is_committed_to_the_tree():
+    """A badge in version control has to be pushed back by CI, which rejects the
+    next local push, and is a snapshot that disagrees with the current score
+    between runs. See docs/decisions/0010-badges-are-published-not-committed.md.
+    """
+    from conftest import ROOT
+
+    committed = sorted((ROOT / "static").rglob("*.svg"))
+    assert not committed, f"badges belong on the published site: {committed}"
+
+
+def test_ci_does_not_push_generated_files_back():
+    from conftest import ROOT
+
+    workflow = (ROOT / ".github" / "workflows" / "spec.yml").read_text(encoding="utf-8")
+    assert "git push" not in workflow
+    pages = (ROOT / ".github" / "workflows" / "pages.yml").read_text(encoding="utf-8")
+    assert "specl-validate badge" in pages, "the site build no longer produces badges"

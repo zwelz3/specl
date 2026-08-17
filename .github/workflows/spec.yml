@@ -42,27 +42,11 @@ jobs:
             specs/${{ matrix.spec }}/report.json
             static/badges/${{ matrix.spec }}.svg
 
-  commit-badges:
-    needs: validate
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@v6
-      - name: Download all badges
-        uses: actions/download-artifact@v4
-        with:
-          pattern: spec-report-*
-          merge-multiple: true
-      - name: Commit badges
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add static/badges/*.svg
-          git diff --staged --quiet && echo "No badge changes" && exit 0
-          git commit -m "ci: update maturity badges [skip ci]"
-          git push
+  # There is no badge-committing job. It used to download the artifacts and
+  # push regenerated SVGs back to main, which meant every push you made was
+  # rejected until you pulled the bot's commit. The badges are derived data and
+  # the Pages build already publishes them, so the README points there and
+  # nothing is committed. See docs/decisions/0010-badges-are-published-not-committed.md.
 
   tests:
     runs-on: ${{ matrix.os }}

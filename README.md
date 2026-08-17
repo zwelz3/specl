@@ -7,7 +7,7 @@
 > read [docs/DOWNSTREAM-COMMITMENTS.md](docs/DOWNSTREAM-COMMITMENTS.md); a
 > consumer has already authored against several behaviors specified there.
 
-[![spec maturity](https://raw.githubusercontent.com/zwelz3/specl/main/static/badges/specl_tool.svg)](https://github.com/zwelz3/specl/blob/main/specs/specl_tool/spec.md)
+[![spec maturity](https://zwelz3.github.io/specl/badges/specl_tool.svg)](https://github.com/zwelz3/specl/blob/main/specs/specl_tool/spec.md)
 
 RDF-native, SHACL-validated specifications for spec-driven AI development.
 
@@ -217,7 +217,11 @@ line.
 
 **Gate in CI.** This repository's own `.github/workflows/spec.yml` is the worked
 example: translate with `--fail-on-warning`, validate with `--json` for a
-machine-readable report, score, and commit a badge. The severity gate is driven
+machine-readable report, and score. The badge is built by the Pages workflow and
+served from the site rather than committed: a badge in version control is
+derived data that has to be pushed back, which rejects your next push and makes
+the badge a snapshot that disagrees with the current state between runs. See
+`docs/decisions/0010-badges-are-published-not-committed.md`. The severity gate is driven
 by the specification's own `status`, so a `draft` specification fails only on
 violations while a `production` one fails on warnings too. A specification
 tightens by changing one word in its front matter rather than by changing the

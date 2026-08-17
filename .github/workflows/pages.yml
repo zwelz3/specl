@@ -23,8 +23,10 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Install rdflib
-        run: pip install rdflib
+      - name: Install specl
+        # The badges are generated here, so the package is needed rather than
+        # rdflib alone.
+        run: pip install -e .
 
       - name: Build pages site
         run: |
@@ -47,9 +49,15 @@ jobs:
           cp src/specl/shapes.ttl _site/shapes/2.ttl
           cp src/specl/explorer.html _site/explorer.html
           cp static/index.html _site/index.html
-          if [ -d static/badges ]; then
-            cp -r static/badges _site/badges
-          fi
+          # Generated here rather than copied from the tree, so the badge
+          # always describes the commit being published rather than whenever it
+          # was last committed.
+          mkdir -p _site/badges
+          for spec in specs/*/; do
+            name=$(basename "$spec")
+            specl-translate "$spec/spec.md" "/tmp/$name.ttl"
+            specl-validate badge "/tmp/$name.ttl" --out "_site/badges/$name.svg"
+          done
           echo "Site contents:"
           ls -la _site/
 
