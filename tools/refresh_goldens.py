@@ -22,7 +22,7 @@ def main() -> int:
         if result.returncode != 0:
             print(f"{name}: FAILED\n{result.stderr}")
             return 1
-        target.write_text(normalize(target.read_text(encoding="utf-8")))
+        target.write_text(normalize(target.read_text(encoding="utf-8")), encoding="utf-8")
         print(f"{name}: {len(target.read_text(encoding="utf-8").splitlines())} lines")
     return 0
 

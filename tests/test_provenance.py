@@ -59,7 +59,7 @@ def test_the_source_is_the_file_name_not_the_path_given(tmp_path):
     source = nested / "s.md"
     source.write_text(HEAD + "# Requirements\n\n- R1 A.\n", encoding="utf-8")
     flat = tmp_path / "s.md"
-    flat.write_text(source.read_text(encoding="utf-8"))
+    flat.write_text(source.read_text(encoding="utf-8"), encoding="utf-8")
     a, b = tmp_path / "a.ttl", tmp_path / "b.ttl"
     translate(source, a)
     translate(flat, b)

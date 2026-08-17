@@ -46,6 +46,15 @@ range check written before `tests/test_ontology.py` named one property, so the
 next property added was unchecked by construction, and two were. Derive the
 assertion from the declaration and a new term is covered the moment it exists.
 
+**Every check in this inventory compares artifacts to each other, and that is
+blind to a claim that is wrong outside the container.** Four defects reached an
+adopter this way: repository-relative paths in the README, a Python floor CI
+never exercised, a publish workflow contradicting a written policy, and text I/O
+assuming the locale encoding. None was a disagreement between artifacts, so
+nothing here could have found any of them. Where a claim depends on an
+environment, the check has to run in that environment; that is why CI now runs
+Windows and installs from a clean clone.
+
 **A check must fail loudly when its own extraction breaks.** A checker that
 silently stops checking is worse than no checker, because it reports success. The
 subcommand extraction in `tools/check_docs.py` fails when it finds nothing, and

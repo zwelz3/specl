@@ -116,7 +116,7 @@ def test_a_merged_legacy_graph_is_refused(tmp_path):
     merged.write_text(
         LEGACY.read_text(encoding="utf-8")
         + '\nspec:pptxgen-001 a specl:Specification ; dct:title "PPTX" .\n'
-    )
+    , encoding="utf-8")
     result = run("iris", str(merged), str(tmp_path / "o.ttl"), "--spec-base", BASE)
     assert result.returncode == 2
     assert "no longer recoverable" in result.stderr
@@ -137,7 +137,7 @@ def test_a_migrated_graph_is_left_alone(tmp_path):
 
 def test_it_refuses_to_overwrite_its_input(tmp_path):
     target = tmp_path / "a.ttl"
-    target.write_text(LEGACY.read_text(encoding="utf-8"))
+    target.write_text(LEGACY.read_text(encoding="utf-8"), encoding="utf-8")
     result = run("iris", str(target), str(target), "--spec-base", BASE)
     assert result.returncode == 2 and "refusing to overwrite" in result.stderr
 

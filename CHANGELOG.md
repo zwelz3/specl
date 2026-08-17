@@ -18,8 +18,12 @@ contract 2 with `specl-migrate contract`.
   equally wrong and merely lucky.
 - `specl-validate diff --changelog` appended in the platform encoding, which
   would have corrupted a changelog containing non-ASCII.
-- `tests/test_portability.py` checks the pattern rather than the symptom, and
-  CI runs the suite on Windows as well as Linux.
+- `tests/test_portability.py` walks the AST rather than matching text. Its first
+  version scanned line by line, so a call split across two lines never found its
+  closing parenthesis, and it treated what it could not parse as passing: ten
+  writes went through and six reached the adopter. A file it cannot parse now
+  raises rather than reporting clean.
+- CI runs the suite on Windows as well as Linux.
 
 ### Governing vocabulary terms
 - `vocabularies:` in front matter and a `governs:` annotation, for a requirement

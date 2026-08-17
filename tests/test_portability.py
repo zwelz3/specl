@@ -1,45 +1,54 @@
 """Text I/O that assumes the platform's default encoding.
 
 Python picks the locale encoding when none is given: UTF-8 on Linux, cp1252 on
-most Windows installs. Every check in this repository ran on Ubuntu, so a
-hundred and ten encoding-less reads sat here until an adopter ran the suite on
-Windows and three tests failed on a single non-ASCII byte in `explorer.html`.
+most Windows installs. Every check here ran on Ubuntu, so 110 encoding-less
+calls sat in the tree until an adopter ran the suite on Windows.
 
-Only three failed because only one shipped file happens to carry non-ASCII
-today. The rest were equally wrong and merely lucky, which is why this checks
-the pattern rather than the symptom.
+The first round fixed the reads and the second round found ten writes it had
+missed, so this walks the AST rather than matching text. A call spanning two
+lines defeated the line-based version, and worse, it treated a call it could not
+parse as passing: a check that silently stops checking is the failure mode
+`docs/decisions/0006-artifact-agreement-strategy.md` names explicitly, and this
+one committed it.
 """
 from __future__ import annotations
 
-import re
+import ast
+
+import pytest
 
 from conftest import ROOT
 
-CALLS = re.compile(r"(?<![\w.])(?:\w+\.)?(read_text|write_text|open)\(")
-BINARY = re.compile(r"""["'][rwax]b["']""")
+TEXT_IO = ("read_text", "write_text", "open")
 SEARCHED = ("src", "tests", "tools")
 
 
-def arguments(line: str, start: int) -> str | None:
-    """The full argument text of a call, counting nested parentheses.
+def unencoded_calls(path):
+    """Every text read or write in a file that does not name an encoding.
 
-    A pattern that stops at the first close paren reports
-    `write_text(f(x), encoding="utf-8")` as unencoded, because the nested call
-    ends the match before the keyword. Widening the pattern only moves the
-    blind spot, so the parentheses are counted.
+    Parsed rather than pattern-matched. A syntax error raises rather than
+    returning nothing, because a file this cannot read is a file it is not
+    checking.
     """
-    depth, out = 0, []
-    for char in line[start:]:
-        if char == "(":
-            depth += 1
-            if depth == 1:
+    tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call):
+            continue
+        func = node.func
+        name = func.attr if isinstance(func, ast.Attribute) else getattr(func, "id", None)
+        if name not in TEXT_IO:
+            continue
+        if any(keyword.arg == "encoding" for keyword in node.keywords):
+            continue
+        if name == "open":
+            # A bare `open` in binary mode takes no encoding, and an attribute
+            # `.open` is something else entirely, such as a zipfile member.
+            if isinstance(func, ast.Attribute):
                 continue
-        elif char == ")":
-            depth -= 1
-            if depth == 0:
-                return "".join(out)
-        out.append(char)
-    return None
+            mode = node.args[1] if len(node.args) > 1 else None
+            if isinstance(mode, ast.Constant) and "b" in str(mode.value):
+                continue
+        yield node.lineno
 
 
 def python_files():
@@ -50,27 +59,44 @@ def python_files():
 
 
 def test_no_text_io_relies_on_the_platform_encoding():
-    offenders = []
-    for path in python_files():
-        for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
-            if "urlopen" in line or "subprocess.run" in line:
-                continue
-            for match in CALLS.finditer(line):
-                args = arguments(line, match.end() - 1)
-                if args is None or "encoding=" in args:
-                    continue
-                if match.group(1) == "open" and BINARY.search(args):
-                    continue
-                # `files(...) / name` returns a Traversable, whose read_text
-                # already defaults to UTF-8 rather than to the locale.
-                if match.group(1) == "read_text" and not args.strip():
-                    if "files(" in line:
-                        continue
-                offenders.append(f"{path.relative_to(ROOT)}:{number}: {line.strip()}")
+    offenders = [
+        f"{path.relative_to(ROOT)}:{line}"
+        for path in python_files()
+        for line in unencoded_calls(path)
+    ]
     assert not offenders, (
-        "text I/O without an explicit encoding reads as cp1252 on Windows:\n  "
+        "text I/O without an explicit encoding uses cp1252 on Windows:\n  "
         + "\n  ".join(offenders)
     )
+
+
+def test_the_checker_sees_a_call_split_across_lines():
+    """The specific blind spot that let ten writes through. A line-based scan
+    found the opening parenthesis, never found the closing one, and treated the
+    unparseable result as fine."""
+    source = ROOT / "tests" / "_portability_probe.py"
+    source.write_text(
+        "from pathlib import Path\n"
+        "def f(p: Path):\n"
+        "    p.write_text(\n"
+        '        "text"\n'
+        "    )\n",
+        encoding="utf-8",
+    )
+    try:
+        assert list(unencoded_calls(source)) == [3]
+    finally:
+        source.unlink()
+
+
+def test_a_file_it_cannot_parse_raises_rather_than_passing():
+    source = ROOT / "tests" / "_portability_broken.py"
+    source.write_text("def f(\n", encoding="utf-8")
+    try:
+        with pytest.raises(SyntaxError):
+            list(unencoded_calls(source))
+    finally:
+        source.unlink()
 
 
 def test_the_shipped_file_that_exposed_this_still_has_non_ascii():

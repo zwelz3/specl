@@ -34,7 +34,7 @@ def test_umbrella_command_is_caught(tmp_path):
     tree = copy_tree(tmp_path)
     (tree / "docs" / "ROADMAP.md").write_text(
         (tree / "docs" / "ROADMAP.md").read_text(encoding="utf-8") + "\n\nRun `specl frobnicate x`.\n"
-    )
+    , encoding="utf-8")
     result = run(tree)
     assert result.returncode == 1 and "specl frobnicate" in result.stdout
 
@@ -44,7 +44,7 @@ def test_missing_path_is_not_suppressed_by_nearby_prose(tmp_path):
     (tree / "docs" / "ROADMAP.md").write_text(
         (tree / "docs" / "ROADMAP.md").read_text(encoding="utf-8")
         + "\n\nSee `docs/nope/absent.md`. The old draft is missing, so that one is current.\n"
-    )
+    , encoding="utf-8")
     result = run(tree)
     assert result.returncode == 1 and "docs/nope/absent.md" in result.stdout
 
@@ -53,14 +53,14 @@ def test_identifier_is_not_read_as_a_command(tmp_path):
     tree = copy_tree(tmp_path)
     (tree / "docs" / "ROADMAP.md").write_text(
         (tree / "docs" / "ROADMAP.md").read_text(encoding="utf-8") + "\n\nThe id `specl-tool-001` is a label.\n"
-    )
+    , encoding="utf-8")
     assert run(tree).returncode == 0
 
 
 def test_stale_extraction_pattern_fails_loudly(tmp_path):
     tree = copy_tree(tmp_path)
     source = tree / "src" / "specl" / "validate_spec.py"
-    source.write_text(source.read_text(encoding="utf-8").replace('add_parser("', "add_parser(NAME_"))
+    source.write_text(source.read_text(encoding="utf-8").replace('add_parser("', "add_parser(NAME_"), encoding="utf-8")
     result = run(tree)
     assert result.returncode == 1 and "extraction pattern is stale" in result.stdout
 
@@ -70,7 +70,7 @@ def test_dead_w3id_redirect_target_is_caught(tmp_path):
     another repository, so a dead target here becomes a live 404 elsewhere."""
     tree = copy_tree(tmp_path)
     rules = tree / "tools" / "w3id" / "specl.htaccess"
-    rules.write_text(rules.read_text(encoding="utf-8").replace("docs/contracts/1.md", "docs/contracts/9.md"))
+    rules.write_text(rules.read_text(encoding="utf-8").replace("docs/contracts/1.md", "docs/contracts/9.md"), encoding="utf-8")
     result = run(tree)
     assert result.returncode == 1 and "docs/contracts/9.md" in result.stdout
 
@@ -78,7 +78,7 @@ def test_dead_w3id_redirect_target_is_caught(tmp_path):
 def test_site_asset_the_build_does_not_produce_is_caught(tmp_path):
     tree = copy_tree(tmp_path)
     rules = tree / "tools" / "w3id" / "specl.htaccess"
-    rules.write_text(rules.read_text(encoding="utf-8").replace("specl/ns.jsonld", "specl/ns.rdf"))
+    rules.write_text(rules.read_text(encoding="utf-8").replace("specl/ns.jsonld", "specl/ns.rdf"), encoding="utf-8")
     result = run(tree)
     assert result.returncode == 1 and "ns.rdf" in result.stdout
 
