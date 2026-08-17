@@ -3,39 +3,134 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix dct:  <http://purl.org/dc/terms/> .
 @prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
 
+# owl:versionIRI is the graph contract, not the release. Per UR6 the contract
+# identifies the vocabulary and shapes pair, and only a designated breaking
+# release may change it, so there are two of these across the whole run to 1.0.
+# owl:versionInfo tracks the package version and is informational.
 <https://w3id.org/specl/ns> a owl:Ontology ;
     dct:title "SPECL Core Ontology" ;
-    owl:versionInfo "0.1.0" .
+    owl:versionIRI <https://w3id.org/specl/ns/2> ;
+    rdfs:comment "Constraints live in the shapes graph rather than here. OWL axioms in this file state what terms mean; what a specification must contain is a validation question and SHACL answers it." ;
+    owl:versionInfo "0.11.0" .
 
 # --- Classes ---
 specl:Specification   a owl:Class ; rdfs:label "Specification" .
-specl:Requirement     a owl:Class ; rdfs:label "Requirement" .
-specl:UserStory       a owl:Class ; rdfs:label "User Story" .
-specl:DesignNote      a owl:Class ; rdfs:label "Design Note" .
-specl:Comment         a owl:Class ; rdfs:label "Comment" .
-specl:OpenIssue       a owl:Class ; rdfs:label "Open Issue" .
-specl:DecisionRecord  a owl:Class ; rdfs:label "Decision Record (ADR)" .
+specl:Requirement     a owl:Class ; rdfs:subClassOf specl:Item ; rdfs:label "Requirement" .
+specl:UserStory       a owl:Class ; rdfs:subClassOf specl:Item ; rdfs:label "User Story" .
+specl:DesignNote      a owl:Class ; rdfs:subClassOf specl:Item ; rdfs:label "Design Note" .
+specl:Comment         a owl:Class ; rdfs:subClassOf specl:Item ; rdfs:label "Comment" .
+specl:OpenIssue       a owl:Class ; rdfs:subClassOf specl:Item ; rdfs:label "Open Issue" .
+specl:DecisionRecord  a owl:Class ; rdfs:subClassOf specl:Item ; rdfs:label "Decision Record (ADR)" .
 specl:Component       a owl:Class ; rdfs:label "Component" .
 specl:Test            a owl:Class ; rdfs:label "Verification Artifact" .
+specl:ClassSubscore   a owl:Class ; rdfs:label "Class Subscore" ;
+    rdfs:comment "One item class's contribution to an assessment. A percentage that cannot be attributed explains nothing." .
+specl:SourceDocument  a owl:Class ; rdfs:label "Source Document" ;
+    rdfs:comment "The markdown a graph was derived from. Identified by file name rather than by the path given on the command line, so a graph does not differ because it was translated from a different working directory." .
+specl:MaturityAssessment a owl:Class ; rdfs:subClassOf prov:Activity ;
+    rdfs:label "Maturity Assessment" ;
+    rdfs:comment "One measurement of a specification, recorded rather than printed and discarded. Maturity without history answers no question about whether a specification is converging." .
+specl:Item            a owl:Class ; rdfs:label "Item" ;
+    rdfs:comment "Anything a specification contains and identifies. The common superclass exists because specl:partOf applies to all of them: rdfs:domain is an inference rule rather than a constraint, so declaring the domain as Requirement made a reasoner conclude that every design note and decision was a requirement." .
+
+specl:Vocabulary      a owl:Class ; rdfs:label "Vocabulary" ;
+    rdfs:comment "An external vocabulary whose terms this specification governs, declared with the namespace its terms resolve under and optionally a local path. Distinct from a SpecificationReference, which names a peer specl specification: an ontology has terms rather than items and is not itself specified here." .
+
+specl:Agent           a owl:Class ; rdfs:subClassOf specl:Item, prov:Agent ;
+    rdfs:label "Agent" ;
+    rdfs:comment "Someone accountable for items in a specification. Subclassed from prov:Agent rather than minted independently, so a consumer already modelling agents recognises one." .
+
+specl:Persona         a owl:Class ; rdfs:subClassOf specl:Item ; rdfs:label "Persona" ;
+    rdfs:comment "Someone a user story is about. Declared once and referenced by identifier, carrying its surface forms as skos:prefLabel and skos:altLabel so that wording varies without the identity moving." .
+specl:AcceptanceQuery a owl:Class ; rdfs:subClassOf specl:Item ; rdfs:label "Acceptance Query" ;
+    rdfs:comment "A query that can falsify the specification. Arguably the only part of a specification that can, which is what earns it a class rather than a home outside the graph." .
+specl:SpecificationReference a owl:Class ; rdfs:label "Specification Reference" ;
+    rdfs:comment "A foreign prefix this specification declares, with the base its items resolve under and a local path to the peer. Carried in the graph so layering resolves from the graph rather than from the markdown source." .
 
 # --- Object properties ---
-specl:partOf       a owl:ObjectProperty ; rdfs:domain specl:Requirement ; rdfs:range specl:Specification .
-specl:verifiedBy   a owl:ObjectProperty ; rdfs:range specl:Test .
-specl:constrains   a owl:ObjectProperty ; rdfs:range specl:Component .
-specl:affects      a owl:ObjectProperty .
+specl:partOf       a owl:ObjectProperty ; rdfs:domain specl:Item ; rdfs:range specl:Specification ; rdfs:label "Part of" .
+specl:verifiedBy   a owl:ObjectProperty ; rdfs:range specl:Test ; rdfs:label "Verified by" .
+specl:constrains   a owl:ObjectProperty ; rdfs:range specl:Component ; rdfs:label "Constrains" .
+specl:affects      a owl:ObjectProperty ; rdfs:label "Affects" .
+specl:declares     a owl:ObjectProperty ; rdfs:range specl:SpecificationReference ; rdfs:label "Declares" .
+specl:governs      a owl:ObjectProperty ;
+    rdfs:comment "A term in an external vocabulary whose meaning or behaviour this item constrains. Distinct from specl:constrains, which names a software component: a requirement governing an RDF class and one constraining a Python class are different claims, and the first consumer's specification wrote both under one key. No range is declared, because the term belongs to a vocabulary this project does not own." .
+specl:declaresVocabulary a owl:ObjectProperty ; rdfs:range specl:Vocabulary ;
+    rdfs:label "Declares vocabulary" .
+specl:gates        a owl:ObjectProperty ; rdfs:domain specl:AcceptanceQuery ;
+    rdfs:comment "Requirements this query verifies. Traversal from a requirement to the queries that gate it is the point of modelling queries at all." .
+specl:dependsOn    a owl:ObjectProperty ; rdfs:range specl:Specification ; rdfs:label "Depends on" .
+specl:upstreamOf   a owl:ObjectProperty ; rdfs:range specl:Specification ; rdfs:label "Upstream of" .
+specl:refines      a owl:ObjectProperty ; rdfs:range specl:Specification ; rdfs:label "Refines" .
+specl:supersededBy a owl:ObjectProperty ;
+    rdfs:comment "The item that replaces this one. Retiring an item in place, rather than deleting it, is what keeps identifiers append-only." .
+specl:detail       a owl:ObjectProperty ; rdfs:range rdf:List ;
+    rdfs:seeAlso skos:note ;
+    rdfs:comment "Ordered content authored under an item, as an rdf:List of string literals in source order. Follows the SKOS documentation-note pattern. Not declared rdfs:subPropertyOf skos:note: skos:note is an annotation property, and OWL DL forbids annotation properties from carrying property axioms, so the subproperty declaration and the range above cannot coexist outside OWL Full." .
 
 # --- Datatype properties ---
-specl:intent              a owl:DatatypeProperty ; rdfs:range xsd:string .
-specl:purpose             a owl:DatatypeProperty ; rdfs:range xsd:string .
-specl:status              a owl:DatatypeProperty ; rdfs:range xsd:string .
-specl:priority            a owl:DatatypeProperty ; rdfs:range xsd:string .
-specl:acceptanceCriterion a owl:DatatypeProperty ; rdfs:range xsd:string .
-specl:asA                 a owl:DatatypeProperty ; rdfs:range xsd:string .
-specl:iWant               a owl:DatatypeProperty ; rdfs:range xsd:string .
-specl:soThat              a owl:DatatypeProperty ; rdfs:range xsd:string .
-specl:recommendation      a owl:DatatypeProperty ; rdfs:range xsd:string .
-specl:owner               a owl:DatatypeProperty ; rdfs:range xsd:string .
-specl:resolutionStatus    a owl:DatatypeProperty ; rdfs:range xsd:string .
-specl:decisionStatus      a owl:DatatypeProperty ; rdfs:range xsd:string .
-specl:rationale           a owl:DatatypeProperty ; rdfs:range xsd:string .
+specl:intent              a owl:DatatypeProperty ; rdfs:range xsd:string ; rdfs:label "Intent" .
+
+specl:purpose             a owl:DatatypeProperty ; rdfs:range xsd:string ; rdfs:label "Purpose" .
+specl:status              a owl:DatatypeProperty ; rdfs:range xsd:string ; rdfs:label "Specification status" .
+specl:implementationStatus a owl:DatatypeProperty ; rdfs:range xsd:string ;
+    rdfs:comment "How much of this item is built: not-started, in-progress, implemented, verified. Distinct from priority, which is importance, and from itemStatus, which is lifecycle. Progress rolls up from items rather than being declared for the specification, which is what makes it honest." .
+specl:itemStatus          a owl:DatatypeProperty ; rdfs:range xsd:string ;
+    rdfs:comment "Lifecycle state of an item: active, superseded, or withdrawn. Absent means active." .
+specl:referenceBase       a owl:DatatypeProperty ; rdfs:range xsd:string ; rdfs:label "Reference base" .
+specl:referencePath       a owl:DatatypeProperty ; rdfs:range xsd:string ;
+    rdfs:comment "Local path to a peer specification. Never fetched over the network; layering reads it from disk or reports inconclusive." .
+specl:assessed            a owl:ObjectProperty ; rdfs:range specl:Specification ; rdfs:label "Assessed" .
+specl:maturityScore       a owl:DatatypeProperty ; rdfs:range xsd:decimal ; rdfs:label "Maturity score" .
+specl:progressScore       a owl:DatatypeProperty ; rdfs:range xsd:decimal ;
+    rdfs:comment "How much is built, rolled up from per-item implementationStatus. Separate from maturity, which is how completely the specification is written." .
+specl:subscore            a owl:ObjectProperty ; rdfs:range specl:ClassSubscore ; rdfs:label "Subscore" .
+specl:itemClass           a owl:DatatypeProperty ; rdfs:range xsd:string ; rdfs:label "Item class" .
+specl:cleanCount          a owl:DatatypeProperty ; rdfs:range xsd:integer ; rdfs:label "Clean count" .
+specl:totalCount          a owl:DatatypeProperty ; rdfs:range xsd:integer ; rdfs:label "Total count" .
+specl:sourceLine          a owl:DatatypeProperty ; rdfs:range xsd:integer ;
+    rdfs:comment "Line in the source document that produced this item, indexing the file as authored." .
+specl:itemPrefix          a owl:DatatypeProperty ; rdfs:range xsd:string ;
+    rdfs:comment "Prefix this specification's own item identifiers carry, declared in place of the reserved prefix its section would otherwise require. Distinct from specl:prefix, which is how other specifications refer to this one." .
+specl:prefix              a owl:DatatypeProperty ; rdfs:range xsd:string ;
+    rdfs:comment "Short name another specification uses to reference this one. Reserved for cross-specification references in 0.5.0; carried in the graph from 0.3.0 so the value is stable before the feature arrives." .
+specl:priority            a owl:DatatypeProperty ; rdfs:range xsd:string ; rdfs:label "Priority" .
+specl:acceptanceCriterion a owl:DatatypeProperty ; rdfs:range xsd:string ; rdfs:label "Acceptance criterion" .
+specl:role                a owl:ObjectProperty ; rdfs:range specl:Persona ;
+    rdfs:comment "Who the user story is about. Replaces specl:asA in contract 2, which held a literal: a role is an entity many stories share, not an adjective repeated on each of them. The value is a declared identifier rather than a name, because minting from the surface string would make 'finance clerk' and 'Finance Clerk' two personas with nothing reporting it." .
+specl:capability          a owl:DatatypeProperty ; rdfs:range xsd:string ;
+    rdfs:comment "What the user story asks for. Replaces specl:iWant in contract 2." .
+specl:benefit             a owl:DatatypeProperty ; rdfs:range xsd:string ;
+    rdfs:comment "Why the user story matters. Replaces specl:soThat in contract 2." .
+specl:recommendation      a owl:DatatypeProperty ; rdfs:range xsd:string ; rdfs:label "Recommendation" .
+specl:owner               a owl:ObjectProperty ; rdfs:range prov:Agent ; rdfs:label "Owner" ;
+    rdfs:comment "Who is accountable for an item. An agent rather than a name: held as a literal it was a spelling repeated across items and joinable only by string equality, which is the defect specl:role had. Range is prov:Agent rather than a minted class, so an agent declared in another vocabulary resolves." .
+specl:resolutionStatus    a owl:DatatypeProperty ; rdfs:range xsd:string ; rdfs:label "Resolution status" .
+specl:decisionStatus      a owl:DatatypeProperty ; rdfs:range xsd:string ; rdfs:label "Decision status" .
+specl:rationale           a owl:DatatypeProperty ; rdfs:range xsd:string ; rdfs:label "Rationale" .
+
+
+# ===========================================================================
+# Axioms
+# ===========================================================================
+
+# Item classes are pairwise disjoint. Stated here because it is true and a
+# consumer's reasoner can use it, and enforced in the shapes because that is
+# what runs: OWL RL implementations vary in whether they surface a disjointness
+# violation at all, and a constraint nothing checks is a comment.
+[] a owl:AllDisjointClasses ;
+    owl:members ( specl:Requirement specl:UserStory specl:OpenIssue
+                  specl:DecisionRecord specl:DesignNote specl:Comment
+                  specl:AcceptanceQuery specl:Persona specl:Agent ) .
+
+# Functional where the modelling is genuinely single-valued. Declared sparingly:
+# functionality makes a second value a logical inconsistency, which is stronger
+# than the shapes intend for properties whose duplication is only a warning, so
+# priority and the status properties stay non-functional and are bounded by
+# sh:maxCount instead.
+specl:partOf a owl:FunctionalProperty .
+specl:role   a owl:FunctionalProperty .

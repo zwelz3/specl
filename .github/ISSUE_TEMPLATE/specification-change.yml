@@ -1,0 +1,75 @@
+name: Specification change proposal
+description: Propose a change to the graph contract, the authoring syntax, or the commitments register
+title: "[proposal] "
+labels: ["specification-change", "comment-period"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Additive changes do not need this.** If every existing graph stays
+        valid and every identifier stays where it was, it lands whenever it is
+        ready. Open a normal issue.
+
+        A substantive change joins the **collection window** for the next major
+        release, described in [GOVERNANCE.md](../../GOVERNANCE.md). The window
+        runs one year from the last major release, and every proposal in it
+        shares that one closing date: long enough that a change appears in the
+        annual review cycle of every adopter who has one.
+
+        Proposals are listed in `docs/proposals/OPEN.md` against that date. One
+        raised in the last sixty days rolls to the following window, because a
+        proposal nobody has had time to object to has not been agreed to.
+
+        Implementation, ergonomics, and documentation are not governed and do
+        not need this. Use a normal issue.
+  - type: textarea
+    id: change
+    attributes:
+      label: What changes
+      description: The behavior after, not the problem before. Be specific enough that someone could implement it from this.
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why
+      description: What is wrong today, and what it costs. Include how you hit it, if you did.
+    validations:
+      required: true
+  - type: dropdown
+    id: contract
+    attributes:
+      label: Does this change the graph contract?
+      description: An IRI that moves, a property whose range or domain changes, or a guarantee in docs/contracts/ that stops holding. If unsure, say so; unclear means governed.
+      options:
+        - "No: additive, existing graphs stay valid"
+        - "Yes: existing graphs would need migration"
+        - "Unsure"
+    validations:
+      required: true
+  - type: textarea
+    id: affected
+    attributes:
+      label: Who is affected, and how
+      description: Existing specifications, emitted graphs, downstream consumers, tooling. Say none if none.
+    validations:
+      required: true
+  - type: textarea
+    id: migration
+    attributes:
+      label: Migration
+      description: If graphs would need migrating, what would the path be, and can it be mechanical? A change nobody can migrate off is a change worth reconsidering.
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Including doing nothing. Decision records here carry rejected options with their reasoning, and this becomes one if ratified.
+  - type: checkboxes
+    id: acknowledgements
+    attributes:
+      label: Before submitting
+      options:
+        - label: I have read GOVERNANCE.md and this is a governed change
+          required: true
+        - label: I have checked docs/ROADMAP.md and docs/REMAINING.md in case this is already recorded
+          required: true

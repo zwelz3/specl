@@ -1,0 +1,42 @@
+# A minimal graph with known defects, for checking that a SHACL processor
+# applies specl's shapes as intended. Point your own processor at this file and
+# the bundled shapes; the findings you should get are in expected.json.
+@prefix specl: <https://w3id.org/specl/ns#> .
+@prefix spec:  <https://example.org/specs/conformance#> .
+@prefix dct:   <http://purl.org/dc/terms/> .
+
+<https://example.org/specs/conformance> a specl:Specification ;
+    dct:conformsTo <https://w3id.org/specl/contract/2> ;
+    dct:title "Conformance fixture" ;
+    dct:hasVersion "1.0.0" ;
+    specl:status "draft" ;
+    specl:intent """A graph with one defect of each kind a processor must catch.""" ;
+    specl:purpose """Checking a SHACL processor rather than a specification.""" ;
+    dct:created "2026-01-01"^^<http://www.w3.org/2001/XMLSchema#date> .
+
+# Retired, and therefore not evaluated: a processor that reports findings
+# against this item is applying the shapes without their SPARQL-based targets.
+spec:R1 a specl:Requirement ;
+    specl:partOf <https://example.org/specs/conformance> ;
+    dct:title "A retired requirement carrying none of its annotations" ;
+    dct:description "A retired requirement carrying none of its annotations." ;
+    specl:itemStatus "superseded" ;
+    specl:supersededBy spec:R2 .
+
+# Live and bare: a processor must report the missing annotations here.
+spec:R2 a specl:Requirement ;
+    specl:partOf <https://example.org/specs/conformance> ;
+    dct:title "A live requirement carrying none of its annotations" ;
+    dct:description "A live requirement carrying none of its annotations." .
+
+# Superseded with no successor named.
+spec:R3 a specl:Requirement ;
+    specl:partOf <https://example.org/specs/conformance> ;
+    dct:title "Retired with nothing named in its place" ;
+    dct:description "Retired with nothing named in its place." ;
+    specl:itemStatus "superseded" .
+
+# A decision with no title: the Violation-severity case.
+spec:D1 a specl:DecisionRecord ;
+    specl:partOf <https://example.org/specs/conformance> ;
+    dct:description "A decision record with no title at all." .

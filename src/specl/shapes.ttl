@@ -1,9 +1,23 @@
 @prefix specl: <https://w3id.org/specl/ns#> .
-@prefix spec: <https://w3id.org/specl/spec#> .
 @prefix sh:   <http://www.w3.org/ns/shacl#> .
 @prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
 @prefix dct:  <http://purl.org/dc/terms/> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+
+# The shapes graph had no ontology header, so there was nothing to version and
+# nothing to pin, which left UR17 unsatisfiable. The version IRI is the graph
+# contract rather than the release: UR6 makes the contract the identity of the
+# vocabulary and shapes pair, and only a designated breaking release may change
+# it. owl:versionInfo tracks the package and is informational; owl:versionIRI is
+# what a consumer pins.
+<https://w3id.org/specl/shapes> a owl:Ontology ;
+    # A consumer loading the shapes alone had no class hierarchy to resolve
+    # against, so nothing told them what specl:Requirement is.
+    owl:imports <https://w3id.org/specl/ns> ;
+    dct:title "SPECL Spec Shapes" ;
+    owl:versionIRI <https://w3id.org/specl/shapes/2> ;
+    owl:versionInfo "0.11.0" .
 
 # =============================================================================
 # SPECL Spec Shapes
@@ -61,7 +75,16 @@ specl:SpecificationShape a sh:NodeShape ;
 
 
 specl:RequirementShape a sh:NodeShape ;
-    sh:targetClass specl:Requirement ;
+    sh:target [ a sh:SPARQLTarget ;
+        sh:select """
+            SELECT ?this WHERE {
+                ?this a <https://w3id.org/specl/ns#Requirement> .
+                FILTER NOT EXISTS {
+                    ?this <https://w3id.org/specl/ns#itemStatus> ?st .
+                    FILTER(?st IN ("superseded", "withdrawn"))
+                }
+            }
+        """ ] ;
 
     # --- Violations: every requirement is identified and attached ---------
     sh:property [
@@ -97,11 +120,90 @@ specl:RequirementShape a sh:NodeShape ;
         sh:path specl:constrains ;
         sh:minCount 1 ;
         sh:severity sh:Warning ;
-        sh:message "Requirement should link to at least one component it constrains." ] .
+        sh:message "Requirement should link to at least one component it constrains." ] ;
+    sh:property [
+        sh:path specl:itemStatus ;
+        sh:in ( "active" "superseded" "withdrawn" ) ;
+        sh:maxCount 1 ;
+        sh:severity sh:Warning ;
+        sh:message "itemStatus must be active, superseded, or withdrawn." ] ;
+    sh:property [
+        sh:path specl:implementationStatus ;
+        sh:in ( "not-started" "in-progress" "implemented" "verified" ) ;
+        sh:maxCount 1 ;
+        sh:severity sh:Warning ;
+        sh:message "implementation must be not-started, in-progress, implemented, or verified." ] .
+
+# An item marked superseded without naming its replacement is the state
+# append-only discipline exists to prevent: the identifier is retired and the
+# reader cannot find what took its place.
+specl:SupersessionShape a sh:NodeShape ;
+    sh:target [ a sh:SPARQLTarget ;
+        sh:select """
+            SELECT ?this WHERE { ?this <https://w3id.org/specl/ns#itemStatus> "superseded" }
+        """ ] ;
+    sh:property [
+        sh:path specl:supersededBy ;
+        sh:minCount 1 ;
+        sh:severity sh:Warning ;
+        sh:message "An item marked superseded should name the item that replaces it." ] .
+
+# A successor of a different class, or one in another specification, is not a
+# replacement: the reader following the chain lands somewhere that does not
+# answer the same question.
+specl:SuccessorShape a sh:NodeShape ;
+    # Severity sits on the shape: pyshacl takes an sh:sparql constraint's
+    # severity from here rather than from the constraint node.
+    sh:severity sh:Warning ;
+    sh:target [ a sh:SPARQLTarget ;
+        sh:select """
+            SELECT ?this WHERE { ?this <https://w3id.org/specl/ns#supersededBy> ?successor }
+        """ ] ;
+    sh:sparql [
+        sh:message "A successor must be the same class as the item it replaces." ;
+        sh:select """
+            SELECT $this WHERE {
+                $this a ?cls ; <https://w3id.org/specl/ns#supersededBy> ?successor .
+                FILTER(STRSTARTS(STR(?cls), "https://w3id.org/specl/ns#"))
+                FILTER NOT EXISTS { ?successor a ?cls }
+            }
+        """ ] ;
+    sh:sparql [
+        sh:message "A successor must belong to the same specification." ;
+        sh:select """
+            SELECT $this WHERE {
+                $this <https://w3id.org/specl/ns#partOf> ?spec ;
+                      <https://w3id.org/specl/ns#supersededBy> ?successor .
+                FILTER NOT EXISTS { ?successor <https://w3id.org/specl/ns#partOf> ?spec }
+            }
+        """ ] .
+
+# Withdrawn is the no-successor case: struck, not replaced. Naming a successor
+# means the item was superseded, and the two states say different things to a
+# reader deciding whether to follow the chain.
+specl:WithdrawnShape a sh:NodeShape ;
+    sh:target [ a sh:SPARQLTarget ;
+        sh:select """
+            SELECT ?this WHERE { ?this <https://w3id.org/specl/ns#itemStatus> "withdrawn" }
+        """ ] ;
+    sh:property [
+        sh:path specl:supersededBy ;
+        sh:maxCount 0 ;
+        sh:severity sh:Warning ;
+        sh:message "A withdrawn item is struck rather than replaced; use superseded if a successor exists." ] .
 
 
 specl:UserStoryShape a sh:NodeShape ;
-    sh:targetClass specl:UserStory ;
+    sh:target [ a sh:SPARQLTarget ;
+        sh:select """
+            SELECT ?this WHERE {
+                ?this a <https://w3id.org/specl/ns#UserStory> .
+                FILTER NOT EXISTS {
+                    ?this <https://w3id.org/specl/ns#itemStatus> ?st .
+                    FILTER(?st IN ("superseded", "withdrawn"))
+                }
+            }
+        """ ] ;
 
     sh:property [
         sh:path dct:description ;
@@ -116,15 +218,15 @@ specl:UserStoryShape a sh:NodeShape ;
 
     # Warnings: the As/I want/So that triad and a linked persona
     sh:property [
-        sh:path specl:asA ;
+        sh:path specl:role ;
         sh:minCount 1 ;
         sh:severity sh:Warning ;
-        sh:message "User story should declare a persona via specl:asA." ] ;
+        sh:message "User story should declare who it is about via specl:role, naming a declared persona." ] ;
     sh:property [
-        sh:path specl:soThat ;
+        sh:path specl:benefit ;
         sh:minCount 1 ;
         sh:severity sh:Warning ;
-        sh:message "User story should declare the outcome/benefit via specl:soThat." ] ;
+        sh:message "User story should declare why it matters via specl:benefit." ] ;
     sh:property [
         sh:path specl:acceptanceCriterion ;
         sh:minCount 1 ;
@@ -133,7 +235,16 @@ specl:UserStoryShape a sh:NodeShape ;
 
 
 specl:OpenIssueShape a sh:NodeShape ;
-    sh:targetClass specl:OpenIssue ;
+    sh:target [ a sh:SPARQLTarget ;
+        sh:select """
+            SELECT ?this WHERE {
+                ?this a <https://w3id.org/specl/ns#OpenIssue> .
+                FILTER NOT EXISTS {
+                    ?this <https://w3id.org/specl/ns#itemStatus> ?st .
+                    FILTER(?st IN ("superseded", "withdrawn"))
+                }
+            }
+        """ ] ;
 
     sh:property [
         sh:path dct:description ;
@@ -151,7 +262,7 @@ specl:OpenIssueShape a sh:NodeShape ;
         sh:path specl:owner ;
         sh:minCount 1 ;
         sh:severity sh:Warning ;
-        sh:message "Open issue should have a named owner." ] ;
+        sh:message "Open issue should name an accountable agent via specl:owner." ] ;
     sh:property [
         sh:path specl:resolutionStatus ;
         sh:in ( "open" "in-review" "resolved" "deferred" ) ;
@@ -162,7 +273,16 @@ specl:OpenIssueShape a sh:NodeShape ;
 
 # Decision records: optional in prototype, encouraged in production.
 specl:DecisionRecordShape a sh:NodeShape ;
-    sh:targetClass specl:DecisionRecord ;
+    sh:target [ a sh:SPARQLTarget ;
+        sh:select """
+            SELECT ?this WHERE {
+                ?this a <https://w3id.org/specl/ns#DecisionRecord> .
+                FILTER NOT EXISTS {
+                    ?this <https://w3id.org/specl/ns#itemStatus> ?st .
+                    FILTER(?st IN ("superseded", "withdrawn"))
+                }
+            }
+        """ ] ;
     sh:property [
         sh:path dct:title ;
         sh:minCount 1 ;
@@ -184,3 +304,106 @@ specl:DecisionRecordShape a sh:NodeShape ;
         sh:minCount 1 ;
         sh:severity sh:Warning ;
         sh:message "Decision record should link to the requirements or components it affects." ] .
+
+
+# Acceptance queries. A query set is arguably the only part of a specification
+# that can falsify the rest, so a query that gates nothing verifies nothing.
+specl:AcceptanceQueryShape a sh:NodeShape ;
+    sh:target [ a sh:SPARQLTarget ;
+        sh:select """
+            SELECT ?this WHERE {
+                ?this a <https://w3id.org/specl/ns#AcceptanceQuery> .
+                FILTER NOT EXISTS {
+                    ?this <https://w3id.org/specl/ns#itemStatus> ?st .
+                    FILTER(?st IN ("superseded", "withdrawn"))
+                }
+            }
+        """ ] ;
+    sh:property [
+        sh:path dct:title ;
+        sh:minCount 1 ;
+        sh:severity sh:Violation ;
+        sh:message "Acceptance query must have a dct:title." ] ;
+    sh:property [
+        sh:path specl:gates ;
+        sh:minCount 1 ;
+        sh:severity sh:Warning ;
+        sh:message "An acceptance query should gate at least one requirement; one that gates nothing verifies nothing." ] .
+
+
+# Personas. A persona nobody references is dead weight, and one with no label
+# cannot be read by anyone who did not write it.
+specl:PersonaShape a sh:NodeShape ;
+    sh:targetClass specl:Persona ;
+    sh:property [
+        sh:path dct:title ;
+        sh:minCount 1 ;
+        sh:severity sh:Violation ;
+        sh:message "Persona must have a dct:title." ] .
+
+
+# Declared ranges, enforced. core.ttl says specl:constrains points at a
+# Component and specl:verifiedBy at a Test, and nothing checked it: reference
+# resolution tries the identifier grammar first, so `constrains: R1` quietly
+# produced a requirement in a position the ontology reserves for a component.
+# P1 fixed the literal half of this; this is the other half.
+specl:ReferenceRangeShape a sh:NodeShape ;
+    sh:severity sh:Warning ;
+    sh:target [ a sh:SPARQLTarget ;
+        sh:select """
+            SELECT ?this WHERE {
+                { ?this <https://w3id.org/specl/ns#constrains> ?o }
+                UNION
+                { ?this <https://w3id.org/specl/ns#verifiedBy> ?o }
+            }
+        """ ] ;
+    sh:sparql [
+        sh:message "specl:constrains points at something typed as an item in this specification; its declared range is specl:Component." ;
+        sh:select """
+            SELECT $this WHERE {
+                $this <https://w3id.org/specl/ns#constrains> ?o .
+                ?o <https://w3id.org/specl/ns#partOf> ?spec .
+                FILTER NOT EXISTS { ?o a <https://w3id.org/specl/ns#Component> }
+            }
+        """ ] ;
+    sh:sparql [
+        sh:message "specl:verifiedBy points at something typed as an item in this specification; its declared range is specl:Test." ;
+        sh:select """
+            SELECT $this WHERE {
+                $this <https://w3id.org/specl/ns#verifiedBy> ?o .
+                ?o <https://w3id.org/specl/ns#partOf> ?spec .
+                FILTER NOT EXISTS { ?o a <https://w3id.org/specl/ns#Test> }
+            }
+        """ ] .
+
+
+# Disjointness, enforced rather than only declared. core.ttl states that the
+# item classes are pairwise disjoint; this is what reports a violation, because
+# a graph is validated by SHACL here and reasoned over only by whoever chooses
+# to.
+specl:DisjointItemShape a sh:NodeShape ;
+    sh:target [ a sh:SPARQLTarget ;
+        sh:select """
+            SELECT ?this WHERE { ?this <https://w3id.org/specl/ns#partOf> ?spec }
+        """ ] ;
+    sh:sparql [
+        sh:severity sh:Violation ;
+        sh:message "An item carries more than one item class; the item classes are disjoint." ;
+        sh:select """
+            SELECT $this WHERE {
+                $this a ?a, ?b .
+                ?a <http://www.w3.org/2000/01/rdf-schema#subClassOf> <https://w3id.org/specl/ns#Item> .
+                ?b <http://www.w3.org/2000/01/rdf-schema#subClassOf> <https://w3id.org/specl/ns#Item> .
+                FILTER(STR(?a) < STR(?b))
+            }
+        """ ] .
+
+
+# Agents. An agent nobody can read is a node with an identifier and nothing else.
+specl:AgentShape a sh:NodeShape ;
+    sh:targetClass specl:Agent ;
+    sh:property [
+        sh:path dct:title ;
+        sh:minCount 1 ;
+        sh:severity sh:Violation ;
+        sh:message "Agent must have a dct:title." ] .

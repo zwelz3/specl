@@ -1,4 +1,6 @@
 ---
+spec_base: https://example.org/specs/pptx_templater#
+prefix: PPTXG
 spec_id: pptxgen-001
 title: Corporate PowerPoint Template Filler
 version: 0.1.0

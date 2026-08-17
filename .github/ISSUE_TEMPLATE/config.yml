@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Defect in the tool
+    url: https://github.com/zwelz3/specl/issues/new
+    about: Implementation, ergonomics, and documentation are not governed. Open a normal issue.
+  - name: How changes are decided
+    url: https://github.com/zwelz3/specl/blob/main/GOVERNANCE.md
+    about: What is governed, the comment period, and who is consulted.

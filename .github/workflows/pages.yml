@@ -23,11 +23,27 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      - name: Install rdflib
+        run: pip install rdflib
+
       - name: Build pages site
         run: |
           mkdir -p _site
           cp src/specl/core.ttl _site/ns.ttl
+          # The w3id rules negotiate application/ld+json to ns.jsonld. Without
+          # this step that redirect lands on a 404.
+          python3 -c "import rdflib; rdflib.Graph().parse('src/specl/core.ttl').serialize('_site/ns.jsonld', format='json-ld')"
           cp src/specl/shapes.ttl _site/shapes.ttl
+          # Versioned copies, addressed by graph contract rather than by
+          # release. UR17 commits these locations and they must stay fetchable.
+          mkdir -p _site/ns _site/shapes
+          # Contract 1 copies stay fetchable: UR17 commits that, and graphs in
+          # the wild still declare it. They are pinned to the v0.10.0 tag rather
+          # than rebuilt from HEAD, which would silently make them contract 2.
+          git show v0.10.0:src/specl/core.ttl > _site/ns/1.ttl
+          git show v0.10.0:src/specl/shapes.ttl > _site/shapes/1.ttl
+          cp src/specl/core.ttl _site/ns/2.ttl
+          cp src/specl/shapes.ttl _site/shapes/2.ttl
           cp src/specl/explorer.html _site/explorer.html
           cp static/index.html _site/index.html
           if [ -d static/badges ]; then

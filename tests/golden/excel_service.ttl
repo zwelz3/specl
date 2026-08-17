@@ -1,0 +1,105 @@
+@prefix specl: <https://w3id.org/specl/ns#> .
+@prefix spec: <https://example.org/specs/excel_service#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+<https://example.org/specs/excel_service> a specl:Specification ;
+    dct:conformsTo <https://w3id.org/specl/contract/2> ;
+    dct:title "Excel Report Generation Service" ;
+    dct:hasVersion "0.1.0" ;
+    specl:status "prototype" ;
+    dct:identifier "xlsvc-001" ;
+    specl:prefix "XLSVC" ;
+    specl:intent """Define a lightweight HTTP service that generates multi-sheet Excel workbooks from structured data with repeatable formatting, formulas, and charts for recurring reporting workflows.""" ;
+    specl:purpose """Eliminate hand-built Excel reports by exposing a single service endpoint that turns query results plus a report definition into a formatted .xlsx file, delivered synchronously for small reports and via job queue for large ones.""" .
+
+spec:source-e9e453bf a specl:SourceDocument ;
+    dct:identifier "spec.md" .
+
+spec:R1.1 a specl:Requirement ;
+    specl:partOf <https://example.org/specs/excel_service> ;
+    dct:title "The service must expose an HTTP POST endpoint that accepts a report definition…" ;
+    dct:description "The service must expose an HTTP POST endpoint that accepts a report definition (JSON) and returns a .xlsx file or a job ID." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "18"^^xsd:integer .
+
+spec:R1.2 a specl:Requirement ;
+    specl:partOf <https://example.org/specs/excel_service> ;
+    dct:title "Report definitions must support multiple named sheets, each bound to a data…" ;
+    dct:description "Report definitions must support multiple named sheets, each bound to a data source (inline JSON, SQL query, or uploaded CSV)." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "19"^^xsd:integer .
+
+spec:R1.3 a specl:Requirement ;
+    specl:partOf <https://example.org/specs/excel_service> ;
+    dct:title "Cell formatting (number formats, conditional formatting, borders, fonts, fills)…" ;
+    dct:description "Cell formatting (number formats, conditional formatting, borders, fonts, fills) must be declarable per column or per range." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "20"^^xsd:integer .
+
+spec:R1.4 a specl:Requirement ;
+    specl:partOf <https://example.org/specs/excel_service> ;
+    dct:title "Formulas must be supported, including cross-sheet references and Excel-native…" ;
+    dct:description "Formulas must be supported, including cross-sheet references and Excel-native functions." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "21"^^xsd:integer .
+
+spec:R1.5 a specl:Requirement ;
+    specl:partOf <https://example.org/specs/excel_service> ;
+    dct:title "Charts must be generated from sheet data using openpyxl or xlsxwriter chart…" ;
+    dct:description "Charts must be generated from sheet data using openpyxl or xlsxwriter chart primitives." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "22"^^xsd:integer .
+
+spec:R1.6 a specl:Requirement ;
+    specl:partOf <https://example.org/specs/excel_service> ;
+    dct:title "Large reports (over 100k rows or over 30 seconds of generation time) must be…" ;
+    dct:description "Large reports (over 100k rows or over 30 seconds of generation time) must be handled via an async job queue with status polling." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "23"^^xsd:integer .
+
+spec:R1.7 a specl:Requirement ;
+    specl:partOf <https://example.org/specs/excel_service> ;
+    dct:title "The service must authenticate callers via OAuth 2.0 bearer tokens" ;
+    dct:description "The service must authenticate callers via OAuth 2.0 bearer tokens." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "24"^^xsd:integer .
+
+spec:R2.1 a specl:Requirement ;
+    specl:partOf <https://example.org/specs/excel_service> ;
+    dct:title "Output files must open without errors in Excel 2016 and later and in…" ;
+    dct:description "Output files must open without errors in Excel 2016 and later and in LibreOffice Calc." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "25"^^xsd:integer .
+
+spec:R2.2 a specl:Requirement ;
+    specl:partOf <https://example.org/specs/excel_service> ;
+    dct:title "The service must emit structured logs and OpenTelemetry traces for every request" ;
+    dct:description "The service must emit structured logs and OpenTelemetry traces for every request." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "26"^^xsd:integer .
+
+spec:US1 a specl:UserStory ;
+    specl:partOf <https://example.org/specs/excel_service> ;
+    dct:title "Generate a monthly financial report from a SQL query with three summary sheets…" ;
+    dct:description "Generate a monthly financial report from a SQL query with three summary sheets and a pivot-style chart." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "30"^^xsd:integer .
+
+spec:US2 a specl:UserStory ;
+    specl:partOf <https://example.org/specs/excel_service> ;
+    dct:title "Produce a per-customer workbook in under two seconds for customer portal…" ;
+    dct:description "Produce a per-customer workbook in under two seconds for customer portal downloads." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "31"^^xsd:integer .
+
+spec:US3 a specl:UserStory ;
+    specl:partOf <https://example.org/specs/excel_service> ;
+    dct:title "Submit a large historical export as an async job and retrieve the file when…" ;
+    dct:description "Submit a large historical export as an async job and retrieve the file when ready." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "32"^^xsd:integer .
+

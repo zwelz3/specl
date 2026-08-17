@@ -1,0 +1,310 @@
+@prefix specl: <https://w3id.org/specl/ns#> .
+@prefix spec: <https://w3id.org/specl/commitments/spec#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+<https://w3id.org/specl/commitments/spec> a specl:Specification ;
+    dct:conformsTo <https://w3id.org/specl/contract/2> ;
+    dct:title "Downstream commitments" ;
+    dct:hasVersion "0.5.0" ;
+    specl:status "review" ;
+    dct:identifier "commitments-001" ;
+    specl:prefix "COMMIT" ;
+    specl:itemPrefix "UR" ;
+    dct:created "2026-08-16"^^xsd:date ;
+    specl:intent """Behavior specl has already specified to a downstream consumer that authored against those answers. These are not proposals. A consumer has made irreversible authoring decisions on each one, and changing an answer here costs that consumer a migration rather than a rewrite of a plan. Before changing any behavior listed here, check whether it is listed here.""" ;
+    specl:purpose """This register is itself a specl specification, so that each commitment carries an identifier a second party can cite, a status that can be retired rather than deleted, and a verification claim checked against the test suite on every run. Three releases in a row under-delivered against clauses written here because the roadmap summarized what this document committed, and the summary was believed. Identifiers are the consumer's own request numbers, UR1 through UR17, so that a conversation about UR11 resolves to one IRI on both sides.""" .
+
+spec:source-e9e453bf a specl:SourceDocument ;
+    dct:identifier "spec.md" .
+
+spec:UR1 a specl:Requirement ;
+    specl:partOf <https://w3id.org/specl/commitments/spec> ;
+    dct:title "spec_base grammar" ;
+    dct:description "Hash termination is required in `spec_base`. Translation rejects a value that does not end in `#` and does not append a missing terminator, rejects a bare authority with no path segment, and rejects a value carrying a fragment beyond the terminating `#`. Slash-terminated bases remain unsupported until a post-1.0 extension." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "33"^^xsd:integer ;
+    specl:priority "MUST" ;
+    specl:acceptanceCriterion "Given a value failing any clause, translation exits non-zero and writes no graph." ;
+    specl:verifiedBy spec:test-400ba476 ;
+    specl:constrains spec:component-spec_to_rdf .
+
+spec:UR2 a specl:Requirement ;
+    specl:partOf <https://w3id.org/specl/commitments/spec> ;
+    dct:title "Legacy base table" ;
+    dct:description "The legacy base table in `NAMESPACE-MIGRATION.md` is recognized by `specl-migrate iris` as the set of migration sources, and the tool fails rather than guessing when no known source is present." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "39"^^xsd:integer ;
+    specl:priority "MUST" ;
+    specl:acceptanceCriterion "Given a graph with no legacy IRIs, migration reports nothing to migrate rather than rewriting." ;
+    specl:verifiedBy spec:test-aa4e97a0 ;
+    specl:constrains spec:component-migrate .
+
+spec:UR3 a specl:Requirement ;
+    specl:partOf <https://w3id.org/specl/commitments/spec> ;
+    dct:title "Reference resolution algorithm" ;
+    dct:description "Reference resolution is string concatenation onto the base, not RFC 3986 relative resolution. The token is used verbatim, so dotted identifiers are safe under any base shape." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "45"^^xsd:integer ;
+    specl:priority "MUST" ;
+    specl:acceptanceCriterion "Given a decision annotated with an item identifier, the emitted object is the base concatenated with that token." ;
+    specl:verifiedBy spec:test-cb4bec55 ;
+    specl:constrains spec:component-spec_to_rdf .
+
+spec:UR4 a specl:Requirement ;
+    specl:partOf <https://w3id.org/specl/commitments/spec> ;
+    dct:title "title fallback derivation" ;
+    dct:description "A `title:` fallback is derived from the description and materialized into the graph: split at the first sentence boundary, strip trailing sentence punctuation, and truncate at the last word boundary within 80 characters with an ellipsis appended." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "51"^^xsd:integer ;
+    specl:priority "MUST" ;
+    specl:acceptanceCriterion "Given an item with no title, the emitted graph carries a derived one." ;
+    specl:verifiedBy spec:test-125bf373 ;
+    specl:constrains spec:component-spec_to_rdf .
+
+spec:UR5 a specl:Requirement ;
+    specl:partOf <https://w3id.org/specl/commitments/spec> ;
+    dct:title "Graph comparison modulo base" ;
+    dct:description "`specl-validate diff --ignore-base` compares graphs modulo their instance base, so a migration reports as unchanged content rather than as wholesale removal and addition." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "57"^^xsd:integer ;
+    specl:priority "MUST" ;
+    specl:acceptanceCriterion "Given a graph and its migration, keying by token yields no added or removed requirements." ;
+    specl:verifiedBy spec:test-8521bcd5 ;
+    specl:constrains spec:component-validate_spec .
+
+spec:UR6 a specl:Requirement ;
+    specl:partOf <https://w3id.org/specl/commitments/spec> ;
+    dct:title "Versioned graph contract" ;
+    dct:description "Every emitted graph declares the version of the graph contract it conforms to, identifying the vocabulary and shapes pair rather than the tool version." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "63"^^xsd:integer ;
+    specl:priority "MUST" ;
+    specl:acceptanceCriterion "Given any translated specification, the Specification node carries dct:conformsTo naming a contract IRI." ;
+    specl:verifiedBy spec:test-c8f47e56 ;
+    specl:constrains spec:component-spec_to_rdf .
+
+spec:UR9 a specl:Requirement ;
+    specl:partOf <https://w3id.org/specl/commitments/spec> ;
+    dct:title "Warn on unrecognized sections" ;
+    dct:description "A section heading the translator does not recognize produces a warning rather than being dropped in silence, and content under it is not lost without notice." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "69"^^xsd:integer ;
+    specl:priority "MUST" ;
+    specl:acceptanceCriterion "Given a heading nothing recognizes, translation warns and names it; given one marked parked, translation is silent." ;
+    specl:verifiedBy spec:test-ac2f7fb3 ;
+    specl:constrains spec:component-spec_to_rdf .
+
+spec:UR11 a specl:Requirement ;
+    specl:partOf <https://w3id.org/specl/commitments/spec> ;
+    dct:title "Reserved prefixes and identifier grammar" ;
+    dct:description "Identifiers are one or more uppercase ASCII letters, one or more digits, then zero or more dot-separated digit groups, case sensitive and never normalized. `R`, `US`, `OQ`, `D`, `DN`, `C`, and `Q` are reserved; project-declared prefixes are at least two characters." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "75"^^xsd:integer ;
+    specl:priority "MUST" ;
+    specl:acceptanceCriterion "Given an identifier legal under the grammar, translation emits it; given a bullet that looks like an item and does not parse, translation warns rather than dropping it." ;
+    specl:verifiedBy spec:test-765bef60 ;
+    specl:constrains spec:component-spec_to_rdf .
+
+spec:UR12 a specl:Requirement ;
+    specl:partOf <https://w3id.org/specl/commitments/spec> ;
+    dct:title "Supersession semantics" ;
+    dct:description "A superseded or withdrawn item is still emitted and is not evaluated by the shapes, except the one requiring a successor. A successor is the same class in the same specification. `withdrawn` is the no-successor case, and a withdrawn identifier is permanently reserved, with reuse a violation rather than a warning." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "81"^^xsd:integer ;
+    specl:priority "MUST" ;
+    specl:acceptanceCriterion "Given a retired item, no shape other than the successor requirement reports against it." ;
+    specl:verifiedBy spec:test-c417493e ;
+    specl:constrains spec:component-shapes .
+
+spec:UR13 a specl:Requirement ;
+    specl:partOf <https://w3id.org/specl/commitments/spec> ;
+    dct:title "Layering resolution and offline operation" ;
+    dct:description "Layering never touches the network. An upstream declaration names a prefix, a base IRI, and a local path. A missing or unreadable peer produces a warning and reports inconclusive, never passing and never failing." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "87"^^xsd:integer ;
+    specl:priority "MUST" ;
+    specl:acceptanceCriterion "Given a peer that cannot be read, layering reports inconclusive and exits 3, never passing." ;
+    specl:verifiedBy spec:test-7fcca54b ;
+    specl:constrains spec:component-validate_spec .
+
+spec:UR15 a specl:Requirement ;
+    specl:partOf <https://w3id.org/specl/commitments/spec> ;
+    dct:title "Cross-specification reference syntax" ;
+    dct:description "Cross-specification references are `PREFIX:ID` in reference-valued fields, with foreign prefixes declared in the referencing specification's front matter as a two-level `references:` mapping carrying a base and a path. References resolve to IRIs always. An unresolvable peer is a warning and the reference is still emitted as an IRI." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "93"^^xsd:integer ;
+    specl:priority "MUST" ;
+    specl:acceptanceCriterion "Given a declared prefix, a PREFIX:ID token resolves to the peer base concatenated with the identifier; given an undeclared one, translation warns and emits a literal." ;
+    specl:verifiedBy spec:test-10300f9c ;
+    specl:constrains spec:component-spec_to_rdf .
+
+spec:UR16 a specl:Requirement ;
+    specl:partOf <https://w3id.org/specl/commitments/spec> ;
+    dct:title "Per-release obsolescence notes" ;
+    dct:description "Each release's notes name the downstream compensations that release makes unnecessary, and state the observable condition for removing each." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "99"^^xsd:integer ;
+    specl:priority "MUST" ;
+    specl:itemStatus "active" .
+
+spec:UR17 a specl:Requirement ;
+    specl:partOf <https://w3id.org/specl/commitments/spec> ;
+    dct:title "Versioned fetchable shapes and vocabulary" ;
+    dct:description "The shapes graph and vocabulary are published at versioned locations and remain fetchable, with the constraint that nothing fetches at validation time." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "103"^^xsd:integer ;
+    specl:priority "MUST" ;
+    specl:acceptanceCriterion "Given the shapes graph, it declares an ontology IRI carrying a version IRI, and that version is the graph contract rather than the release." ;
+    specl:verifiedBy spec:test-0094029f ;
+    specl:constrains spec:component-shapes .
+
+spec:UR18 a specl:Requirement ;
+    specl:partOf <https://w3id.org/specl/commitments/spec> ;
+    dct:title "Prefixed tokens before layering" ;
+    dct:description "Prefixed tokens are illegal in reference-valued fields until cross-specification references exist. Such a token produces a parser warning and is emitted as a literal rather than a guessed IRI." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "109"^^xsd:integer ;
+    specl:priority "MUST" ;
+    specl:acceptanceCriterion "Given a CURIE in a reference field before 0.5.0, translation warns and emits a literal." ;
+    specl:verifiedBy spec:test-66be4d56 ;
+    specl:constrains spec:component-spec_to_rdf .
+
+spec:UR19 a specl:Requirement ;
+    specl:partOf <https://w3id.org/specl/commitments/spec> ;
+    dct:title "Unresolvable reference tokens survive" ;
+    dct:description "A reference token that does not match the identifier grammar produces a parser warning and is emitted as a literal, never silently discarded." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "115"^^xsd:integer ;
+    specl:priority "MUST" ;
+    specl:acceptanceCriterion "Given a reference to an identifier no item declares, translation warns and still emits the IRI." ;
+    specl:verifiedBy spec:test-8a1d0267 ;
+    specl:constrains spec:component-spec_to_rdf .
+
+spec:UR20 a specl:Requirement ;
+    specl:partOf <https://w3id.org/specl/commitments/spec> ;
+    dct:title "Acceptance query class" ;
+    dct:description "The acceptance query class arrives under the section heading `# Acceptance Queries` with prefix `Q`, one bullet per query with the intent as description, and a `gates:` annotation taking a comma-separated list of requirement identifiers." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "121"^^xsd:integer ;
+    specl:priority "MUST" ;
+    specl:acceptanceCriterion "Given a Q-prefixed bullet under the committed heading with a gates annotation, the query is emitted and the requirements it gates are reachable from it." ;
+    specl:verifiedBy spec:test-65070211 ;
+    specl:constrains spec:component-spec_to_rdf .
+
+spec:UR21 a specl:Requirement ;
+    specl:partOf <https://w3id.org/specl/commitments/spec> ;
+    dct:title "Per-term stability tiers" ;
+    dct:description "Per-term stability tiers are deferred rather than refused, because assigning stability to a vocabulary that gains classes in four of the next five releases would record an assurance that cannot be honored." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "127"^^xsd:integer ;
+    specl:priority "SHOULD" ;
+    specl:itemStatus "active" .
+
+spec:UR22 a specl:OpenIssue ;
+    specl:partOf <https://w3id.org/specl/commitments/spec> ;
+    dct:title "Whether the process commitment under UR16 should itself be verifiable, given…" ;
+    dct:description "Whether the process commitment under UR16 should itself be verifiable, given that release notes are prose and the observable condition for removing a compensation is stated in words rather than checked." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "154"^^xsd:integer ;
+    specl:recommendation "Bind each compensation to a test the way the contract page binds its guarantees" ;
+    specl:resolutionStatus "open" .
+
+spec:UR8 a specl:DecisionRecord ;
+    specl:partOf <https://w3id.org/specl/commitments/spec> ;
+    dct:title "No per-item shape suppression" ;
+    dct:description "Per-item shape suppression is declined as requested, and the root cause is accepted instead. A suppression key with a reason field is a warning made invisible, and specl already has decision records for recording a judgment." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "134"^^xsd:integer ;
+    specl:decisionStatus "accepted" ;
+    specl:rationale "The requester's own framing was that the warnings were unclearable; the answer is to make them clearable rather than to hide them." .
+
+spec:UR14 a specl:DecisionRecord ;
+    specl:partOf <https://w3id.org/specl/commitments/spec> ;
+    dct:title "No namespace registry" ;
+    dct:description "specl does not model a namespace registry and will not. `spec_base` and `prefix` live in front matter, and foreign prefixes live in the front matter of the referencing specification. There is no tool-level registry and none is planned." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "138"^^xsd:integer ;
+    specl:decisionStatus "accepted" ;
+    specl:rationale "A registry is a second source of truth for a value the specification already declares." .
+
+spec:UR7 a specl:DecisionRecord ;
+    specl:partOf <https://w3id.org/specl/commitments/spec> ;
+    dct:title "Status-conditional severity model" ;
+    dct:description "The severity gate is driven by the specification's own status rather than by a fixed severity threshold, with the original premise corrected." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "142"^^xsd:integer ;
+    specl:decisionStatus "accepted" ;
+    specl:rationale "A fixed threshold makes every warning either blocking or ignorable, and neither is a representable target." .
+
+spec:UR10 a specl:DecisionRecord ;
+    specl:partOf <https://w3id.org/specl/commitments/spec> ;
+    dct:title "Pre-adoption path per planned class" ;
+    dct:description "Each planned class has a pre-adoption path: content is authored under a prose marker before the class exists, and adoption becomes moving the section rather than rewriting it." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "146"^^xsd:integer ;
+    specl:decisionStatus "accepted" ;
+    specl:affects spec:UR9 ;
+    specl:affects spec:UR20 ;
+    specl:rationale "Adoption should be a mechanical lift rather than a rewrite." .
+
+spec:component-migrate a specl:Component ;
+    dct:identifier "migrate" .
+
+spec:component-shapes a specl:Component ;
+    dct:identifier "shapes" .
+
+spec:component-spec_to_rdf a specl:Component ;
+    dct:identifier "spec_to_rdf" .
+
+spec:component-validate_spec a specl:Component ;
+    dct:identifier "validate_spec" .
+
+spec:test-0094029f a specl:Test ;
+    dct:identifier "tests/test_drift.py::test_the_shapes_graph_is_identified_and_versioned" .
+
+spec:test-10300f9c a specl:Test ;
+    dct:identifier "tests/test_references.py::test_a_declared_prefix_resolves_to_the_peer_base" .
+
+spec:test-125bf373 a specl:Test ;
+    dct:identifier "tests/test_title.py::test_every_item_carries_a_title" .
+
+spec:test-400ba476 a specl:Test ;
+    dct:identifier "tests/test_spec_base.py::test_rejections" .
+
+spec:test-65070211 a specl:Test ;
+    dct:identifier "tests/test_sections_and_queries.py::test_a_requirement_is_reachable_from_the_query_that_gates_it" .
+
+spec:test-66be4d56 a specl:Test ;
+    dct:identifier "tests/test_references.py::test_an_undeclared_prefix_warns_and_stays_a_literal" .
+
+spec:test-765bef60 a specl:Test ;
+    dct:identifier "tests/test_grammar.py::test_committed_grammar_identifiers_translate" .
+
+spec:test-7fcca54b a specl:Test ;
+    dct:identifier "tests/test_layering.py::test_an_unreadable_peer_is_inconclusive_rather_than_a_pass" .
+
+spec:test-8521bcd5 a specl:Test ;
+    dct:identifier "tests/test_migrate.py::test_diff_ignore_base_sees_a_rebased_graph_as_the_same_items" .
+
+spec:test-8a1d0267 a specl:Test ;
+    dct:identifier "tests/test_references.py::test_a_dangling_reference_warns_and_still_resolves" .
+
+spec:test-aa4e97a0 a specl:Test ;
+    dct:identifier "tests/test_migrate.py::test_a_migrated_graph_is_left_alone" .
+
+spec:test-ac2f7fb3 a specl:Test ;
+    dct:identifier "tests/test_sections_and_queries.py::test_an_unrecognized_heading_warns_rather_than_vanishing" .
+
+spec:test-c417493e a specl:Test ;
+    dct:identifier "tests/test_lifecycle.py::test_a_retired_item_accumulates_no_other_warnings" .
+
+spec:test-c8f47e56 a specl:Test ;
+    dct:identifier "tests/test_spec_base.py::test_the_specification_is_the_base_without_its_terminator" .
+
+spec:test-cb4bec55 a specl:Test ;
+    dct:identifier "tests/test_references.py::test_an_item_reference_resolves_against_the_base" .
+

@@ -8,7 +8,7 @@ repos:
           for spec_dir in specs/*/; do
             name=$(basename "$spec_dir")
             [ -f "$spec_dir/spec.md" ] || continue
-            specl-translate "$spec_dir/spec.md" "$spec_dir/spec.ttl" --strict
+            specl-translate "$spec_dir/spec.md" "$spec_dir/spec.ttl" --fail-on-warning
             specl-validate validate "$spec_dir/spec.ttl" src/specl/shapes.ttl --explain
           done
         '

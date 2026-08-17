@@ -16,9 +16,7 @@ jobs:
         spec:
           - specl_tool
           - specl_explorer
-          - html_presenter
-          - pptx_templater
-          - excel_service
+          - commitments
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v6
@@ -27,7 +25,7 @@ jobs:
       - name: Install specl
         run: pip install -e .
       - name: Translate ${{ matrix.spec }}
-        run: specl-translate specs/${{ matrix.spec }}/spec.md specs/${{ matrix.spec }}/spec.ttl --strict
+        run: specl-translate specs/${{ matrix.spec }}/spec.md specs/${{ matrix.spec }}/spec.ttl --fail-on-warning
       - name: Validate ${{ matrix.spec }}
         run: specl-validate validate specs/${{ matrix.spec }}/spec.ttl src/specl/shapes.ttl --explain --json specs/${{ matrix.spec }}/report.json
       - name: Score ${{ matrix.spec }}
@@ -65,3 +63,39 @@ jobs:
           git diff --staged --quiet && echo "No badge changes" && exit 0
           git commit -m "ci: update maturity badges [skip ci]"
           git push
+
+  tests:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # Every version pyproject claims to support. The floor was 3.10 and
+        # untested, which meant the first person on 3.10 would have found out.
+        python-version: ['3.11', '3.12', '3.13']
+        # Windows, because everything here ran on Ubuntu and an adopter found
+        # three failures on the platform's default encoding. One version is
+        # enough: the defects platforms differ on are path and encoding
+        # handling, not interpreter version.
+        os: [ubuntu-latest]
+        include:
+          - os: windows-latest
+            python-version: '3.12'
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install specl with test dependencies
+        run: pip install -e ".[dev]"
+      - name: Test suite
+        run: pytest -q
+
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Documentation agrees with the code
+        run: python3 tools/check_docs.py

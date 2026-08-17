@@ -77,13 +77,19 @@ pre{background:var(--panel);padding:16px;border-radius:6px;overflow-x:auto;font:
 const MAT_LOW=50,MAT_HIGH=85;
 const TYPES={Requirement:{cls:'req',label:'Requirements'},UserStory:{cls:'us',label:'User Stories'},
 OpenIssue:{cls:'issue',label:'Open Issues'},DecisionRecord:{cls:'adr',label:'Decisions'},
-DesignNote:{cls:'note',label:'Design Notes'},Comment:{cls:'note',label:'Comments'}};
+DesignNote:{cls:'note',label:'Design Notes'},Comment:{cls:'note',label:'Comments'},
+AcceptanceQuery:{cls:'query',label:'Acceptance Queries'},
+Persona:{cls:'note',label:'Personas'},
+Agent:{cls:'note',label:'Agents'}};
 const PROD=['priority','acceptanceCriterion','verifiedBy','constrains'];
 const FIELDS={
-  Requirement:[['description','Description'],['priority','Priority'],['acceptanceCriterion','Acceptance'],['verifiedBy','Verified by'],['constrains','Constrains']],
-  UserStory:[['description','Description'],['asA','As a'],['iWant','I want'],['soThat','So that'],['acceptanceCriterion','Acceptance']],
+  Requirement:[['description','Description'],['priority','Priority'],['acceptanceCriterion','Acceptance'],['verifiedBy','Verified by'],['constrains','Constrains'],['implementationStatus','Implementation'],['itemStatus','Lifecycle'],['supersededBy','Superseded by']],
+  UserStory:[['description','Description'],['role','Role'],['capability','Capability'],['benefit','Benefit'],['acceptanceCriterion','Acceptance']],
   OpenIssue:[['description','Description'],['recommendation','Recommendation'],['owner','Owner'],['resolutionStatus','Status']],
   DecisionRecord:[['description','Description'],['decisionStatus','Status'],['rationale','Rationale'],['affects','Affects']],
+  AcceptanceQuery:[['description','Description'],['gates','Gates']],
+  Persona:[['description','Description'],['prefLabel','Preferred label'],['altLabel','Other labels']],
+  Agent:[['description','Description'],['prefLabel','Preferred label'],['altLabel','Other labels']],
   DesignNote:[['description','Description']],Comment:[['description','Description']]};
 let S={raw:'',spec:null,items:[],selected:null,tab:'detail',error:null};
 

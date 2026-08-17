@@ -1,4 +1,6 @@
 ---
+spec_base: https://example.org/specs/html_presenter#
+prefix: HTMLP
 spec_id: htmlpres-001
 title: Interactive HTML Presentation Tool
 version: 0.1.0

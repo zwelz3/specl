@@ -1,0 +1,141 @@
+@prefix specl: <https://w3id.org/specl/ns#> .
+@prefix spec: <https://example.org/specs/maximal#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+<https://example.org/specs/maximal> a specl:Specification ;
+    specl:declaresVocabulary spec:vocabulary-skos ;
+    specl:declares spec:reference-DOWN ;
+    specl:declares spec:reference-UP ;
+    specl:dependsOn <https://example.org/specs/upstream> ;
+    specl:upstreamOf <https://example.org/specs/downstream> ;
+    specl:refines <https://example.org/specs/upstream> ;
+    dct:conformsTo <https://w3id.org/specl/contract/2> ;
+    dct:title "Maximal fixture" ;
+    dct:hasVersion "1.2.3" ;
+    specl:status "prototype" ;
+    dct:identifier "maximal-001" ;
+    specl:prefix "MAX" ;
+    dct:created "2020-01-01"^^xsd:date ;
+    specl:intent """Exercise every section type and every annotation key the translator recognizes, so that shapes coverage is checked against what the translator can actually produce rather than against what it is assumed to produce.""" ;
+    specl:purpose """Serve as the input to the coverage assertion and as a golden that changes whenever the emission surface changes.""" .
+
+spec:source-e9e453bf a specl:SourceDocument ;
+    dct:identifier "spec.md" .
+
+spec:vocabulary-skos a specl:Vocabulary ;
+    specl:prefix "skos" ;
+    specl:referenceBase "http://www.w3.org/2004/02/skos/core#" .
+spec:reference-DOWN a specl:SpecificationReference ;
+    specl:prefix "DOWN" ;
+    specl:referenceBase "https://example.org/specs/downstream#" ;
+    specl:referencePath "../downstream/spec.ttl" .
+spec:reference-UP a specl:SpecificationReference ;
+    specl:prefix "UP" ;
+    specl:referenceBase "https://example.org/specs/upstream#" ;
+    specl:referencePath "../upstream/spec.ttl" .
+
+spec:R1 a specl:Requirement ;
+    specl:partOf <https://example.org/specs/maximal> ;
+    dct:title "Exercise every requirement annotation" ;
+    dct:description "The system MUST exercise every requirement annotation." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "38"^^xsd:integer ;
+    specl:priority "MUST" ;
+    specl:implementationStatus "implemented" ;
+    specl:acceptanceCriterion "Given a fixture, when translated, then every annotation appears" ;
+    specl:verifiedBy spec:test-1d8c4efd ;
+    specl:constrains spec:component-Translator ;
+    specl:constrains spec:component-Emitter ;
+    specl:affects <https://example.org/specs/upstream#R1> ;
+    specl:governs <http://www.w3.org/2004/02/skos/core#Concept> .
+
+spec:R1.1 a specl:Requirement ;
+    specl:partOf <https://example.org/specs/maximal> ;
+    dct:title "A dotted identifier with one group MUST translate" ;
+    dct:description "A dotted identifier with one group MUST translate." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "48"^^xsd:integer ;
+    specl:priority "SHOULD" ;
+    specl:itemStatus "superseded" ;
+    specl:supersededBy spec:R1 .
+
+spec:US1 a specl:UserStory ;
+    specl:partOf <https://example.org/specs/maximal> ;
+    dct:title "As a maintainer, I want every user story annotation exercised, so that coverage…" ;
+    dct:description "As a maintainer, I want every user story annotation exercised, so that coverage is real." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "66"^^xsd:integer ;
+    specl:role spec:P1 ;
+    specl:capability "every user story annotation exercised" ;
+    specl:benefit "coverage is real" ;
+    specl:acceptanceCriterion "Given this fixture, when translated, then role, capability, and benefit appear" .
+
+spec:OQ1 a specl:OpenIssue ;
+    specl:partOf <https://example.org/specs/maximal> ;
+    dct:title "Whether the coverage assertion should treat warnings as required" ;
+    dct:description "Whether the coverage assertion should treat warnings as required." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "74"^^xsd:integer ;
+    specl:owner spec:AG1 ;
+    specl:recommendation "Treat Violation severity as required and Warning as advisory" ;
+    specl:resolutionStatus "open" .
+
+spec:OQ2 a specl:OpenIssue ;
+    specl:partOf <https://example.org/specs/maximal> ;
+    dct:title "Whether the alias heading `Open Issues` should remain, given `Open Questions`…" ;
+    dct:description "Whether the alias heading `Open Issues` should remain, given `Open Questions` reads better." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "98"^^xsd:integer ;
+    specl:resolutionStatus "open" ;
+    specl:owner spec:AG1 .
+
+spec:D1 a specl:DecisionRecord ;
+    specl:partOf <https://example.org/specs/maximal> ;
+    dct:title "Use one maximal fixture rather than one fixture per annotation key" ;
+    dct:description "Use one maximal fixture rather than one fixture per annotation key." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "81"^^xsd:integer ;
+    specl:decisionStatus "accepted" ;
+    specl:rationale "A single input keeps the emission surface visible in one golden" ;
+    specl:affects spec:R1 ;
+    specl:affects spec:R1.1 .
+
+spec:Q001 a specl:AcceptanceQuery ;
+    specl:partOf <https://example.org/specs/maximal> ;
+    dct:title "Every annotation key the translator recognizes appears in the emitted graph" ;
+    dct:description "Every annotation key the translator recognizes appears in the emitted graph." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "88"^^xsd:integer ;
+    specl:gates spec:R1 ;
+    specl:gates spec:R1.1 .
+
+spec:P1 a specl:Persona ;
+    specl:partOf <https://example.org/specs/maximal> ;
+    dct:title "The maintainer who runs this fixture" ;
+    dct:description "The maintainer who runs this fixture." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "60"^^xsd:integer ;
+    skos:prefLabel "Maintainer" ;
+    skos:altLabel "repository maintainer" .
+
+spec:AG1 a specl:Agent ;
+    specl:partOf <https://example.org/specs/maximal> ;
+    dct:title "The maintainer accountable for this repository" ;
+    dct:description "The maintainer accountable for this repository." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "55"^^xsd:integer ;
+    skos:prefLabel "Maintainer" .
+
+spec:component-Emitter a specl:Component ;
+    dct:identifier "Emitter" .
+
+spec:component-Translator a specl:Component ;
+    dct:identifier "Translator" .
+
+spec:test-1d8c4efd a specl:Test ;
+    dct:identifier "tests/test_shapes_coverage.py::test_violation_paths_are_producible" .
+

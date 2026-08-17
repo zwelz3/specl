@@ -1,0 +1,44 @@
+# Gaps that documentation is allowed to reference.
+#
+# Referencing something that does not exist yet is legitimate: downstream
+# consumers author against announced behavior, and a known defect has to be
+# written down somewhere. What is not legitimate is an undeclared reference.
+# `specl migrate-iris` reached three documents because nobody had decided it
+# existed.
+#
+# Every entry names the record that authorizes it, and the doc checker verifies
+# that record exists. Delete an entry when the gap closes.
+
+[scripts]
+# specl-migrate shipped in 0.3.0 and is declared in [project.scripts].
+
+[validate_subcommands]
+# layering shipped in 0.5.0 and is registered in validate_spec.py.
+
+# Repository paths that documentation may reference while they do not exist.
+# An entry here is a claim that the absence is tracked, not that it is
+# acceptable. The named record must say what closes it. A name that is simply
+# gone does not belong here; write it in prose without backticks instead.
+[paths]
+
+# There is no umbrella `specl` command. A document may still quote the form,
+# either because it is describing the defect or because it is a released record
+# that must not be rewritten. Allowances are per document and per verb, so
+# quoting `specl migrate-iris` in the decision record does not license a new
+# `specl whatever` elsewhere in the same file.
+[umbrella_mentions]
+"CLAUDE.md" = { verbs = [
+    "migrate-iris",
+], record = "docs/decisions/0001-cli-surface.md" }
+"docs/decisions/0001-cli-surface.md" = { verbs = [
+    "migrate-iris",
+    "diff",
+], record = "docs/decisions/0001-cli-surface.md" }
+# The 0.2.0 section is a released record of what was said at the time. The
+# unreleased section was corrected instead.
+"docs/decisions/0002-documented-gaps-registry.md" = { verbs = [
+    "migrate-iris",
+], record = "docs/decisions/0002-documented-gaps-registry.md" }
+"CHANGELOG.md" = { verbs = [
+    "suggest-annotations",
+], record = "docs/decisions/0001-cli-surface.md" }

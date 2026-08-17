@@ -1,4 +1,6 @@
 ---
+spec_base: https://example.org/specs/excel_service#
+prefix: XLSVC
 spec_id: xlsvc-001
 title: Excel Report Generation Service
 version: 0.1.0

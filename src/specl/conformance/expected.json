@@ -1,0 +1,41 @@
+{
+  "note": "Findings a conforming SHACL processor produces for fixture.ttl using specl's bundled shapes, with the vocabulary supplied to the processor. Compare by severity, focus node, and property path.",
+  "requires": "SHACL Advanced Features: SPARQL-based targets and constraints.",
+  "findings": [
+    {
+      "severity": "Violation",
+      "focus": "D1",
+      "path": "title"
+    },
+    {
+      "severity": "Warning",
+      "focus": "D1",
+      "path": "affects"
+    },
+    {
+      "severity": "Warning",
+      "focus": "D1",
+      "path": "rationale"
+    },
+    {
+      "severity": "Warning",
+      "focus": "R2",
+      "path": "acceptanceCriterion"
+    },
+    {
+      "severity": "Warning",
+      "focus": "R2",
+      "path": "constrains"
+    },
+    {
+      "severity": "Warning",
+      "focus": "R2",
+      "path": "verifiedBy"
+    },
+    {
+      "severity": "Warning",
+      "focus": "R3",
+      "path": "supersededBy"
+    }
+  ]
+}

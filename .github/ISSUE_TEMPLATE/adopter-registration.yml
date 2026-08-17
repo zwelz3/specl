@@ -1,0 +1,44 @@
+name: Adopter registration
+description: Register as an adopter, so that you are notified of proposals and your objections block ratification
+title: "[adopter] "
+labels: ["adopter"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Registering costs nothing and commits you to nothing. It means you are
+        notified when a specification change is proposed, and that a substantive
+        objection from you blocks ratification until it is resolved.
+
+        Silence during a comment period counts as assent, which is only fair if
+        you were told. This is how you get told.
+  - type: input
+    id: project
+    attributes:
+      label: What you are using specl for
+      description: A sentence. A link if it is public; it does not need to be.
+    validations:
+      required: true
+  - type: dropdown
+    id: depth
+    attributes:
+      label: How you use it
+      options:
+        - "Authoring specifications"
+        - "Consuming emitted graphs"
+        - "Both"
+        - "Evaluating"
+    validations:
+      required: true
+  - type: textarea
+    id: constraints
+    attributes:
+      label: Anything that constrains what changes cost you
+      description: Air-gapped, a SHACL processor other than pyshacl, graphs already published, identifiers already cited elsewhere. This is what tells the author what a break would actually mean.
+  - type: input
+    id: notify
+    attributes:
+      label: Who to notify
+      description: GitHub handles to mention when a proposal opens.
+    validations:
+      required: true

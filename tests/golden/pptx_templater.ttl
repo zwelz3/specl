@@ -1,0 +1,98 @@
+@prefix specl: <https://w3id.org/specl/ns#> .
+@prefix spec: <https://example.org/specs/pptx_templater#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+<https://example.org/specs/pptx_templater> a specl:Specification ;
+    dct:conformsTo <https://w3id.org/specl/contract/2> ;
+    dct:title "Corporate PowerPoint Template Filler" ;
+    dct:hasVersion "0.1.0" ;
+    specl:status "prototype" ;
+    dct:identifier "pptxgen-001" ;
+    specl:prefix "PPTXG" ;
+    specl:intent """Specify a tool that populates an approved corporate PowerPoint template from structured inputs, preserving brand compliance and eliminating manual slide assembly for routine deliverables.""" ;
+    specl:purpose """Produce branded .pptx decks from markdown or JSON content without letting authors drift from the approved master layout, color palette, or typography.""" .
+
+spec:source-e9e453bf a specl:SourceDocument ;
+    dct:identifier "spec.md" .
+
+spec:R1.1 a specl:Requirement ;
+    specl:partOf <https://example.org/specs/pptx_templater> ;
+    dct:title "The tool must accept a corporate .pptx template as input and preserve all…" ;
+    dct:description "The tool must accept a corporate .pptx template as input and preserve all master slide layouts, theme colors, fonts, and placeholders exactly." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "18"^^xsd:integer .
+
+spec:R1.2 a specl:Requirement ;
+    specl:partOf <https://example.org/specs/pptx_templater> ;
+    dct:title "Content must be supplied as markdown or JSON with a declared mapping from…" ;
+    dct:description "Content must be supplied as markdown or JSON with a declared mapping from content sections to named slide layouts in the template." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "19"^^xsd:integer .
+
+spec:R1.3 a specl:Requirement ;
+    specl:partOf <https://example.org/specs/pptx_templater> ;
+    dct:title "Text placeholders must be filled without altering run-level formatting (font…" ;
+    dct:description "Text placeholders must be filled without altering run-level formatting (font family, size, color) inherited from the layout." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "20"^^xsd:integer .
+
+spec:R1.4 a specl:Requirement ;
+    specl:partOf <https://example.org/specs/pptx_templater> ;
+    dct:title "Images must fit placeholder bounds with configurable crop or letterbox…" ;
+    dct:description "Images must fit placeholder bounds with configurable crop or letterbox behavior, never stretched." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "21"^^xsd:integer .
+
+spec:R1.5 a specl:Requirement ;
+    specl:partOf <https://example.org/specs/pptx_templater> ;
+    dct:title "Tables must be inserted using the template's native table style, not as images" ;
+    dct:description "Tables must be inserted using the template's native table style, not as images." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "22"^^xsd:integer .
+
+spec:R1.6 a specl:Requirement ;
+    specl:partOf <https://example.org/specs/pptx_templater> ;
+    dct:title "Speaker notes from the source content must populate the notes pane of each slide" ;
+    dct:description "Speaker notes from the source content must populate the notes pane of each slide." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "23"^^xsd:integer .
+
+spec:R1.7 a specl:Requirement ;
+    specl:partOf <https://example.org/specs/pptx_templater> ;
+    dct:title "The tool must emit a validation report listing any content that could not be…" ;
+    dct:description "The tool must emit a validation report listing any content that could not be placed (missing layout, overflowing text, unsupported element)." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "24"^^xsd:integer .
+
+spec:R2.1 a specl:Requirement ;
+    specl:partOf <https://example.org/specs/pptx_templater> ;
+    dct:title "python-pptx is the preferred implementation library" ;
+    dct:description "python-pptx is the preferred implementation library." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "25"^^xsd:integer .
+
+spec:US1 a specl:UserStory ;
+    specl:partOf <https://example.org/specs/pptx_templater> ;
+    dct:title "Generate a weekly status deck from a markdown file that matches the corporate…" ;
+    dct:description "Generate a weekly status deck from a markdown file that matches the corporate template pixel-for-pixel." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "29"^^xsd:integer .
+
+spec:US2 a specl:UserStory ;
+    specl:partOf <https://example.org/specs/pptx_templater> ;
+    dct:title "Bulk-produce customer-specific decks from a CSV of account data and a single…" ;
+    dct:description "Bulk-produce customer-specific decks from a CSV of account data and a single content template." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "30"^^xsd:integer .
+
+spec:US3 a specl:UserStory ;
+    specl:partOf <https://example.org/specs/pptx_templater> ;
+    dct:title "Reject content that would break brand compliance before producing the file" ;
+    dct:description "Reject content that would break brand compliance before producing the file." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "31"^^xsd:integer .
+

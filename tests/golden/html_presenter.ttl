@@ -1,0 +1,91 @@
+@prefix specl: <https://w3id.org/specl/ns#> .
+@prefix spec: <https://example.org/specs/html_presenter#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+<https://example.org/specs/html_presenter> a specl:Specification ;
+    dct:conformsTo <https://w3id.org/specl/contract/2> ;
+    dct:title "Interactive HTML Presentation Tool" ;
+    dct:hasVersion "0.1.0" ;
+    specl:status "prototype" ;
+    dct:identifier "htmlpres-001" ;
+    specl:prefix "HTMLP" ;
+    specl:intent """Capture the design of a zero-dependency, single-file HTML presentation tool suitable for technical talks with live code, diagrams, and interactive widgets.""" ;
+    specl:purpose """Give presenters a durable, version-controllable alternative to slide decks that renders in any browser, works offline, and supports embedded interactivity without a build step.""" .
+
+spec:source-e9e453bf a specl:SourceDocument ;
+    dct:identifier "spec.md" .
+
+spec:R1.1 a specl:Requirement ;
+    specl:partOf <https://example.org/specs/html_presenter> ;
+    dct:title "Output must be a single self-contained HTML file with no external runtime…" ;
+    dct:description "Output must be a single self-contained HTML file with no external runtime dependencies." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "18"^^xsd:integer .
+
+spec:R1.2 a specl:Requirement ;
+    specl:partOf <https://example.org/specs/html_presenter> ;
+    dct:title "Slides are authored in markdown with YAML frontmatter per slide for transitions…" ;
+    dct:description "Slides are authored in markdown with YAML frontmatter per slide for transitions and speaker notes." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "19"^^xsd:integer .
+
+spec:R1.3 a specl:Requirement ;
+    specl:partOf <https://example.org/specs/html_presenter> ;
+    dct:title "The tool must support keyboard navigation (arrow keys, space, home/end) and a…" ;
+    dct:description "The tool must support keyboard navigation (arrow keys, space, home/end) and a presenter mode with notes on a second display." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "20"^^xsd:integer .
+
+spec:R1.4 a specl:Requirement ;
+    specl:partOf <https://example.org/specs/html_presenter> ;
+    dct:title "Embedded code blocks must be executable for JavaScript and renderable with…" ;
+    dct:description "Embedded code blocks must be executable for JavaScript and renderable with syntax highlighting for all common languages." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "21"^^xsd:integer .
+
+spec:R1.5 a specl:Requirement ;
+    specl:partOf <https://example.org/specs/html_presenter> ;
+    dct:title "Mermaid diagrams and inline SVG must render natively" ;
+    dct:description "Mermaid diagrams and inline SVG must render natively." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "22"^^xsd:integer .
+
+spec:R1.6 a specl:Requirement ;
+    specl:partOf <https://example.org/specs/html_presenter> ;
+    dct:title "Export to PDF must be supported via the browser print pathway with correct page…" ;
+    dct:description "Export to PDF must be supported via the browser print pathway with correct page breaks." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "23"^^xsd:integer .
+
+spec:R2.1 a specl:Requirement ;
+    specl:partOf <https://example.org/specs/html_presenter> ;
+    dct:title "The tool should load a deck in under 500ms on a cold browser cache for decks up…" ;
+    dct:description "The tool should load a deck in under 500ms on a cold browser cache for decks up to 100 slides." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "24"^^xsd:integer .
+
+spec:US1 a specl:UserStory ;
+    specl:partOf <https://example.org/specs/html_presenter> ;
+    dct:title "Present a conference talk from a USB drive on an unknown machine with no network" ;
+    dct:description "Present a conference talk from a USB drive on an unknown machine with no network." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "28"^^xsd:integer .
+
+spec:US2 a specl:UserStory ;
+    specl:partOf <https://example.org/specs/html_presenter> ;
+    dct:title "Share a deck as a single .html attachment that recipients can open directly" ;
+    dct:description "Share a deck as a single .html attachment that recipients can open directly." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "29"^^xsd:integer .
+
+spec:US3 a specl:UserStory ;
+    specl:partOf <https://example.org/specs/html_presenter> ;
+    dct:title "Maintain a deck in git alongside the code it describes, with meaningful diffs" ;
+    dct:description "Maintain a deck in git alongside the code it describes, with meaningful diffs." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "30"^^xsd:integer .
+

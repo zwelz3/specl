@@ -1,0 +1,69 @@
+# SPECL — RDF-native, SHACL-validated spec language
+# https://github.com/zwelz3/specl
+#
+# Contact:
+#   Zachary Welz
+#   GitHub: zwelz3
+#
+# This file is the intended state of specl/.htaccess in perma-id/w3id.org.
+# The copy here is the source of truth; changes are applied upstream by pull
+# request. w3id.org hosts nothing and only redirects, so every target must be a
+# URL this project actually publishes.
+#
+# Hash namespaces mean a client strips the fragment before requesting, so one
+# rule serves a whole specification regardless of how many items it holds.
+
+Options +FollowSymLinks
+RewriteEngine on
+
+# Ontology namespace: content negotiation
+# Turtle
+RewriteCond %{HTTP_ACCEPT} ^.*text/turtle.*
+RewriteRule ^ns/?$ https://zwelz3.github.io/specl/ns.ttl [R=303,NE,L]
+
+# RDF/XML
+RewriteCond %{HTTP_ACCEPT} ^.*application/rdf\+xml.*
+RewriteRule ^ns/?$ https://zwelz3.github.io/specl/ns.ttl [R=303,NE,L]
+
+# JSON-LD
+RewriteCond %{HTTP_ACCEPT} ^.*application/ld\+json.*
+RewriteRule ^ns/?$ https://zwelz3.github.io/specl/ns.jsonld [R=303,NE,L]
+
+# HTML (default for browsers)
+RewriteRule ^ns/?$ https://zwelz3.github.io/specl/ [R=303,NE,L]
+
+# Shapes
+RewriteCond %{HTTP_ACCEPT} ^.*text/turtle.*
+RewriteRule ^shapes/?$ https://zwelz3.github.io/specl/shapes.ttl [R=303,NE,L]
+RewriteRule ^shapes/?$ https://zwelz3.github.io/specl/ [R=303,NE,L]
+
+# Versioned locations, addressed by graph contract rather than by release. UR17
+# commits that these stay fetchable; the contract changes only in a designated
+# breaking release, so there are two of each across the run to 1.0.
+RewriteRule ^ns/1/?$ https://zwelz3.github.io/specl/ns/1.ttl [R=303,NE,L]
+RewriteRule ^ns/2/?$ https://zwelz3.github.io/specl/ns/2.ttl [R=303,NE,L]
+RewriteRule ^shapes/1/?$ https://zwelz3.github.io/specl/shapes/1.ttl [R=303,NE,L]
+RewriteRule ^shapes/2/?$ https://zwelz3.github.io/specl/shapes/2.ttl [R=303,NE,L]
+
+# Retired instance namespace. Graphs distributed before 0.3.0 carry IRIs under
+# https://w3id.org/specl/spec# and continue to resolve here. The base is not
+# reassigned to any specification; see
+# docs/decisions/0003-self-spec-instance-base.md.
+RewriteRule ^spec/?$ https://github.com/zwelz3/specl/blob/main/NAMESPACE-MIGRATION.md [R=303,NE,L]
+
+# specl's own specifications. The commitments register is one of them: it is a
+# specl specification, and a second party cites its items by IRI.
+RewriteRule ^tool/spec/?$ https://github.com/zwelz3/specl/blob/main/specs/specl_tool/spec.md [R=303,NE,L]
+RewriteRule ^explorer/spec/?$ https://github.com/zwelz3/specl/blob/main/specs/specl_explorer/spec.md [R=303,NE,L]
+RewriteRule ^commitments/spec/?$ https://github.com/zwelz3/specl/blob/main/specs/commitments/spec.md [R=303,NE,L]
+
+# Graph contract. Emitted into every graph as the object of dct:conformsTo, so
+# this rule ships with 0.3.0 rather than after it.
+RewriteRule ^contract/1/?$ https://github.com/zwelz3/specl/blob/main/docs/contracts/1.md [R=303,NE,L]
+RewriteRule ^contract/2/?$ https://github.com/zwelz3/specl/blob/main/docs/contracts/2.md [R=303,NE,L]
+
+# Explorer
+RewriteRule ^explorer/?$ https://zwelz3.github.io/specl/explorer.html [R=303,NE,L]
+
+# Root — repo landing
+RewriteRule ^$ https://github.com/zwelz3/specl [R=303,NE,L]

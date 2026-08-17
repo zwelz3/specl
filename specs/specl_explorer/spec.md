@@ -1,4 +1,6 @@
 ---
+spec_base: https://w3id.org/specl/explorer/spec#
+prefix: EXPL
 spec_id: explorer-001
 title: specl Spec Explorer
 version: 0.1.0
@@ -94,17 +96,29 @@ Replace the current drag-and-drop viewer (which only lists subject IDs and short
 
 # Design Considerations
 
-- The Turtle parser does not need to be RFC-compliant. It only needs to handle the output of `specl.spec_to_rdf`, which is deterministic and well-formed. A 30-line parser is sufficient.
-- Prefer declarative CSS over runtime style manipulation. Use CSS classes and variables; avoid setting styles via JavaScript except for the maturity bar width and color.
-- Keep the JavaScript in a single `<script>` block at the bottom of the file. No modules, no imports, no bundler.
-- Treat the explorer as read-only. Editing, saving, or uploading is explicitly out of scope for v1.
-- The existing broken `explorer.html` placeholder in the package should be replaced wholesale, not patched.
+- DN1 The Turtle parser does not need to be RFC-compliant. It only needs to handle the output of `specl.spec_to_rdf`, which is deterministic and well-formed. A 30-line parser is sufficient.
+- DN2 Prefer declarative CSS over runtime style manipulation. Use CSS classes and variables; avoid setting styles via JavaScript except for the maturity bar width and color.
+- DN3 Keep the JavaScript in a single `<script>` block at the bottom of the file. No modules, no imports, no bundler.
+- DN4 Treat the explorer as read-only. Editing, saving, or uploading is explicitly out of scope for v1.
+- DN5 The existing broken `explorer.html` placeholder in the package should be replaced wholesale, not patched.
 
 # Open Questions and Gaps
 
-- Whether to support slash namespaces (`/`) as an alternative to the current hash namespaces (`#`) for spec instances. Hash namespaces resolve all terms to a single document and are the right default for specs authored as a unit. Slash namespaces (as used by Schema.org, where `https://schema.org/Person` returns a dedicated page) would let specs host each requirement, story, or decision at its own dereferenceable URL. This matters for large, multi-team specs where individual elements need independent linking, versioning, or API-driven resolution. Recommendation: support a `namespace_style: hash | slash` front-matter key in a future release; default to `hash`; document the tradeoffs in SYNTAX.md.
-- Whether to support loading the companion `spec.md` alongside the `.ttl` for side-by-side reading. Recommendation: defer to v2.
-- Whether to render Mermaid diagrams embedded in description strings. Recommendation: defer; out of scope for a read-only viewer.
-- Whether to show SHACL validation results inline by also loading a `shapes.ttl`. Recommendation: defer to v2 as a separate "Validation" tab.
-- Light theme toggle. Recommendation: defer, but ensure CSS variables are structured to support it.
-- Export of the current view (selected item as PDF or HTML snippet). Recommendation: defer; browser print is sufficient for v1.
+- OQ1 Whether to support slash namespaces (`/`) as an alternative to the current hash namespaces (`#`) for spec instances. Hash namespaces resolve all terms to a single document and are the right default for specs authored as a unit. Slash namespaces (as used by Schema.org, where `https://schema.org/Person` returns a dedicated page) would let specs host each requirement, story, or decision at its own dereferenceable URL. This matters for large, multi-team specs where individual elements need independent linking, versioning, or API-driven resolution.
+  - recommendation: support a `namespace_style: hash | slash` front-matter key in a future release; default to `hash`; document the tradeoffs in SYNTAX.md
+  - status: open
+- OQ2 Whether to support loading the companion `spec.md` alongside the `.ttl` for side-by-side reading.
+  - recommendation: defer to v2
+  - status: open
+- OQ3 Whether to render Mermaid diagrams embedded in description strings.
+  - recommendation: defer; out of scope for a read-only viewer
+  - status: open
+- OQ4 Whether to show SHACL validation results inline by also loading a `shapes.ttl`.
+  - recommendation: defer to v2 as a separate "Validation" tab
+  - status: open
+- OQ5 Light theme toggle.
+  - recommendation: defer, but ensure CSS variables are structured to support it
+  - status: open
+- OQ6 Export of the current view (selected item as PDF or HTML snippet).
+  - recommendation: defer; browser print is sufficient for v1
+  - status: open

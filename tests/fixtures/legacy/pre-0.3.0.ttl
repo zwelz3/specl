@@ -1,0 +1,27 @@
+# A graph as specl 0.2.x emitted it: every item under one shared namespace,
+# reference-valued properties as literals, no titles, no contract declaration.
+@prefix specl: <https://w3id.org/specl/ns#> .
+@prefix spec: <https://w3id.org/specl/spec#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+spec:xlsvc-001 a specl:Specification ;
+    dct:title "Excel Service" ;
+    dct:hasVersion "0.2.0" ;
+    specl:status "prototype" ;
+    dct:created "2026-01-15"^^xsd:date .
+
+spec:R1.1 a specl:Requirement ;
+    specl:partOf spec:xlsvc-001 ;
+    dct:description "The service must expose an HTTP POST endpoint." ;
+    specl:priority "MUST" ;
+    specl:constrains "api_layer" .
+
+spec:US1 a specl:UserStory ;
+    specl:partOf spec:xlsvc-001 ;
+    dct:description "As an analyst, I want a spreadsheet." .
+
+spec:D1 a specl:DecisionRecord ;
+    specl:partOf spec:xlsvc-001 ;
+    dct:description "Use openpyxl." ;
+    specl:affects "R1.1" .
