@@ -104,3 +104,28 @@ def test_the_shipped_file_that_exposed_this_still_has_non_ascii():
     thing standing between this defect and its return."""
     raw = (ROOT / "src" / "specl" / "explorer.html").read_bytes()
     assert any(byte > 127 for byte in raw)
+
+
+def test_no_f_string_nests_the_same_quote():
+    """Legal from 3.12 under PEP 701 and a syntax error on 3.11.
+
+    A bulk rewrite inserted `encoding="utf-8"` inside an f-string already
+    delimited by double quotes. It parsed on the interpreter it was written
+    against and failed on the floor the package claims to support, which is
+    what the version matrix exists to catch and did on its first real run.
+    """
+    import re
+
+    offenders = []
+    for path in python_files():
+        for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+            for quote in ('"', "'"):
+                if f"f{quote}" not in line:
+                    continue
+                for field in re.findall(r"\{([^{}]*)\}", line):
+                    if quote in field:
+                        offenders.append(f"{path.relative_to(ROOT)}:{number}")
+    assert not offenders, (
+        "f-strings nesting their own delimiter parse only on 3.12 and later:\n  "
+        + "\n  ".join(sorted(set(offenders)))
+    )

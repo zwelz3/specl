@@ -1,0 +1,328 @@
+@prefix specl: <https://w3id.org/specl/ns#> .
+@prefix sh:   <http://www.w3.org/ns/shacl#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+
+# The shapes graph had no ontology header, so there was nothing to version and
+# nothing to pin, which left UR17 unsatisfiable. The version IRI is the graph
+# contract rather than the release: UR6 makes the contract the identity of the
+# vocabulary and shapes pair, and only a designated breaking release may change
+# it. owl:versionInfo tracks the package and is informational; owl:versionIRI is
+# what a consumer pins.
+<https://w3id.org/specl/shapes> a owl:Ontology ;
+    dct:title "SPECL Spec Shapes" ;
+    owl:versionIRI <https://w3id.org/specl/shapes/1> ;
+    owl:versionInfo "0.10.0" .
+
+# =============================================================================
+# SPECL Spec Shapes
+# -----------------------------------------------------------------------------
+# Two-tier severity so the spec can evolve from prototype to production:
+#
+#   sh:Violation -> structural integrity. Must hold at every maturity level.
+#                   A spec that fails these is broken, not just incomplete.
+#
+#   sh:Warning   -> production-readiness signals. Expected to accumulate as
+#                   the spec matures. Prototype specs will emit many warnings
+#                   and that is fine.
+#
+# A CI gate can fail on Violations only during prototype, then tighten to
+# fail on Warnings once the spec is declared `specl:status "production"`.
+# =============================================================================
+
+specl:SpecificationShape a sh:NodeShape ;
+    sh:targetClass specl:Specification ;
+
+    # --- Violations: the spec must at least identify itself ----------------
+    sh:property [
+        sh:path dct:title ;
+        sh:minCount 1 ; sh:datatype xsd:string ;
+        sh:severity sh:Violation ;
+        sh:message "Specification must have a dct:title." ] ;
+    sh:property [
+        sh:path dct:hasVersion ;
+        sh:minCount 1 ;
+        sh:severity sh:Violation ;
+        sh:message "Specification must declare a version." ] ;
+    sh:property [
+        sh:path specl:status ;
+        sh:minCount 1 ;
+        sh:in ( "draft" "prototype" "review" "production" ) ;
+        sh:severity sh:Violation ;
+        sh:message "Specification status must be one of: draft, prototype, review, production." ] ;
+
+    # --- Warnings: things a production spec should have --------------------
+    sh:property [
+        sh:path specl:intent ;
+        sh:minCount 1 ;
+        sh:severity sh:Warning ;
+        sh:message "Specification should declare its intent." ] ;
+    sh:property [
+        sh:path specl:purpose ;
+        sh:minCount 1 ;
+        sh:severity sh:Warning ;
+        sh:message "Specification should declare the application purpose." ] ;
+    sh:property [
+        sh:path dct:created ;
+        sh:minCount 1 ; sh:datatype xsd:date ;
+        sh:severity sh:Warning ;
+        sh:message "Specification should record a creation date." ] .
+
+
+specl:RequirementShape a sh:NodeShape ;
+    sh:target [ a sh:SPARQLTarget ;
+        sh:select """
+            SELECT ?this WHERE {
+                ?this a <https://w3id.org/specl/ns#Requirement> .
+                FILTER NOT EXISTS {
+                    ?this <https://w3id.org/specl/ns#itemStatus> ?st .
+                    FILTER(?st IN ("superseded", "withdrawn"))
+                }
+            }
+        """ ] ;
+
+    # --- Violations: every requirement is identified and attached ---------
+    sh:property [
+        sh:path dct:description ;
+        sh:minCount 1 ; sh:datatype xsd:string ;
+        sh:minLength 10 ;
+        sh:severity sh:Violation ;
+        sh:message "Requirement needs a description of at least 10 characters." ] ;
+    sh:property [
+        sh:path specl:partOf ;
+        sh:minCount 1 ; sh:class specl:Specification ;
+        sh:severity sh:Violation ;
+        sh:message "Requirement must be linked to its parent Specification via specl:partOf." ] ;
+
+    # --- Warnings: production-grade requirements need more --------------
+    sh:property [
+        sh:path specl:priority ;
+        sh:in ( "MUST" "SHOULD" "COULD" "WONT" ) ;
+        sh:maxCount 1 ;
+        sh:severity sh:Warning ;
+        sh:message "Requirement should carry a MoSCoW priority (MUST/SHOULD/COULD/WONT)." ] ;
+    sh:property [
+        sh:path specl:acceptanceCriterion ;
+        sh:minCount 1 ; sh:datatype xsd:string ;
+        sh:severity sh:Warning ;
+        sh:message "Requirement should have at least one acceptance criterion." ] ;
+    sh:property [
+        sh:path specl:verifiedBy ;
+        sh:minCount 1 ;
+        sh:severity sh:Warning ;
+        sh:message "Requirement should point to a test or verification artifact via specl:verifiedBy." ] ;
+    sh:property [
+        sh:path specl:constrains ;
+        sh:minCount 1 ;
+        sh:severity sh:Warning ;
+        sh:message "Requirement should link to at least one component it constrains." ] ;
+    sh:property [
+        sh:path specl:itemStatus ;
+        sh:in ( "active" "superseded" "withdrawn" ) ;
+        sh:maxCount 1 ;
+        sh:severity sh:Warning ;
+        sh:message "itemStatus must be active, superseded, or withdrawn." ] ;
+    sh:property [
+        sh:path specl:implementationStatus ;
+        sh:in ( "not-started" "in-progress" "implemented" "verified" ) ;
+        sh:maxCount 1 ;
+        sh:severity sh:Warning ;
+        sh:message "implementation must be not-started, in-progress, implemented, or verified." ] .
+
+# An item marked superseded without naming its replacement is the state
+# append-only discipline exists to prevent: the identifier is retired and the
+# reader cannot find what took its place.
+specl:SupersessionShape a sh:NodeShape ;
+    sh:target [ a sh:SPARQLTarget ;
+        sh:select """
+            SELECT ?this WHERE { ?this <https://w3id.org/specl/ns#itemStatus> "superseded" }
+        """ ] ;
+    sh:property [
+        sh:path specl:supersededBy ;
+        sh:minCount 1 ;
+        sh:severity sh:Warning ;
+        sh:message "An item marked superseded should name the item that replaces it." ] .
+
+# A successor of a different class, or one in another specification, is not a
+# replacement: the reader following the chain lands somewhere that does not
+# answer the same question.
+specl:SuccessorShape a sh:NodeShape ;
+    # Severity sits on the shape: pyshacl takes an sh:sparql constraint's
+    # severity from here rather than from the constraint node.
+    sh:severity sh:Warning ;
+    sh:target [ a sh:SPARQLTarget ;
+        sh:select """
+            SELECT ?this WHERE { ?this <https://w3id.org/specl/ns#supersededBy> ?successor }
+        """ ] ;
+    sh:sparql [
+        sh:message "A successor must be the same class as the item it replaces." ;
+        sh:select """
+            SELECT $this WHERE {
+                $this a ?cls ; <https://w3id.org/specl/ns#supersededBy> ?successor .
+                FILTER(STRSTARTS(STR(?cls), "https://w3id.org/specl/ns#"))
+                FILTER NOT EXISTS { ?successor a ?cls }
+            }
+        """ ] ;
+    sh:sparql [
+        sh:message "A successor must belong to the same specification." ;
+        sh:select """
+            SELECT $this WHERE {
+                $this <https://w3id.org/specl/ns#partOf> ?spec ;
+                      <https://w3id.org/specl/ns#supersededBy> ?successor .
+                FILTER NOT EXISTS { ?successor <https://w3id.org/specl/ns#partOf> ?spec }
+            }
+        """ ] .
+
+# Withdrawn is the no-successor case: struck, not replaced. Naming a successor
+# means the item was superseded, and the two states say different things to a
+# reader deciding whether to follow the chain.
+specl:WithdrawnShape a sh:NodeShape ;
+    sh:target [ a sh:SPARQLTarget ;
+        sh:select """
+            SELECT ?this WHERE { ?this <https://w3id.org/specl/ns#itemStatus> "withdrawn" }
+        """ ] ;
+    sh:property [
+        sh:path specl:supersededBy ;
+        sh:maxCount 0 ;
+        sh:severity sh:Warning ;
+        sh:message "A withdrawn item is struck rather than replaced; use superseded if a successor exists." ] .
+
+
+specl:UserStoryShape a sh:NodeShape ;
+    sh:target [ a sh:SPARQLTarget ;
+        sh:select """
+            SELECT ?this WHERE {
+                ?this a <https://w3id.org/specl/ns#UserStory> .
+                FILTER NOT EXISTS {
+                    ?this <https://w3id.org/specl/ns#itemStatus> ?st .
+                    FILTER(?st IN ("superseded", "withdrawn"))
+                }
+            }
+        """ ] ;
+
+    sh:property [
+        sh:path dct:description ;
+        sh:minCount 1 ; sh:datatype xsd:string ;
+        sh:severity sh:Violation ;
+        sh:message "User story needs a description." ] ;
+    sh:property [
+        sh:path specl:partOf ;
+        sh:minCount 1 ; sh:class specl:Specification ;
+        sh:severity sh:Violation ;
+        sh:message "User story must be linked to its parent Specification." ] ;
+
+    # Warnings: the As/I want/So that triad and a linked persona
+    sh:property [
+        sh:path specl:asA ;
+        sh:minCount 1 ;
+        sh:severity sh:Warning ;
+        sh:message "User story should declare a persona via specl:asA." ] ;
+    sh:property [
+        sh:path specl:soThat ;
+        sh:minCount 1 ;
+        sh:severity sh:Warning ;
+        sh:message "User story should declare the outcome/benefit via specl:soThat." ] ;
+    sh:property [
+        sh:path specl:acceptanceCriterion ;
+        sh:minCount 1 ;
+        sh:severity sh:Warning ;
+        sh:message "User story should have at least one Given/When/Then acceptance criterion." ] .
+
+
+specl:OpenIssueShape a sh:NodeShape ;
+    sh:target [ a sh:SPARQLTarget ;
+        sh:select """
+            SELECT ?this WHERE {
+                ?this a <https://w3id.org/specl/ns#OpenIssue> .
+                FILTER NOT EXISTS {
+                    ?this <https://w3id.org/specl/ns#itemStatus> ?st .
+                    FILTER(?st IN ("superseded", "withdrawn"))
+                }
+            }
+        """ ] ;
+
+    sh:property [
+        sh:path dct:description ;
+        sh:minCount 1 ;
+        sh:severity sh:Violation ;
+        sh:message "Open issue needs a description." ] ;
+
+    # Warnings: as the spec matures, open issues should resolve or be owned
+    sh:property [
+        sh:path specl:recommendation ;
+        sh:minCount 1 ;
+        sh:severity sh:Warning ;
+        sh:message "Open issue should carry a recommendation." ] ;
+    sh:property [
+        sh:path specl:owner ;
+        sh:minCount 1 ;
+        sh:severity sh:Warning ;
+        sh:message "Open issue should have a named owner." ] ;
+    sh:property [
+        sh:path specl:resolutionStatus ;
+        sh:in ( "open" "in-review" "resolved" "deferred" ) ;
+        sh:maxCount 1 ;
+        sh:severity sh:Warning ;
+        sh:message "Open issue should track resolution status." ] .
+
+
+# Decision records: optional in prototype, encouraged in production.
+specl:DecisionRecordShape a sh:NodeShape ;
+    sh:target [ a sh:SPARQLTarget ;
+        sh:select """
+            SELECT ?this WHERE {
+                ?this a <https://w3id.org/specl/ns#DecisionRecord> .
+                FILTER NOT EXISTS {
+                    ?this <https://w3id.org/specl/ns#itemStatus> ?st .
+                    FILTER(?st IN ("superseded", "withdrawn"))
+                }
+            }
+        """ ] ;
+    sh:property [
+        sh:path dct:title ;
+        sh:minCount 1 ;
+        sh:severity sh:Violation ;
+        sh:message "Decision record needs a title." ] ;
+    sh:property [
+        sh:path specl:decisionStatus ;
+        sh:in ( "proposed" "accepted" "superseded" "rejected" ) ;
+        sh:maxCount 1 ;
+        sh:severity sh:Warning ;
+        sh:message "Decision record should declare status." ] ;
+    sh:property [
+        sh:path specl:rationale ;
+        sh:minCount 1 ;
+        sh:severity sh:Warning ;
+        sh:message "Decision record should capture rationale." ] ;
+    sh:property [
+        sh:path specl:affects ;
+        sh:minCount 1 ;
+        sh:severity sh:Warning ;
+        sh:message "Decision record should link to the requirements or components it affects." ] .
+
+
+# Acceptance queries. A query set is arguably the only part of a specification
+# that can falsify the rest, so a query that gates nothing verifies nothing.
+specl:AcceptanceQueryShape a sh:NodeShape ;
+    sh:target [ a sh:SPARQLTarget ;
+        sh:select """
+            SELECT ?this WHERE {
+                ?this a <https://w3id.org/specl/ns#AcceptanceQuery> .
+                FILTER NOT EXISTS {
+                    ?this <https://w3id.org/specl/ns#itemStatus> ?st .
+                    FILTER(?st IN ("superseded", "withdrawn"))
+                }
+            }
+        """ ] ;
+    sh:property [
+        sh:path dct:title ;
+        sh:minCount 1 ;
+        sh:severity sh:Violation ;
+        sh:message "Acceptance query must have a dct:title." ] ;
+    sh:property [
+        sh:path specl:gates ;
+        sh:minCount 1 ;
+        sh:severity sh:Warning ;
+        sh:message "An acceptance query should gate at least one requirement; one that gates nothing verifies nothing." ] .

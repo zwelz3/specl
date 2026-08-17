@@ -10,6 +10,24 @@ its release is tagged.
 The second and final graph-breaking release. Graphs move from contract 1 to
 contract 2 with `specl-migrate contract`.
 
+### Build correctness
+- The contract 1 vocabulary and shapes are frozen files in `published/` rather
+  than reconstructed with `git show v0.10.0:`. The tag does not exist in every
+  clone and `actions/checkout` fetches none by default, so the Pages build
+  failed. A frozen artifact a build rebuilds from history is one shallow clone
+  away from disappearing.
+- An f-string nesting its own quote parsed on 3.12 and was a syntax error on
+  3.11, the floor the package claims. Caught by the version matrix on its first
+  real run, and now checked for directly.
+
+### Release readiness
+- `LIMITATIONS.md`, linked from the top of the README: what specl does not do,
+  collected where someone deciding whether to adopt will read it rather than
+  scattered across the roadmap and the contract page. Closes 1.0 criterion 4.
+- `RELEASING.md`. The 1.0 procedure has ordering that matters: Pages content
+  must be live before the redirects pointing at it merge, and creating the
+  GitHub release is what publishes to PyPI.
+
 ### Portability
 - Every text read and write declares an encoding. Python falls back to the
   locale encoding, which is cp1252 on most Windows installs, so 110 calls were
@@ -70,6 +88,16 @@ contract 2 with `specl-migrate contract`.
 - `docs/decisions/0009-what-1.0-means.md` recasts 1.0 as a change in who may
   change the specification, replacing criteria that asked for adoption evidence
   as a precondition for the release that makes adoption reasonable.
+
+### Build correctness
+- The contract 1 vocabulary and shapes are frozen files in `published/` rather
+  than reconstructed with `git show v0.10.0:`. The tag does not exist in every
+  clone and `actions/checkout` fetches none by default, so the Pages build
+  failed. A frozen artifact a build rebuilds from history is one shallow clone
+  away from disappearing.
+- An f-string nesting its own quote parsed on 3.12 and was a syntax error on
+  3.11, the floor the package claims. Caught by the version matrix on its first
+  real run, and now checked for directly.
 
 ### Release readiness
 - The 1.0 criteria are measured in the roadmap rather than assumed. Three of

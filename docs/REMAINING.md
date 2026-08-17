@@ -12,16 +12,14 @@ it is finished; see `docs/decisions/0009-what-1.0-means.md`. Three of its five
 criteria are met. The three open items below are all achievable now, which the
 previous criteria were not.
 
-**Published IRIs must resolve.** One pull request against perma-id/w3id.org.
+**Published IRIs must resolve. This is the only criterion still open.** One pull request against perma-id/w3id.org.
 Nine rules are new and one target changes; `tools/w3id/README.md` carries the
 measured delta, the ordering constraint that Pages must serve a target before a
 redirect to it merges, and the verification loop. A stability promise over
 identifiers that return 404 is not worth making.
 
-**Known limitations need collecting where an evaluating adopter reads first.**
-They exist, in the roadmap and the contract page, which is not where someone
-deciding whether to adopt looks. What is being accepted should be visible rather
-than discovered.
+**Done: known limitations.** `LIMITATIONS.md`, linked from the top of the
+README.
 
 **Done: the governance mechanism.** `GOVERNANCE.md`. Additive changes land
 whenever ready; substantive ones are collected in a one-year window opening at

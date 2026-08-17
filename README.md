@@ -27,6 +27,12 @@ need permission.
 See [GOVERNANCE.md](GOVERNANCE.md) and `docs/proposals/OPEN.md` for what is
 currently collected. Register as an adopter if you want to be notified.
 
+## Before you adopt
+
+[LIMITATIONS.md](LIMITATIONS.md) is what specl does not do, in one place. Worth
+ten minutes before the rest of this file, particularly the first entry if you
+run more than one specification.
+
 ## Concepts
 
 A **specification** is one or more markdown files with front matter declaring

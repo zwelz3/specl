@@ -14,6 +14,11 @@ same review and the same checks as everything else.
 
 ## What keeps it honest
 
+The contract 1 copies of the vocabulary and shapes live in `published/` as
+frozen files. Graphs in the wild pin `https://w3id.org/specl/ns/1`, so it has to
+keep resolving to the same bytes, and reconstructing them from a git tag during
+the build required the tag to exist and the checkout to have fetched it.
+
 `tools/check_docs.py` verifies every redirect target that points back at this
 project. A `blob/main/<path>` target must exist in the tree. A
 `zwelz3.github.io/specl/<asset>` target must be something

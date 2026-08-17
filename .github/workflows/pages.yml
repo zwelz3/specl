@@ -38,10 +38,11 @@ jobs:
           # release. UR17 commits these locations and they must stay fetchable.
           mkdir -p _site/ns _site/shapes
           # Contract 1 copies stay fetchable: UR17 commits that, and graphs in
-          # the wild still declare it. They are pinned to the v0.10.0 tag rather
-          # than rebuilt from HEAD, which would silently make them contract 2.
-          git show v0.10.0:src/specl/core.ttl > _site/ns/1.ttl
-          git show v0.10.0:src/specl/shapes.ttl > _site/shapes/1.ttl
+          # the wild still declare it. Copied from published/, which holds them
+          # as frozen files. Reading them from a git tag needed the tag to exist
+          # and the checkout to have fetched it, and neither is guaranteed.
+          cp published/ns-1.ttl _site/ns/1.ttl
+          cp published/shapes-1.ttl _site/shapes/1.ttl
           cp src/specl/core.ttl _site/ns/2.ttl
           cp src/specl/shapes.ttl _site/shapes/2.ttl
           cp src/specl/explorer.html _site/explorer.html

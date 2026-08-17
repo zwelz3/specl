@@ -129,3 +129,22 @@ def test_the_expedited_bar_names_what_is_not_grounds():
     assert "open to objection" in section, (
         "an expedited change must remain objectable, or shipping first settles it"
     )
+
+
+def test_the_release_procedure_names_the_irreversible_step():
+    """Creating a GitHub release is what publishes to PyPI, and the guard
+    permits anything at or above 1.0, so nothing stops a mistake there."""
+    text = (ROOT / "RELEASING.md").read_text(encoding="utf-8")
+    assert "irreversible" in text
+    assert "publish.yml" in text
+
+
+def test_limitations_are_collected_and_linked():
+    """1.0 criterion 4. Scattered across the roadmap is not where someone
+    deciding whether to adopt looks."""
+    limitations = ROOT / "LIMITATIONS.md"
+    assert limitations.exists()
+    assert "LIMITATIONS.md" in (ROOT / "README.md").read_text(encoding="utf-8")
+    text = limitations.read_text(encoding="utf-8")
+    for topic in ("Advanced Features", "several nodes", "one author"):
+        assert topic in text

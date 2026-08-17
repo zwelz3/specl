@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import pytest
 
-from conftest import PUBLISHED, SRC, spec_path, translate
+from conftest import PUBLISHED, ROOT, SRC, spec_path, translate
 
 rdflib = pytest.importorskip("rdflib")
 from rdflib import Graph, Literal, Namespace, RDF, RDFS, URIRef, XSD  # noqa: E402
@@ -331,3 +331,22 @@ def test_the_exported_bundle_explains_itself():
         assert names == {"fixture.ttl", "shapes.ttl", "ns.ttl", "expected.json", "README.md"}
         readme = (_P(out) / "README.md").read_text(encoding="utf-8")
         assert "Advanced Features" in readme and "expected.json" in readme
+
+
+def test_the_frozen_contract_1_artifacts_are_files_and_unchanged():
+    """Graphs in the wild pin https://w3id.org/specl/ns/1, so it must keep
+    resolving to the same bytes. The build read these from a git tag at first,
+    which needed the tag to exist locally and the checkout to have fetched it:
+    a frozen artifact one shallow clone away from disappearing."""
+    for name, version in (("ns-1.ttl", "ns/1"), ("shapes-1.ttl", "shapes/1")):
+        path = ROOT / "published" / name
+        assert path.exists(), f"published/{name} is missing"
+        text = path.read_text(encoding="utf-8")
+        assert f"owl:versionIRI <https://w3id.org/specl/{version}>" in text
+        assert "/2>" not in text, f"published/{name} carries a contract 2 IRI"
+
+
+def test_the_pages_build_does_not_reconstruct_them_from_history():
+    workflow = (ROOT / ".github" / "workflows" / "pages.yml").read_text(encoding="utf-8")
+    assert "git show" not in workflow
+    assert "published/ns-1.ttl" in workflow

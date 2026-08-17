@@ -1,0 +1,93 @@
+@prefix specl: <https://w3id.org/specl/ns#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+
+# owl:versionIRI is the graph contract, not the release. Per UR6 the contract
+# identifies the vocabulary and shapes pair, and only a designated breaking
+# release may change it, so there are two of these across the whole run to 1.0.
+# owl:versionInfo tracks the package version and is informational.
+<https://w3id.org/specl/ns> a owl:Ontology ;
+    dct:title "SPECL Core Ontology" ;
+    owl:versionIRI <https://w3id.org/specl/ns/1> ;
+    owl:versionInfo "0.10.0" .
+
+# --- Classes ---
+specl:Specification   a owl:Class ; rdfs:label "Specification" .
+specl:Requirement     a owl:Class ; rdfs:label "Requirement" .
+specl:UserStory       a owl:Class ; rdfs:label "User Story" .
+specl:DesignNote      a owl:Class ; rdfs:label "Design Note" .
+specl:Comment         a owl:Class ; rdfs:label "Comment" .
+specl:OpenIssue       a owl:Class ; rdfs:label "Open Issue" .
+specl:DecisionRecord  a owl:Class ; rdfs:label "Decision Record (ADR)" .
+specl:Component       a owl:Class ; rdfs:label "Component" .
+specl:Test            a owl:Class ; rdfs:label "Verification Artifact" .
+specl:ClassSubscore   a owl:Class ; rdfs:label "Class Subscore" ;
+    rdfs:comment "One item class's contribution to an assessment. A percentage that cannot be attributed explains nothing." .
+specl:SourceDocument  a owl:Class ; rdfs:label "Source Document" ;
+    rdfs:comment "The markdown a graph was derived from. Identified by file name rather than by the path given on the command line, so a graph does not differ because it was translated from a different working directory." .
+specl:MaturityAssessment a owl:Class ; rdfs:subClassOf prov:Activity ;
+    rdfs:label "Maturity Assessment" ;
+    rdfs:comment "One measurement of a specification, recorded rather than printed and discarded. Maturity without history answers no question about whether a specification is converging." .
+specl:AcceptanceQuery a owl:Class ; rdfs:label "Acceptance Query" ;
+    rdfs:comment "A query that can falsify the specification. Arguably the only part of a specification that can, which is what earns it a class rather than a home outside the graph." .
+specl:SpecificationReference a owl:Class ; rdfs:label "Specification Reference" ;
+    rdfs:comment "A foreign prefix this specification declares, with the base its items resolve under and a local path to the peer. Carried in the graph so layering resolves from the graph rather than from the markdown source." .
+
+# --- Object properties ---
+specl:partOf       a owl:ObjectProperty ; rdfs:domain specl:Requirement ; rdfs:range specl:Specification .
+specl:verifiedBy   a owl:ObjectProperty ; rdfs:range specl:Test .
+specl:constrains   a owl:ObjectProperty ; rdfs:range specl:Component .
+specl:affects      a owl:ObjectProperty .
+specl:declares     a owl:ObjectProperty ; rdfs:range specl:SpecificationReference .
+specl:gates        a owl:ObjectProperty ; rdfs:domain specl:AcceptanceQuery ;
+    rdfs:comment "Requirements this query verifies. Traversal from a requirement to the queries that gate it is the point of modelling queries at all." .
+specl:dependsOn    a owl:ObjectProperty ; rdfs:range specl:Specification .
+specl:upstreamOf   a owl:ObjectProperty ; rdfs:range specl:Specification .
+specl:refines      a owl:ObjectProperty ; rdfs:range specl:Specification .
+specl:supersededBy a owl:ObjectProperty ;
+    rdfs:comment "The item that replaces this one. Retiring an item in place, rather than deleting it, is what keeps identifiers append-only." .
+specl:detail       a owl:ObjectProperty ; rdfs:range rdf:List ;
+    rdfs:seeAlso skos:note ;
+    rdfs:comment "Ordered content authored under an item, as an rdf:List of string literals in source order. Follows the SKOS documentation-note pattern. Not declared rdfs:subPropertyOf skos:note: skos:note is an annotation property, and OWL DL forbids annotation properties from carrying property axioms, so the subproperty declaration and the range above cannot coexist outside OWL Full." .
+
+# --- Datatype properties ---
+specl:intent              a owl:DatatypeProperty ; rdfs:range xsd:string .
+
+specl:purpose             a owl:DatatypeProperty ; rdfs:range xsd:string .
+specl:status              a owl:DatatypeProperty ; rdfs:range xsd:string .
+specl:implementationStatus a owl:DatatypeProperty ; rdfs:range xsd:string ;
+    rdfs:comment "How much of this item is built: not-started, in-progress, implemented, verified. Distinct from priority, which is importance, and from itemStatus, which is lifecycle. Progress rolls up from items rather than being declared for the specification, which is what makes it honest." .
+specl:itemStatus          a owl:DatatypeProperty ; rdfs:range xsd:string ;
+    rdfs:comment "Lifecycle state of an item: active, superseded, or withdrawn. Absent means active." .
+specl:referenceBase       a owl:DatatypeProperty ; rdfs:range xsd:string .
+specl:referencePath       a owl:DatatypeProperty ; rdfs:range xsd:string ;
+    rdfs:comment "Local path to a peer specification. Never fetched over the network; layering reads it from disk or reports inconclusive." .
+specl:assessed            a owl:ObjectProperty ; rdfs:range specl:Specification .
+specl:maturityScore       a owl:DatatypeProperty ; rdfs:range xsd:decimal .
+specl:progressScore       a owl:DatatypeProperty ; rdfs:range xsd:decimal ;
+    rdfs:comment "How much is built, rolled up from per-item implementationStatus. Separate from maturity, which is how completely the specification is written." .
+specl:subscore            a owl:ObjectProperty ; rdfs:range specl:ClassSubscore .
+specl:itemClass           a owl:DatatypeProperty ; rdfs:range xsd:string .
+specl:cleanCount          a owl:DatatypeProperty ; rdfs:range xsd:integer .
+specl:totalCount          a owl:DatatypeProperty ; rdfs:range xsd:integer .
+specl:sourceLine          a owl:DatatypeProperty ; rdfs:range xsd:integer ;
+    rdfs:comment "Line in the source document that produced this item, indexing the file as authored." .
+specl:itemPrefix          a owl:DatatypeProperty ; rdfs:range xsd:string ;
+    rdfs:comment "Prefix this specification's own item identifiers carry, declared in place of the reserved prefix its section would otherwise require. Distinct from specl:prefix, which is how other specifications refer to this one." .
+specl:prefix              a owl:DatatypeProperty ; rdfs:range xsd:string ;
+    rdfs:comment "Short name another specification uses to reference this one. Reserved for cross-specification references in 0.5.0; carried in the graph from 0.3.0 so the value is stable before the feature arrives." .
+specl:priority            a owl:DatatypeProperty ; rdfs:range xsd:string .
+specl:acceptanceCriterion a owl:DatatypeProperty ; rdfs:range xsd:string .
+specl:asA                 a owl:DatatypeProperty ; rdfs:range xsd:string .
+specl:iWant               a owl:DatatypeProperty ; rdfs:range xsd:string .
+specl:soThat              a owl:DatatypeProperty ; rdfs:range xsd:string .
+specl:recommendation      a owl:DatatypeProperty ; rdfs:range xsd:string .
+specl:owner               a owl:DatatypeProperty ; rdfs:range xsd:string .
+specl:resolutionStatus    a owl:DatatypeProperty ; rdfs:range xsd:string .
+specl:decisionStatus      a owl:DatatypeProperty ; rdfs:range xsd:string .
+specl:rationale           a owl:DatatypeProperty ; rdfs:range xsd:string .
