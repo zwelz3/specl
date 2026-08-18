@@ -317,7 +317,7 @@ breaking release may do that.
 | --- | --- | --- | --- |
 | front matter | `specl:status` | `draft`, `prototype`, `review`, `production` | how strictly should this specification be gated |
 | `status:` on a `D` item | `specl:decisionStatus` | `proposed`, `accepted`, `superseded`, `rejected` | where is this decision in its lifecycle |
-| `status:` on any other item | `specl:resolutionStatus` | `open`, `in-review`, `resolved`, `deferred` | has this question been answered |
+| `status:` on any other item | `specl:resolutionStatus` | `open`, `in-review`, `resolved`, `deferred` | has this question been decided |
 | `itemStatus:` on any item | `specl:itemStatus` | `active`, `superseded`, `withdrawn` | is this item still live |
 
 A fifth, `implementation:`, deliberately avoids the word: it maps to
@@ -543,3 +543,11 @@ rather than scoring afresh.
 Every subcommand that takes a shapes graph defaults to the one bundled with the
 package, so `specl-validate validate spec.ttl` works from an install with no
 checkout. Pass a path to use your own.
+
+## Deferring a question
+
+`resolved` and `deferred` both count as settled for maturity. A deferral is a decision: someone read the question and chose not to answer it yet.
+
+Counting it as unanswered would penalise recording a known unknown, so a specification that never asked scored higher than one that asked and postponed. The deferral still has to be a real decision, though: the shapes want an owner and a recommendation on an open issue, so a bare `resolutionStatus: deferred` is flagged there and stays unclean.
+
+`open` and `in-review` are the unsettled half of the same enum.

@@ -10,6 +10,16 @@ its release is tagged.
 The second and final graph-breaking release. Graphs move from contract 1 to
 contract 2 with `specl-migrate contract`.
 
+### Scoring
+- A deferred open question counts as settled for maturity. Reported by an
+  adopter running 0.11: counting it as unanswered meant a specification that
+  never asked a question scored higher than one that asked and deliberately
+  postponed, which penalises recording a known unknown. A bare `deferred` with
+  no owner or recommendation is still flagged by the shapes and stays unclean.
+- The scorer and the shapes now agree on the resolution-status enum. The scorer
+  accepted `closed` and `answered`, which the shapes reject as invalid, and
+  rejected `deferred`, which the shapes permit.
+
 ### Badges
 - The badge-committing CI job is removed. It pushed regenerated SVGs back to
   main, so every local push was rejected until the bot's commit was pulled.
@@ -105,6 +115,16 @@ contract 2 with `specl-migrate contract`.
 - `docs/decisions/0009-what-1.0-means.md` recasts 1.0 as a change in who may
   change the specification, replacing criteria that asked for adoption evidence
   as a precondition for the release that makes adoption reasonable.
+
+### Scoring
+- A deferred open question counts as settled for maturity. Reported by an
+  adopter running 0.11: counting it as unanswered meant a specification that
+  never asked a question scored higher than one that asked and deliberately
+  postponed, which penalises recording a known unknown. A bare `deferred` with
+  no owner or recommendation is still flagged by the shapes and stays unclean.
+- The scorer and the shapes now agree on the resolution-status enum. The scorer
+  accepted `closed` and `answered`, which the shapes reject as invalid, and
+  rejected `deferred`, which the shapes permit.
 
 ### Badges
 - The badge-committing CI job is removed. It pushed regenerated SVGs back to

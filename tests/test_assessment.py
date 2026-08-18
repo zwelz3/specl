@@ -186,3 +186,66 @@ def test_the_breakdown_explains_the_headline(tmp_path):
         "- R2 The service must accept ZIP archives.\n  - itemStatus: withdrawn\n",
     )
     assert sum(total for _, total in report["subscores"].values()) == report["total"]
+
+
+def test_a_documented_deferral_is_settled(tmp_path):
+    """Reported by an adopter running 0.11.
+
+    `deferred` is a decision: someone looked at the question and chose not to
+    answer it yet. Counting it as unanswered meant a specification that never
+    asked scored higher than one that asked and postponed, which penalises
+    recording a known unknown. Same perverse incentive as the retired-item bug,
+    where striking something out raised the score.
+    """
+    body = "# Requirements\n\n- R1 The system must persist records.\n" + CLEAN.format(priority="MUST")
+    silent = score(tmp_path, body, "a")
+    deferred = score(
+        tmp_path,
+        body + "\n# Open Questions\n\n- OQ1 Whether to shard by tenant.\n"
+               "  - resolutionStatus: deferred\n  - owner: platform\n"
+               "  - recommendation: Revisit when volume justifies it\n",
+        "b",
+    )
+    assert deferred["score"] == silent["score"] == 100
+
+
+def test_an_undocumented_deferral_is_not_settled(tmp_path):
+    """A deferral still has to be a decision. The shapes want an owner and a
+    recommendation, so a bare `deferred` is flagged there and counts unclean
+    without the scorer needing a rule of its own."""
+    report = score(
+        tmp_path,
+        "# Requirements\n\n- R1 The system must persist records.\n" + CLEAN.format(priority="MUST")
+        + "\n# Open Questions\n\n- OQ1 Whether to shard by tenant.\n"
+          "  - resolutionStatus: deferred\n",
+    )
+    assert report["score"] < 100
+
+
+def test_an_open_question_is_still_unsettled(tmp_path):
+    report = score(
+        tmp_path,
+        "# Requirements\n\n- R1 The system must persist records.\n" + CLEAN.format(priority="MUST")
+        + "\n# Open Questions\n\n- OQ1 Whether to shard by tenant.\n"
+          "  - resolutionStatus: open\n  - owner: platform\n"
+          "  - recommendation: Decide before launch\n",
+    )
+    assert report["score"] < 100
+
+
+def test_the_scorer_and_the_shapes_agree_on_the_status_enum():
+    """They did not. The scorer accepted `closed` and `answered`, which the
+    shapes reject as invalid, and rejected `deferred`, which the shapes permit.
+    Two artifacts describing one enum, with nothing comparing them.
+    """
+    import re
+
+    from specl.validate_spec import SETTLED_ISSUE_STATUSES, UNSETTLED_ISSUE_STATUSES
+
+    shapes = SHAPES.read_text(encoding="utf-8")
+    block = shapes[shapes.index("specl:resolutionStatus"):]
+    permitted = set(re.findall(r'"([\w-]+)"', block[:block.index(";", block.index("sh:in"))]))
+    known = set(SETTLED_ISSUE_STATUSES) | set(UNSETTLED_ISSUE_STATUSES)
+    assert known == permitted, (
+        f"scorer knows {sorted(known)}, shapes permit {sorted(permitted)}"
+    )

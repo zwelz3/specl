@@ -290,18 +290,37 @@ def _weight(g, item):
     return PRIORITY_WEIGHT.get(str(priority).upper(), DEFAULT_WEIGHT) if priority else DEFAULT_WEIGHT
 
 
+# An open issue is settled when someone has decided something about it. Both of
+# these are decisions: `resolved` answers the question, `deferred` decides not to
+# answer it yet. Treating a deferral as unanswered penalised recording a known
+# unknown, so a specification that never asked the question scored higher than
+# one that asked and deliberately postponed. That is the same perverse incentive
+# as the retired-item bug, where striking something out raised the score.
+#
+# A deferral still has to be a real decision. The shapes want an owner and a
+# recommendation on an open issue, so a `deferred` item carrying neither is
+# flagged there and counts unclean anyway; nothing extra is needed here.
+SETTLED_ISSUE_STATUSES = ("resolved", "deferred")
+
+# `open` and `in-review` are the unsettled half of the same enum. Named rather
+# than inferred, so the two halves stay checkable against `shapes.ttl`, which
+# had been permitting values this function rejected and rejecting one it
+# permitted.
+UNSETTLED_ISSUE_STATUSES = ("open", "in-review")
+
+
 def _unresolved_issue(g, item):
-    """An open issue that is still open is never clean.
+    """An open issue nobody has decided anything about is never clean.
 
     A specification cannot be fully mature while carrying unanswered questions,
     and the previous metric could not see this at all: it counted requirements
-    only, so a specification with no open issues and a specification with a
-    dozen unresolved ones scored identically.
+    only, so a specification with no open issues and one with a dozen
+    unanswered ones scored identically.
     """
     if (item, RDF.type, SPECL.OpenIssue) not in g:
         return False
     status = g.value(item, SPECL.resolutionStatus)
-    return status is None or str(status).lower() not in ("resolved", "closed", "answered")
+    return status is None or str(status).lower() not in SETTLED_ISSUE_STATUSES
 
 
 # Progress is asked only of what gets built. A decision record, a persona, or an
