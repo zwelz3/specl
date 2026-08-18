@@ -29,14 +29,13 @@ proposals, and a test asserting the window length agrees across artifacts.
 
 ## Deferred to 2.0
 
-Each is expected to break something, so they join the collection window rather
-than trickling through 1.x. From 1.0 these are not the author's to decide alone.
+These join the collection window rather than trickling through 1.x. From 1.0 they are not the author's to decide alone. Neither is now expected to change an IRI or a property range: what puts them here is that they are syntax and vocabulary changes, which `GOVERNANCE.md` governs whether or not they break a graph.
 
-**Multi-specification projects and component identity.** Components, and by
-extension shared personas and agents, are minted under the referencing
-specification's base, so one entity named by three specifications is three
-nodes. Adopting a fix moves every component IRI a project had. It should be
-designed with the people who hit it rather than invented first.
+**The component-name abbreviation.** A specification family can already share a component: write the absolute IRI and every specification naming it names the same node. What waits for 2.0 is the front-matter map that shortens `constrains: https://example.org/components#engine` to `constrains: engine`.
+
+This is no longer expected to break anything. The earlier claim that adopting a map moves every component IRI held only for a project that had already minted local hashed nodes; one writing absolute IRIs has nothing to abbreviate yet and nothing to move. Personas and agents were never affected. See `docs/proposals/0003-g3t-component-identity-disposition.md`.
+
+The open design question is whether a declared component namespace should carry a `path` the way `vocabularies:` does, so a typo in an absolute IRI is caught. Today it is not, and a misspelled IRI is a valid IRI naming a node nothing else references.
 
 **Agent integration.** An MCP server for the deterministic verbs and a skill for
 the authoring rules, plus `--print-prompt` on `gaps` and `check`. The analysis,
