@@ -15,6 +15,7 @@ rdflib = pytest.importorskip("rdflib")
 from rdflib import Graph, Literal, Namespace, URIRef  # noqa: E402
 
 SPECL = Namespace("https://w3id.org/specl/ns#")
+BASE = "https://example.org/specs/t#"
 HEAD = (
     "---\ntitle: T\nspec_base: https://example.org/specs/t#\n"
     "spec_id: t-001\nversion: 0.1.0\nstatus: draft\n---\n\n"
@@ -204,3 +205,75 @@ def test_a_component_reference_does_not_trip_the_range_check(tmp_path):
     translate(source, target)
     _, results, _ = run_shacl(Graph().parse(target), load(SHAPES))
     assert not [r for r in results if "declared range" in r["message"]]
+
+
+def test_an_absolute_iri_is_used_as_written(tmp_path):
+    """UR23. It previously matched neither the CURIE branch nor the identifier
+    grammar, so it fell through to node minting and was hashed into a local
+    `component-<digest>`, discarding the identity the author supplied."""
+    result, graph = build(
+        tmp_path,
+        "# Requirements\n\n- R1 Names a shared component.\n"
+        "  - constrains: https://g3t.example/components#geometry\n",
+    )
+    assert result.returncode == 0 and result.stderr == ""
+    assert graph.value(URIRef(BASE + "R1"), SPECL.constrains) == URIRef(
+        "https://g3t.example/components#geometry"
+    )
+    assert not [n for n in graph.subjects() if "component-" in str(n)]
+
+
+def test_three_specifications_naming_one_iri_share_a_node(tmp_path):
+    """UR23's acceptance criterion, and the whole point of it: a specification
+    family shares a component with no map and no coordination."""
+    merged = Graph()
+    for name in ("parent", "routing", "render"):
+        source = tmp_path / f"{name}.md"
+        source.write_text(
+            f"---\ntitle: {name}\nspec_base: https://g3t.example/specs/{name}#\n"
+            f"spec_id: {name}-001\n---\n\n"
+            "# Requirements\n\n- R1 Names the shared geometry document.\n"
+            "  - constrains: https://g3t.example/components#geometry\n",
+            encoding="utf-8",
+        )
+        target = tmp_path / f"{name}.ttl"
+        assert translate(source, target).returncode == 0
+        merged.parse(target)
+
+    components = set(merged.objects(None, SPECL.constrains))
+    assert components == {URIRef("https://g3t.example/components#geometry")}
+    assert len(list(merged.subjects(SPECL.constrains, next(iter(components))))) == 3
+
+
+def test_a_reference_prefix_used_for_a_component_warns(tmp_path):
+    """UR24. It resolves, and then pins layering to inconclusive forever,
+    because a reference declares a peer specification and a component namespace
+    is not one. Leaving that discoverable was the wrong state."""
+    source = tmp_path / "s.md"
+    source.write_text(
+        f"---\ntitle: T\nspec_base: {BASE}\nspec_id: t-001\n"
+        "references:\n  SHARED:\n    base: https://g3t.example/components#\n---\n\n"
+        "# Requirements\n\n- R1 Names a shared component by CURIE.\n"
+        "  - constrains: SHARED:geometry\n",
+        encoding="utf-8",
+    )
+    result = translate(source, tmp_path / "s.ttl")
+    assert "write the absolute IRI instead" in result.stderr
+    assert "layering inconclusive" in result.stderr
+
+
+def test_a_reference_prefix_with_a_path_is_a_peer_and_does_not_warn(tmp_path):
+    """The legitimate use. A declared path means it really is a peer
+    specification, which layering can read."""
+    peer = tmp_path / "peer.ttl"
+    peer.write_text("", encoding="utf-8")
+    source = tmp_path / "s.md"
+    source.write_text(
+        f"---\ntitle: T\nspec_base: {BASE}\nspec_id: t-001\n"
+        "references:\n  UP:\n    base: https://example.org/specs/up#\n"
+        f"    path: {peer}\n---\n\n"
+        "# Requirements\n\n- R1 Verified by a peer's test.\n  - verifiedBy: UP:T1\n",
+        encoding="utf-8",
+    )
+    result = translate(source, tmp_path / "s.ttl")
+    assert "absolute IRI instead" not in result.stderr

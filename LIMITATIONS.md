@@ -7,10 +7,9 @@ read before deciding.
 
 ## One entity across several specifications becomes several nodes
 
-`constrains` and `verifiedBy` mint their nodes under the referencing
-specification's own base, so a component named by three specifications is three
-unrelated nodes. Shared personas and agents have the same property. This is not
-a spelling problem: it happens when everyone spells it identically.
+`constrains` and `verifiedBy` mint a node under the referencing specification's own base when given a bare name, so three specifications naming `engine` produce three unrelated nodes. This is not a spelling problem: it happens when everyone spells it identically.
+
+**There is a way to share one.** Write the absolute IRI, and every specification naming it names the same node. The verbosity is the cost, and the front-matter abbreviation for it is 2.0 work. Personas and agents were never affected: `role:` and `owner:` resolve a `PREFIX:ID` token against a base declared under `references:`, so declaring one in a parent specification and referencing it from peers already gives one node per entity.
 
 Visible in specl's own repository, where `specl_tool` declares
 `component-explorer` while `specl_explorer` is that component with its own

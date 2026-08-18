@@ -507,6 +507,17 @@ def resolve_reference(key, value, known_ids, warnings, context, references=None,
         )
         return f'"{esc(token)}"', None
 
+    # An absolute IRI is already unambiguous, so it is used as written. It fell
+    # through to node minting before, which hashed it into a local
+    # `component-<digest>` and discarded the identity the author had supplied.
+    #
+    # This is what gives a specification family one node per shared component
+    # without a name-to-IRI map: three specifications naming the same IRI name
+    # the same node. The map deferred to 2.0 is an abbreviation of this, and
+    # because these IRIs are the project's own, adopting it later moves nothing.
+    if token.startswith(("http://", "https://")):
+        return f"<{token}>", None
+
     if BULLET_RE.match(f"- {token} x"):
         if known_ids is not None and token not in known_ids:
             warnings.append(
@@ -529,6 +540,20 @@ def resolve_reference(key, value, known_ids, warnings, context, references=None,
             # UR15: references resolve to IRIs always. Whether the peer actually
             # declares the item is a layering question, checked against the peer
             # rather than guessed at here.
+            #
+            # A prefix declared here names a peer specification. Using one for a
+            # shared component namespace resolves, and then pins
+            # specl-validate layering to inconclusive forever, because layering
+            # tries to read the peer as a specification. Absolute IRIs are the
+            # sanctioned way to share a component across specifications.
+            if key in ("constrains", "verifiedBy") and not entry.get("path"):
+                warnings.append(
+                    f"{context}: {key} resolves {token!r} against the "
+                    f"specification reference {prefix!r}, which declares no "
+                    "path. If this names a shared component rather than an item "
+                    "in a peer specification, write the absolute IRI instead: a "
+                    "reference prefix makes layering inconclusive"
+                )
             return f"<{entry['base']}{local}>", None
         warnings.append(
             f"{context}: {key} value {token!r} uses prefix {prefix!r}, which this "

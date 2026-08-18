@@ -503,12 +503,27 @@ everyone spells it identically. Visible here already, since `specl_tool`
 declares `component-explorer` while `specl_explorer` is that component with its
 own Specification IRI.
 
-The likely shape is a front-matter map from a component name to a
-project-controlled IRI, in the manner of `references:`. **Expect breaking
-changes.** The mapping mechanism itself is additive, but a project that adopts
-it moves every component IRI it had, and the work may well surface more: shared
-personas and agents have the same spec-local minting, and a cross-specification
-identity model touches all three.
+**Partly answered, and the framing here was wrong.** See
+`docs/proposals/0003-g3t-component-identity-disposition.md`.
+
+Absolute IRIs in reference-valued fields shipped after the g3-toolkit track
+asked whether the timing could change. Three specifications naming one IRI name
+one node, so a family can share a component today with no map and no
+coordination. What remains for 2.0 is the front-matter abbreviation for it.
+
+The claim that the map breaks things was true only of a project that had already
+minted local hashed nodes. A project writing absolute IRIs has nothing to
+abbreviate yet and nothing to move later, so adopting the map is a pure
+shorthand. The deferral was protecting against a migration that the alternative
+avoids entirely.
+
+Personas and agents were never affected. `role:` and `owner:` resolve a CURIE
+against a declared base, so one node per entity was always available.
+
+The open design question is narrower than it was: whether a declared component
+namespace should carry a `path` the way `vocabularies:` does, so that a typo in
+an absolute IRI is caught. Today it is not, and a misspelled IRI is a valid IRI
+naming a node nothing else references.
 
 This should be designed against a real multi-specification project rather than
 invented. Designing cross-specification identity without one in front of you is

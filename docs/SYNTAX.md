@@ -71,10 +71,7 @@ Item IRIs are the base concatenated with the identifier token verbatim, not RFC
 3986 relative resolution, so a dotted identifier such as `R2.1` is safe under
 any base. The Specification itself is the base without its terminating `#`.
 
-`prefix` is the short name another specification will use to reference this one.
-It is carried in the graph from 0.3.0 and unused until cross-specification
-references arrive in 0.5.0, so that the value is stable before the feature
-depends on it.
+`prefix` is the short name another specification uses to reference this one. It was carried in the graph from 0.3.0 and unused until cross-specification references arrived in 0.5.0, so the value was stable before the feature depended on it.
 
 `item_prefix` declares the prefix this specification's own item identifiers
 carry, in place of the reserved one its section would otherwise require. Two or
@@ -248,8 +245,7 @@ concatenation, and warns if no item in the specification declares it. The IRI is
 still emitted, so a dangling reference is visible in the graph rather than
 silently absent.
 
-A CURIE such as `SBL:D14` is illegal until cross-specification references arrive
-in 0.5.0. It warns and stays a literal, because there is no prefix map yet and
+A CURIE such as `SBL:D14` resolves through `references:`; before 0.5.0 it was illegal. It warns and stays a literal, because there is no prefix map yet and
 guessing one would mint a wrong IRI. A pytest node id such as
 `tests/test_a.py::test_b` carries colons and is not a CURIE.
 
@@ -258,6 +254,10 @@ The declared range is enforced. `constrains` points at a `specl:Component` and
 specification warns: resolution tries the identifier grammar first, and
 `constrains: R1` would otherwise put a requirement where the ontology reserves a
 component.
+
+An absolute IRI is used as written. That is how a specification family shares a component: three specifications naming the same IRI name the same node, with no map and no coordination. Writing a shared component's IRI in full is verbose, and the front-matter abbreviation for it is 2.0 work; nothing about the IRIs changes when it arrives.
+
+A CURIE resolving against a `references:` prefix works here too and should not be used for a component. A reference declares a peer specification, so `specl-validate layering` tries to read it as one and reports inconclusive forever. Doing it warns and names the absolute IRI instead.
 
 Anything else names an external artifact and becomes a typed node,
 `specl:Component` for `constrains` and `specl:Test` for `verifiedBy`, carrying

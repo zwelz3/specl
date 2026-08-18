@@ -10,6 +10,21 @@ its release is tagged.
 The second and final graph-breaking release. Graphs move from contract 1 to
 contract 2 with `specl-migrate contract`.
 
+### Shared components across specifications
+- An absolute IRI in `constrains` or `verifiedBy` is used as written rather than
+  hashed into a local node. Three specifications naming one IRI name one node,
+  so a specification family shares a component with no map and no coordination.
+  Requested by the g3-toolkit track; see
+  `docs/proposals/0003-g3t-component-identity-disposition.md`. `UR23`.
+- A `constrains` or `verifiedBy` value resolving against a specification
+  reference that declares no path now warns. It resolved silently before and
+  pinned `specl-validate layering` to inconclusive, because a reference declares
+  a peer specification and a component namespace is not one. `UR24`.
+- `LIMITATIONS.md` no longer implies shared personas and agents are unfixable;
+  `role:` and `owner:` always resolved CURIEs against a declared base.
+  `docs/SYNTAX.md` no longer describes cross-specification references as
+  arriving in a future release.
+
 ### Scoring
 - A deferred open question counts as settled for maturity. Reported by an
   adopter running 0.11: counting it as unanswered meant a specification that
@@ -115,6 +130,21 @@ contract 2 with `specl-migrate contract`.
 - `docs/decisions/0009-what-1.0-means.md` recasts 1.0 as a change in who may
   change the specification, replacing criteria that asked for adoption evidence
   as a precondition for the release that makes adoption reasonable.
+
+### Shared components across specifications
+- An absolute IRI in `constrains` or `verifiedBy` is used as written rather than
+  hashed into a local node. Three specifications naming one IRI name one node,
+  so a specification family shares a component with no map and no coordination.
+  Requested by the g3-toolkit track; see
+  `docs/proposals/0003-g3t-component-identity-disposition.md`. `UR23`.
+- A `constrains` or `verifiedBy` value resolving against a specification
+  reference that declares no path now warns. It resolved silently before and
+  pinned `specl-validate layering` to inconclusive, because a reference declares
+  a peer specification and a component namespace is not one. `UR24`.
+- `LIMITATIONS.md` no longer implies shared personas and agents are unfixable;
+  `role:` and `owner:` always resolved CURIEs against a declared base.
+  `docs/SYNTAX.md` no longer describes cross-specification references as
+  arriving in a future release.
 
 ### Scoring
 - A deferred open question counts as settled for maturity. Reported by an

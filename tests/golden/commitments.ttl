@@ -204,12 +204,34 @@ spec:UR21 a specl:Requirement ;
     specl:priority "SHOULD" ;
     specl:itemStatus "active" .
 
+spec:UR23 a specl:Requirement ;
+    specl:partOf <https://w3id.org/specl/commitments/spec> ;
+    dct:title "Absolute IRIs in reference-valued fields" ;
+    dct:description "An absolute IRI in a reference-valued field is used as written rather than minted into a local node. Several specifications naming the same IRI name the same node, which is how a specification family shares a component without a name-to-IRI map." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "132"^^xsd:integer ;
+    specl:priority "MUST" ;
+    specl:acceptanceCriterion "Given three specifications whose requirements each name the same absolute IRI under constrains, merging their graphs yields one node reached by three requirements." ;
+    specl:verifiedBy spec:test-e931e426 ;
+    specl:constrains spec:component-spec_to_rdf .
+
+spec:UR24 a specl:Requirement ;
+    specl:partOf <https://w3id.org/specl/commitments/spec> ;
+    dct:title "Warn on a reference prefix used for a component" ;
+    dct:description "A `constrains` or `verifiedBy` value resolving against a specification reference that declares no path warns and names the absolute IRI as the alternative. A reference prefix declares a peer specification, and using one for a component namespace pins layering to inconclusive." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "138"^^xsd:integer ;
+    specl:priority "MUST" ;
+    specl:acceptanceCriterion "Given constrains resolving a CURIE against a pathless specification reference, translation warns and the message names the absolute IRI alternative." ;
+    specl:verifiedBy spec:test-1a78f530 ;
+    specl:constrains spec:component-spec_to_rdf .
+
 spec:UR22 a specl:OpenIssue ;
     specl:partOf <https://w3id.org/specl/commitments/spec> ;
     dct:title "Whether the process commitment under UR16 should itself be verifiable, given…" ;
     dct:description "Whether the process commitment under UR16 should itself be verifiable, given that release notes are prose and the observable condition for removing a compensation is stated in words rather than checked." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "154"^^xsd:integer ;
+    specl:sourceLine "167"^^xsd:integer ;
     specl:recommendation "Bind each compensation to a test the way the contract page binds its guarantees" ;
     specl:resolutionStatus "open" .
 
@@ -218,7 +240,7 @@ spec:UR8 a specl:DecisionRecord ;
     dct:title "No per-item shape suppression" ;
     dct:description "Per-item shape suppression is declined as requested, and the root cause is accepted instead. A suppression key with a reason field is a warning made invisible, and specl already has decision records for recording a judgment." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "134"^^xsd:integer ;
+    specl:sourceLine "147"^^xsd:integer ;
     specl:decisionStatus "accepted" ;
     specl:rationale "The requester's own framing was that the warnings were unclearable; the answer is to make them clearable rather than to hide them." .
 
@@ -227,7 +249,7 @@ spec:UR14 a specl:DecisionRecord ;
     dct:title "No namespace registry" ;
     dct:description "specl does not model a namespace registry and will not. `spec_base` and `prefix` live in front matter, and foreign prefixes live in the front matter of the referencing specification. There is no tool-level registry and none is planned." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "138"^^xsd:integer ;
+    specl:sourceLine "151"^^xsd:integer ;
     specl:decisionStatus "accepted" ;
     specl:rationale "A registry is a second source of truth for a value the specification already declares." .
 
@@ -236,7 +258,7 @@ spec:UR7 a specl:DecisionRecord ;
     dct:title "Status-conditional severity model" ;
     dct:description "The severity gate is driven by the specification's own status rather than by a fixed severity threshold, with the original premise corrected." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "142"^^xsd:integer ;
+    specl:sourceLine "155"^^xsd:integer ;
     specl:decisionStatus "accepted" ;
     specl:rationale "A fixed threshold makes every warning either blocking or ignorable, and neither is a representable target." .
 
@@ -245,7 +267,7 @@ spec:UR10 a specl:DecisionRecord ;
     dct:title "Pre-adoption path per planned class" ;
     dct:description "Each planned class has a pre-adoption path: content is authored under a prose marker before the class exists, and adoption becomes moving the section rather than rewriting it." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "146"^^xsd:integer ;
+    specl:sourceLine "159"^^xsd:integer ;
     specl:decisionStatus "accepted" ;
     specl:affects spec:UR9 ;
     specl:affects spec:UR20 ;
@@ -271,6 +293,9 @@ spec:test-10300f9c a specl:Test ;
 
 spec:test-125bf373 a specl:Test ;
     dct:identifier "tests/test_title.py::test_every_item_carries_a_title" .
+
+spec:test-1a78f530 a specl:Test ;
+    dct:identifier "tests/test_references.py::test_a_reference_prefix_used_for_a_component_warns" .
 
 spec:test-400ba476 a specl:Test ;
     dct:identifier "tests/test_spec_base.py::test_rejections" .
@@ -307,4 +332,7 @@ spec:test-c8f47e56 a specl:Test ;
 
 spec:test-cb4bec55 a specl:Test ;
     dct:identifier "tests/test_references.py::test_an_item_reference_resolves_against_the_base" .
+
+spec:test-e931e426 a specl:Test ;
+    dct:identifier "tests/test_references.py::test_three_specifications_naming_one_iri_share_a_node" .
 

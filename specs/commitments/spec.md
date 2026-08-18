@@ -129,6 +129,19 @@ conversation about UR11 resolves to one IRI on both sides.
   - priority: SHOULD
   - itemStatus: active
 
+- UR23 An absolute IRI in a reference-valued field is used as written rather than minted into a local node. Several specifications naming the same IRI name the same node, which is how a specification family shares a component without a name-to-IRI map.
+  - title: Absolute IRIs in reference-valued fields
+  - priority: MUST
+  - acceptance: Given three specifications whose requirements each name the same absolute IRI under constrains, merging their graphs yields one node reached by three requirements.
+  - verifiedBy: tests/test_references.py::test_three_specifications_naming_one_iri_share_a_node
+  - constrains: spec_to_rdf
+- UR24 A `constrains` or `verifiedBy` value resolving against a specification reference that declares no path warns and names the absolute IRI as the alternative. A reference prefix declares a peer specification, and using one for a component namespace pins layering to inconclusive.
+  - title: Warn on a reference prefix used for a component
+  - priority: MUST
+  - acceptance: Given constrains resolving a CURIE against a pathless specification reference, translation warns and the message names the absolute IRI alternative.
+  - verifiedBy: tests/test_references.py::test_a_reference_prefix_used_for_a_component_warns
+  - constrains: spec_to_rdf
+
 # Decisions
 
 - UR8 Per-item shape suppression is declined as requested, and the root cause is accepted instead. A suppression key with a reason field is a warning made invisible, and specl already has decision records for recording a judgment.

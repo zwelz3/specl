@@ -48,6 +48,9 @@ EXCLUDE = {
     # Verbatim archive of a document received from a downstream consumer. Its
     # references describe the sender's repository and must not be rewritten.
     "docs/proposals/0002a-downstream-requests-as-received.md",
+    # Verbatim archive of the g3-toolkit request. Its references describe that
+    # project's repository and must not be rewritten to match this one.
+    "docs/proposals/0003a-g3t-component-identity-as-received.md",
 }
 
 # Documents that legitimately reference another repository's paths. Command
