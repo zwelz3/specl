@@ -1,8 +1,8 @@
 # w3id redirect rules
 
-`specl.htaccess` in this directory is the intended state of `specl/.htaccess` in
-[perma-id/w3id.org](https://github.com/perma-id/w3id.org). The copy here is the
-source of truth. Upstream is a mirror of it, updated by pull request.
+`specl.htaccess` and `upstream-README.md` in this directory are copies of the `.htaccess` and `README.md` in the `specl` directory of [perma-id/w3id.org](https://github.com/perma-id/w3id.org). They are kept byte-identical to what is live there, and changes go upstream by pull request.
+
+Both files are theirs in form. The `.htaccess` header follows the house style their examples use, and their process requires a `README.md` alongside it listing the maintainer's GitHub account. An earlier version of this directory held only the rules, in a house style of its own, which meant the file described as the source of truth diverged from the file actually serving traffic the moment a pull request was reviewed.
 
 ## Why the file lives here
 
@@ -35,15 +35,13 @@ The upstream file is `specl/.htaccess` in
 rather than patched, so the two never diverge by accumulating edits made in one
 place and not the other.
 
-1. Edit `specl.htaccess` here, in the same commit as whatever motivated it.
+1. Edit `specl.htaccess` and, if the URI table changes, `upstream-README.md`, in the same commit as whatever motivated it.
 2. `python3 tools/check_docs.py`. A target that does not exist in the tree, or a
    site asset the Pages workflow does not build, fails the check.
-3. Confirm the Pages site already serves every `zwelz3.github.io` target. A
-   redirect merged ahead of the content it points at is a live 404.
-4. Fork perma-id/w3id.org, replace `specl/.htaccess` with this file verbatim,
-   and open a pull request. Their maintainers review redirect changes; expect
-   turnaround in days rather than minutes.
-5. After it merges, verify each rule, including the content-negotiated variants:
+3. Confirm the Pages site already serves every `zwelz3.github.io` target. A redirect merged ahead of the content it points at is a live 404 on an identifier that may already be in emitted graphs.
+4. Fork perma-id/w3id.org and replace their `specl` directory's `.htaccess` and `README.md` with these two files verbatim. **Their files use LF endings**; a Windows clone with `core.autocrlf=true` will produce a diff touching every line, which is a diff a volunteer maintainer closes unread. Set `core.autocrlf=false` in that clone and verify with `git diff --stat` before opening the pull request.
+5. Open the pull request. Fill in their template rather than leaving it blank, squash to one commit, and use a message naming the project rather than "Update .htaccess". Their maintainers review redirect changes; expect turnaround in days.
+6. After it merges, verify each rule, including the content-negotiated variants:
 
    ```bash
    for p in ns shapes ns/1 ns/2 shapes/1 shapes/2 spec tool/spec \
@@ -60,8 +58,11 @@ place and not the other.
 
 ## What is pending
 
-Measured against the live upstream file rather than remembered. Nine rules are
-new and one target changes.
+Nothing. The nine rules below and the one changed target merged upstream; the copies here match what is live.
+
+Recompute this section rather than trusting it whenever something changes, by diffing against `https://raw.githubusercontent.com/perma-id/w3id.org/master/specl/.htaccess`. The table went stale once already.
+
+## What merged
 
 | Rule | Change | Why |
 | --- | --- | --- |
@@ -77,12 +78,7 @@ new and one target changes.
 Nothing upstream is removed, so no identifier already in the wild stops
 resolving.
 
-Until this merges, the IRIs above are valid identifiers that do not dereference.
-That is cosmetic rather than a correctness problem: validation never fetches and
-nothing in this project resolves an IRI at runtime. It stops being cosmetic when
-a second party publishes documents citing those IRIs, which is why the downstream
-embargo in `specs/commitments/spec.md` lifts on this merging rather than on a
-tag.
+These now resolve, which closes 1.0 criterion 3 and satisfies the second half of the downstream embargo condition in `specs/commitments/spec.md`.
 
 ## What is not covered yet
 
