@@ -49,12 +49,16 @@ place and not the other.
      printf '%-18s %s\n' "$p" "$(curl -s -o /dev/null -w '%{http_code} -> %{redirect_url}' \
        "https://w3id.org/specl/$p")"
    done
-   curl -sI -H 'Accept: text/turtle' https://w3id.org/specl/ns | grep -i location
-   curl -sI -H 'Accept: application/ld+json' https://w3id.org/specl/ns | grep -i location
+   for accept in text/turtle application/ld+json; do
+     curl -sI -H "Accept: $accept" https://w3id.org/specl/ns | grep -i location
+   done
+   curl -sI -H 'Accept: text/turtle' https://w3id.org/specl/shapes | grep -i location
    ```
 
    Every one should be a 303 to the target in this file, and neither
-   Accept-header variant should land on the HTML page.
+   Accept-header variant should land on the HTML page. `shapes` negotiates
+   Turtle too and was missing from this loop until 1.0, so one negotiated
+   redirect went unverified through the whole pull request.
 
 ## What is pending
 

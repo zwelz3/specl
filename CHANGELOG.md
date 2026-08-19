@@ -5,7 +5,7 @@ PyPI carries 0.2.0 until 1.0; see
 `docs/decisions/0007-internal-releases-until-1.0.md`. A section is dated when
 its release is tagged.
 
-## 1.0.0 — UNRELEASED
+## 1.0.0 — 2026-08-19
 
 Everything here landed after `v0.11.0` was tagged and before 1.0. It was filed
 under the 0.11.0 heading by mistake, which is the defect `RELEASING.md` now has

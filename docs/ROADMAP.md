@@ -450,7 +450,7 @@ makes adoption reasonable.
 | --- | --- | --- |
 | 1 | Documented graph contract with a migration path from every prior version | met |
 | 2 | Every section type, annotation key, and shape exercised by the corpus | met, asserted in `tests/test_exit_criteria.py` |
-| 3 | Published IRIs resolve | met: the w3id pull request merged 2026-08-19. Verify with the loop in `tools/w3id/README.md` before tagging |
+| 3 | Published IRIs resolve | met and verified 2026-08-19: all thirteen paths return 303 to their declared targets, and both content-negotiated variants of `ns` resolve correctly |
 | 4 | Known limitations documented where an evaluating adopter reads first | met: `LIMITATIONS.md`, linked from the README |
 | 5 | Governance mechanism written down | met: `GOVERNANCE.md`, with issue templates and a check that the comment period agrees across artifacts |
 

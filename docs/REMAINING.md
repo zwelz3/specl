@@ -9,7 +9,7 @@ feature list.
 
 Nothing. All five criteria are met; `docs/ROADMAP.md` carries the table. The w3id pull request merged on 2026-08-19, which closed the last one.
 
-Verify the redirects resolve before tagging anyway, with the loop in `tools/w3id/README.md`. A merge is not the same as a live redirect, and this is the one criterion nothing in CI can check.
+Verified 2026-08-19: all thirteen paths return 303 to their declared targets, and `ns` negotiates Turtle and JSON-LD correctly. Nothing in CI can check this, so it is re-run by hand whenever the rules change.
 
 ## Deferred to 2.0
 
