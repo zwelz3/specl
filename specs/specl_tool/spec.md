@@ -7,6 +7,10 @@ version: 0.3.0
 status: prototype
 ---
 
+<!--specl
+created: 2026-08-19
+-->
+
 # Intent
 Specify the SPECL toolchain itself — the parser, validator, scorer, badge generator, LLM assistant, and explorer — so the tool is governed by the same spec-driven process it provides to downstream projects.
 
@@ -73,6 +77,7 @@ Give SPECL a maturity signal of its own. Every capability the tool exposes to co
   - acceptance: Given 3 of 10 requirements with all four production properties, score reports 30%.
   - verifiedBy: tests/test_score.py::test_the_population_is_every_item_not_only_requirements
 - R2.4 `specl-validate badge` must produce a valid SVG file with color reflecting the maturity score.
+  - verifiedBy: tests/test_badge.py::test_every_score_renders_legibly
   - priority: SHOULD
   - constrains: validate_spec
   - acceptance: Given a score of 40%, the badge SVG contains fill color matching the red threshold.
@@ -91,6 +96,7 @@ Give SPECL a maturity signal of its own. Every capability the tool exposes to co
 
 ## R4 Explorer
 - R4.1 The explorer must be a single self-contained HTML file under 30 KB.
+  - verifiedBy: tests/test_explorer.py::test_the_explorer_is_one_self_contained_file_under_30_kb
   - priority: MUST
   - constrains: explorer
   - acceptance: explorer.html file size is under 30720 bytes and contains no external resource references.
@@ -111,24 +117,55 @@ Give SPECL a maturity signal of its own. Every capability the tool exposes to co
   - constrains: pyproject
   - acceptance: After pip install, specl-translate, specl-validate, and specl-assist are on PATH and --help works.
 - R6.2 shapes.ttl, core.ttl, and explorer.html must be included as package data.
+  - verifiedBy: tests/test_check_docs.py::test_the_bundled_data_files_are_declared_as_package_data
   - priority: MUST
   - constrains: pyproject
   - acceptance: After pip install, importlib.resources.files('specl').joinpath('shapes.ttl') resolves.
 
+# Agents
+
+- AG1 The maintainer accountable for specl's specification and releases.
+  - prefLabel: Maintainer
+
+# Personas
+
+- P1 Someone writing a specification in markdown and wanting to know whether it is complete.
+  - prefLabel: Spec author
+- P2 A continuous integration pipeline validating a specification on every change.
+  - prefLabel: CI pipeline
+- P3 A coding agent reading a translated specification before writing code against it.
+  - prefLabel: AI agent
+  - altLabel: coding agent
+
 # User Stories
 
 - US1 As a spec author, I run specl-translate on my markdown, specl-validate to check it, and see a maturity score that climbs as I add annotations.
+  - role: P1
+  - capability: translate, validate, and see a maturity score
+  - benefit: the specification's completeness is visible rather than guessed at
+  - acceptance: Given a markdown specification when translated and validated then a maturity score is reported
 - US2 As a CI pipeline, I run specl-validate on every PR and fail the build if a production-status spec has violations or warnings.
+  - role: P2
+  - capability: fail a build when a production specification carries warnings
+  - benefit: a specification cannot regress silently once it claims to be production ready
+  - acceptance: Given a production-status specification with warnings when validated then the command exits non-zero
 - US3 As an AI agent, I read the translated spec.ttl to understand what a system should do before generating code.
+  - role: P3
+  - capability: read the translated graph before writing code
+  - benefit: the specification rather than a summary of it is what the code is written against
+  - acceptance: Given a translated specification when queried for its requirements then each returns its acceptance criteria
 
 # Open Questions and Gaps
 
 - OQ1 Whether to add a scaffolding command that creates a new spec directory with a template spec.md. Its CLI surface is undecided and follows `docs/decisions/0001-cli-surface.md`; there is no umbrella `specl` command to hang it on.
-  - recommendation: Add in 0.4.0
-  - status: open
+  - owner: AG1
+  - recommendation: Deferred. It was recommended for 0.4.0 and nine releases passed without it being wanted, which is evidence that it is not needed. `docs/SYNTAX.md` shows the front matter and copying an existing specification is the path people actually take. From 1.0 adding a command is additive and ungoverned, so it can arrive whenever someone asks
+  - resolutionStatus: deferred
 - OQ2 Whether specl-validate should default to the bundled shapes.ttl via importlib.resources when no shapes path is given.
+  - owner: AG1
   - recommendation: Implemented. It was the first command an adopter runs and it failed, because nothing tells someone who pip installed the package where the bundled file lives
   - resolutionStatus: resolved
 - OQ3 Whether to support a `namespace_style: hash | slash` front-matter key for specs that want per-element slash URIs (Schema.org pattern).
-  - recommendation: Defer to 0.4.0
-  - status: open
+  - owner: AG1
+  - recommendation: Declined. Hash namespaces are what every emitted graph and both published contracts use, and a per-specification choice would make two specifications with the same items produce different IRIs. That is a contract-level change and would need the 2.0 window, not a front-matter key
+  - resolutionStatus: resolved

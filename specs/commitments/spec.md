@@ -9,6 +9,7 @@ status: review
 ---
 
 <!--specl
+created: 2026-08-19
 created: 2026-08-16
 -->
 
@@ -161,7 +162,9 @@ conversation about UR11 resolves to one IRI on both sides.
   - title: No per-item shape suppression
   - status: accepted
   - rationale: The requester's own framing was that the warnings were unclearable; the answer is to make them clearable rather than to hide them.
+  - affects: UR25
 - UR14 specl does not model a namespace registry and will not. `spec_base` and `prefix` live in front matter, and foreign prefixes live in the front matter of the referencing specification. There is no tool-level registry and none is planned.
+  - affects: UR15
   - title: No namespace registry
   - status: accepted
   - rationale: A registry is a second source of truth for a value the specification already declares.
@@ -169,6 +172,7 @@ conversation about UR11 resolves to one IRI on both sides.
   - title: Status-conditional severity model
   - status: accepted
   - rationale: A fixed threshold makes every warning either blocking or ignorable, and neither is a representable target.
+  - affects: UR25
 - UR10 Each planned class has a pre-adoption path: content is authored under a prose marker before the class exists, and adoption becomes moving the section rather than rewriting it.
   - title: Pre-adoption path per planned class
   - status: accepted

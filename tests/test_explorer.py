@@ -79,3 +79,16 @@ def test_no_retired_property_names_remain():
     text = EXPLORER.read_text(encoding="utf-8")
     for retired in ("'asA'", "'iWant'", "'soThat'"):
         assert retired not in text, f"{retired} was renamed in contract 2"
+
+
+def test_the_explorer_is_one_self_contained_file_under_30_kb():
+    """specl_tool R4.1, which had no test and so no `verifiedBy`.
+
+    The size bound is the point of the requirement: the explorer is meant to be
+    droppable into a page or opened from disk, which a build step or an external
+    asset would defeat.
+    """
+    html = EXPLORER.read_text(encoding="utf-8")
+    assert len(EXPLORER.read_bytes()) < 30 * 1024, "explorer.html exceeds 30 KB"
+    for external in ("<script src=", "<link rel=\"stylesheet\"", "@import"):
+        assert external not in html, f"explorer.html loads {external!r} from outside itself"

@@ -164,3 +164,24 @@ def test_the_commitments_pointer_does_not_name_a_stale_range():
     assert max(claimed) <= highest, (
         f"the pointer names UR{max(claimed)} and the register stops at UR{highest}"
     )
+
+
+def test_the_bundled_data_files_are_declared_as_package_data():
+    """specl_tool R6.2, which had no test and so no `verifiedBy`.
+
+    An undeclared data file is present in a source checkout and missing from an
+    installed wheel, so the defect appears only for the people who install
+    normally.
+    """
+    import tomllib
+
+    with (ROOT / "pyproject.toml").open("rb") as fh:
+        declared = tomllib.load(fh)["tool"]["setuptools"]["package-data"]["specl"]
+
+    for name in ("shapes.ttl", "core.ttl", "explorer.html"):
+        assert name in declared, f"{name} is not declared as package data"
+        assert (ROOT / "src" / "specl" / name).exists()
+
+    assert any(pattern.startswith("conformance/") for pattern in declared), (
+        "the conformance fixture is loaded at runtime and must ship"
+    )

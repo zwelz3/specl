@@ -13,6 +13,7 @@
     specl:status "prototype" ;
     dct:identifier "specl-tool-001" ;
     specl:prefix "TOOL" ;
+    dct:created "2026-08-19"^^xsd:date ;
     specl:intent """Specify the SPECL toolchain itself — the parser, validator, scorer, badge generator, LLM assistant, and explorer — so the tool is governed by the same spec-driven process it provides to downstream projects.""" ;
     specl:purpose """Give SPECL a maturity signal of its own. Every capability the tool exposes to consumers must be traceable to a requirement with acceptance criteria, a priority, and a verification artifact.""" .
 
@@ -24,7 +25,7 @@ spec:R1.1 a specl:Requirement ;
     dct:title "`specl-translate` must parse markdown with YAML front-matter, H1 sections…" ;
     dct:description "`specl-translate` must parse markdown with YAML front-matter, H1 sections, ID-bulleted items (R, US, OQ, D prefixes), and indented sub-bullet annotations into valid Turtle." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "19"^^xsd:integer ;
+    specl:sourceLine "23"^^xsd:integer ;
     specl:priority "MUST" ;
     specl:constrains spec:component-spec_to_rdf ;
     specl:acceptanceCriterion "Given any markdown spec conforming to docs/SYNTAX.md, when translated, the output parses without error in rdflib and every ID-bulleted item appears as a typed individual with specl:partOf linking to the spec." ;
@@ -35,7 +36,7 @@ spec:R1.2 a specl:Requirement ;
     dct:title "Sub-bullet annotations must populate structured RDF properties (priority…" ;
     dct:description "Sub-bullet annotations must populate structured RDF properties (priority, acceptance, verifiedBy, constrains, role, capability, benefit, owner, recommendation, decisionStatus, resolutionStatus, rationale, affects)." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "24"^^xsd:integer ;
+    specl:sourceLine "28"^^xsd:integer ;
     specl:priority "MUST" ;
     specl:constrains spec:component-spec_to_rdf ;
     specl:acceptanceCriterion "Given a requirement with all annotation keys, when translated, the output contains the corresponding specl: triples with correct property names." ;
@@ -46,7 +47,7 @@ spec:R1.3 a specl:Requirement ;
     dct:title "Comma-separated values on constrains and affects sub-bullets must produce…" ;
     dct:description "Comma-separated values on constrains and affects sub-bullets must produce multiple triples. Prose keys must not split on commas." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "29"^^xsd:integer ;
+    specl:sourceLine "33"^^xsd:integer ;
     specl:priority "MUST" ;
     specl:constrains spec:component-spec_to_rdf ;
     specl:acceptanceCriterion "Given `constrains: A, B`, output has two specl:constrains triples. Given `acceptance: Given X, when Y`, output has one specl:acceptanceCriterion triple with the full comma-containing string." ;
@@ -57,7 +58,7 @@ spec:R1.4 a specl:Requirement ;
     dct:title "Specs without sub-bullet annotations must produce identical output to specl…" ;
     dct:description "Specs without sub-bullet annotations must produce identical output to specl 0.1.x." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "34"^^xsd:integer ;
+    specl:sourceLine "38"^^xsd:integer ;
     specl:priority "MUST" ;
     specl:constrains spec:component-spec_to_rdf ;
     specl:acceptanceCriterion "Given the EKGA reference spec with no sub-bullets, the translated subject set is identical to the 0.1.x golden file." .
@@ -67,7 +68,7 @@ spec:R1.5 a specl:Requirement ;
     dct:title "The `--strict` flag must print parser warnings to stderr without failing the…" ;
     dct:description "The `--strict` flag must print parser warnings to stderr without failing the translation. Retained for compatibility; it selects behavior that R1.6 makes unconditional." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "38"^^xsd:integer ;
+    specl:sourceLine "42"^^xsd:integer ;
     specl:priority "SHOULD" ;
     specl:constrains spec:component-spec_to_rdf ;
     specl:acceptanceCriterion "Given a spec with an unrecognized annotation key, when translated with --strict, stderr contains a warning and the exit code is 0." ;
@@ -78,7 +79,7 @@ spec:R1.6 a specl:Requirement ;
     dct:title "Parser warnings must print to stderr on every translation, with no flag…" ;
     dct:description "Parser warnings must print to stderr on every translation, with no flag required, followed by a count naming the source file. A warning that appears only behind a flag is one nobody reads." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "43"^^xsd:integer ;
+    specl:sourceLine "47"^^xsd:integer ;
     specl:priority "MUST" ;
     specl:constrains spec:component-spec_to_rdf ;
     specl:acceptanceCriterion "Given a spec with an unrecognized annotation key, when translated with no flags, stderr contains the warning and a count line." ;
@@ -89,7 +90,7 @@ spec:R1.8 a specl:Requirement ;
     dct:title "An indented bullet that names no known annotation key must be read as nested…" ;
     dct:description "An indented bullet that names no known annotation key must be read as nested content when it sits at four or more columns, and must warn as a probable typo below that. Nested lines attach to the item as an `rdf:List` on `specl:detail` in source order, with IRI-named cells rather than blank nodes." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "48"^^xsd:integer ;
+    specl:sourceLine "52"^^xsd:integer ;
     specl:priority "MUST" ;
     specl:constrains spec:component-spec_to_rdf ;
     specl:acceptanceCriterion "Given a requirement with a four-column sub-list of unrecognized keys, translation emits an rdf:List on specl:detail containing those lines in order, every node in the graph is an IRI, and no warning is produced. Given the same lines at two columns, translation warns." ;
@@ -100,7 +101,7 @@ spec:R1.7 a specl:Requirement ;
     dct:title "The `--fail-on-warning` flag must exit non-zero when the parser produced any…" ;
     dct:description "The `--fail-on-warning` flag must exit non-zero when the parser produced any warning, after writing the output file. The output is written either way, because reading the emitted graph is how the cost of a dropped line is seen." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "53"^^xsd:integer ;
+    specl:sourceLine "57"^^xsd:integer ;
     specl:priority "MUST" ;
     specl:constrains spec:component-spec_to_rdf ;
     specl:acceptanceCriterion "Given a spec with an unrecognized annotation key, when translated with --fail-on-warning, the output file exists and the exit code is 1. Given a spec with no warnings, the exit code is 0." ;
@@ -111,7 +112,7 @@ spec:R2.1 a specl:Requirement ;
     dct:title "`specl-validate validate` must run the SHACL shapes graph against a translated…" ;
     dct:description "`specl-validate validate` must run the SHACL shapes graph against a translated spec and report violations and warnings." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "60"^^xsd:integer ;
+    specl:sourceLine "64"^^xsd:integer ;
     specl:priority "MUST" ;
     specl:constrains spec:component-validate_spec ;
     specl:acceptanceCriterion "Given a spec.ttl with a missing dct:description on a Requirement, validation reports a Violation." ;
@@ -122,7 +123,7 @@ spec:R2.2 a specl:Requirement ;
     dct:title "The severity gate must be driven by the spec's own specl:status value" ;
     dct:description "The severity gate must be driven by the spec's own specl:status value." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "65"^^xsd:integer ;
+    specl:sourceLine "69"^^xsd:integer ;
     specl:priority "MUST" ;
     specl:constrains spec:component-validate_spec ;
     specl:acceptanceCriterion "Given a spec at status draft with Warnings only, validate exits 0. Given status production with Warnings, validate exits 1." ;
@@ -133,7 +134,7 @@ spec:R2.3 a specl:Requirement ;
     dct:title "`specl-validate score` must report a maturity percentage based on…" ;
     dct:description "`specl-validate score` must report a maturity percentage based on production-ready requirements." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "70"^^xsd:integer ;
+    specl:sourceLine "74"^^xsd:integer ;
     specl:priority "MUST" ;
     specl:constrains spec:component-validate_spec ;
     specl:acceptanceCriterion "Given 3 of 10 requirements with all four production properties, score reports 30%." ;
@@ -144,7 +145,8 @@ spec:R2.4 a specl:Requirement ;
     dct:title "`specl-validate badge` must produce a valid SVG file with color reflecting the…" ;
     dct:description "`specl-validate badge` must produce a valid SVG file with color reflecting the maturity score." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "75"^^xsd:integer ;
+    specl:sourceLine "79"^^xsd:integer ;
+    specl:verifiedBy spec:test-63bb3a4e ;
     specl:priority "SHOULD" ;
     specl:constrains spec:component-validate_spec ;
     specl:acceptanceCriterion "Given a score of 40%, the badge SVG contains fill color matching the red threshold." .
@@ -154,7 +156,7 @@ spec:R2.5 a specl:Requirement ;
     dct:title "`specl-validate diff` must report added, removed, and modified requirements…" ;
     dct:description "`specl-validate diff` must report added, removed, and modified requirements between two Turtle files." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "79"^^xsd:integer ;
+    specl:sourceLine "84"^^xsd:integer ;
     specl:priority "SHOULD" ;
     specl:constrains spec:component-validate_spec ;
     specl:acceptanceCriterion "Given old.ttl with R1.1 and new.ttl with R1.1 (changed) and R1.2 (added), diff reports 1 added and 1 modified." ;
@@ -165,7 +167,7 @@ spec:R3.1 a specl:Requirement ;
     dct:title "All generated Turtle must use `https://w3id.org/specl/ns#` as the vocabulary…" ;
     dct:description "All generated Turtle must use `https://w3id.org/specl/ns#` as the vocabulary namespace and the specification's own declared `spec_base` as the instance namespace. The translator must never mint instance IRIs into a namespace the specification did not declare." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "86"^^xsd:integer ;
+    specl:sourceLine "91"^^xsd:integer ;
     specl:priority "MUST" ;
     specl:constrains spec:component-spec_to_rdf ;
     specl:constrains spec:component-core_ttl ;
@@ -177,7 +179,8 @@ spec:R4.1 a specl:Requirement ;
     dct:title "The explorer must be a single self-contained HTML file under 30 KB" ;
     dct:description "The explorer must be a single self-contained HTML file under 30 KB." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "93"^^xsd:integer ;
+    specl:sourceLine "98"^^xsd:integer ;
+    specl:verifiedBy spec:test-94401fb8 ;
     specl:priority "MUST" ;
     specl:constrains spec:component-explorer ;
     specl:acceptanceCriterion "explorer.html file size is under 30720 bytes and contains no external resource references." .
@@ -187,7 +190,7 @@ spec:R5.1 a specl:Requirement ;
     dct:title "`specl-assist gaps` must read SHACL warnings and draft remediation prompts via…" ;
     dct:description "`specl-assist gaps` must read SHACL warnings and draft remediation prompts via Ollama." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "99"^^xsd:integer ;
+    specl:sourceLine "105"^^xsd:integer ;
     specl:priority "SHOULD" ;
     specl:constrains spec:component-spec_assistant ;
     specl:acceptanceCriterion "Given a spec with warnings and a running Ollama instance, gaps prints a draft for each warning." .
@@ -197,7 +200,7 @@ spec:R5.2 a specl:Requirement ;
     dct:title "`specl-assist check` must flag contradictions and duplications across…" ;
     dct:description "`specl-assist check` must flag contradictions and duplications across requirements." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "103"^^xsd:integer ;
+    specl:sourceLine "109"^^xsd:integer ;
     specl:priority "SHOULD" ;
     specl:constrains spec:component-spec_assistant ;
     specl:acceptanceCriterion "Given a spec with two requirements that contradict, check output includes a finding referencing both." .
@@ -207,7 +210,7 @@ spec:R6.1 a specl:Requirement ;
     dct:title "The package must be installable via `pip install specl` and register three…" ;
     dct:description "The package must be installable via `pip install specl` and register three console scripts." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "109"^^xsd:integer ;
+    specl:sourceLine "115"^^xsd:integer ;
     specl:priority "MUST" ;
     specl:constrains spec:component-pyproject ;
     specl:acceptanceCriterion "After pip install, specl-translate, specl-validate, and specl-assist are on PATH and --help works." .
@@ -217,7 +220,8 @@ spec:R6.2 a specl:Requirement ;
     dct:title "shapes.ttl, core.ttl, and explorer.html must be included as package data" ;
     dct:description "shapes.ttl, core.ttl, and explorer.html must be included as package data." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "113"^^xsd:integer ;
+    specl:sourceLine "119"^^xsd:integer ;
+    specl:verifiedBy spec:test-f20a4e93 ;
     specl:priority "MUST" ;
     specl:constrains spec:component-pyproject ;
     specl:acceptanceCriterion "After pip install, importlib.resources.files('specl').joinpath('shapes.ttl') resolves." .
@@ -227,37 +231,51 @@ spec:US1 a specl:UserStory ;
     dct:title "As a spec author, I run specl-translate on my markdown, specl-validate to check…" ;
     dct:description "As a spec author, I run specl-translate on my markdown, specl-validate to check it, and see a maturity score that climbs as I add annotations." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "120"^^xsd:integer .
+    specl:sourceLine "142"^^xsd:integer ;
+    specl:role spec:P1 ;
+    specl:capability "translate, validate, and see a maturity score" ;
+    specl:benefit "the specification's completeness is visible rather than guessed at" ;
+    specl:acceptanceCriterion "Given a markdown specification when translated and validated then a maturity score is reported" .
 
 spec:US2 a specl:UserStory ;
     specl:partOf <https://w3id.org/specl/tool/spec> ;
     dct:title "As a CI pipeline, I run specl-validate on every PR and fail the build if a…" ;
     dct:description "As a CI pipeline, I run specl-validate on every PR and fail the build if a production-status spec has violations or warnings." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "121"^^xsd:integer .
+    specl:sourceLine "147"^^xsd:integer ;
+    specl:role spec:P2 ;
+    specl:capability "fail a build when a production specification carries warnings" ;
+    specl:benefit "a specification cannot regress silently once it claims to be production ready" ;
+    specl:acceptanceCriterion "Given a production-status specification with warnings when validated then the command exits non-zero" .
 
 spec:US3 a specl:UserStory ;
     specl:partOf <https://w3id.org/specl/tool/spec> ;
     dct:title "As an AI agent, I read the translated spec.ttl to understand what a system…" ;
     dct:description "As an AI agent, I read the translated spec.ttl to understand what a system should do before generating code." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "122"^^xsd:integer .
+    specl:sourceLine "152"^^xsd:integer ;
+    specl:role spec:P3 ;
+    specl:capability "read the translated graph before writing code" ;
+    specl:benefit "the specification rather than a summary of it is what the code is written against" ;
+    specl:acceptanceCriterion "Given a translated specification when queried for its requirements then each returns its acceptance criteria" .
 
 spec:OQ1 a specl:OpenIssue ;
     specl:partOf <https://w3id.org/specl/tool/spec> ;
     dct:title "Whether to add a scaffolding command that creates a new spec directory with a…" ;
     dct:description "Whether to add a scaffolding command that creates a new spec directory with a template spec.md. Its CLI surface is undecided and follows `docs/decisions/0001-cli-surface.md`; there is no umbrella `specl` command to hang it on." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "126"^^xsd:integer ;
-    specl:recommendation "Add in 0.4.0" ;
-    specl:resolutionStatus "open" .
+    specl:sourceLine "160"^^xsd:integer ;
+    specl:owner spec:AG1 ;
+    specl:recommendation "Deferred. It was recommended for 0.4.0 and nine releases passed without it being wanted, which is evidence that it is not needed. `docs/SYNTAX.md` shows the front matter and copying an existing specification is the path people actually take. From 1.0 adding a command is additive and ungoverned, so it can arrive whenever someone asks" ;
+    specl:resolutionStatus "deferred" .
 
 spec:OQ2 a specl:OpenIssue ;
     specl:partOf <https://w3id.org/specl/tool/spec> ;
     dct:title "Whether specl-validate should default to the bundled shapes.ttl via…" ;
     dct:description "Whether specl-validate should default to the bundled shapes.ttl via importlib.resources when no shapes path is given." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "129"^^xsd:integer ;
+    specl:sourceLine "164"^^xsd:integer ;
+    specl:owner spec:AG1 ;
     specl:recommendation "Implemented. It was the first command an adopter runs and it failed, because nothing tells someone who pip installed the package where the bundled file lives" ;
     specl:resolutionStatus "resolved" .
 
@@ -266,9 +284,43 @@ spec:OQ3 a specl:OpenIssue ;
     dct:title "Whether to support a `namespace_style: hash | slash` front-matter key for specs…" ;
     dct:description "Whether to support a `namespace_style: hash | slash` front-matter key for specs that want per-element slash URIs (Schema.org pattern)." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "168"^^xsd:integer ;
+    specl:owner spec:AG1 ;
+    specl:recommendation "Declined. Hash namespaces are what every emitted graph and both published contracts use, and a per-specification choice would make two specifications with the same items produce different IRIs. That is a contract-level change and would need the 2.0 window, not a front-matter key" ;
+    specl:resolutionStatus "resolved" .
+
+spec:P1 a specl:Persona ;
+    specl:partOf <https://w3id.org/specl/tool/spec> ;
+    dct:title "Someone writing a specification in markdown and wanting to know whether it is…" ;
+    dct:description "Someone writing a specification in markdown and wanting to know whether it is complete." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
     specl:sourceLine "132"^^xsd:integer ;
-    specl:recommendation "Defer to 0.4.0" ;
-    specl:resolutionStatus "open" .
+    skos:prefLabel "Spec author" .
+
+spec:P2 a specl:Persona ;
+    specl:partOf <https://w3id.org/specl/tool/spec> ;
+    dct:title "A continuous integration pipeline validating a specification on every change" ;
+    dct:description "A continuous integration pipeline validating a specification on every change." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "134"^^xsd:integer ;
+    skos:prefLabel "CI pipeline" .
+
+spec:P3 a specl:Persona ;
+    specl:partOf <https://w3id.org/specl/tool/spec> ;
+    dct:title "A coding agent reading a translated specification before writing code against it" ;
+    dct:description "A coding agent reading a translated specification before writing code against it." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "136"^^xsd:integer ;
+    skos:prefLabel "AI agent" ;
+    skos:altLabel "coding agent" .
+
+spec:AG1 a specl:Agent ;
+    specl:partOf <https://w3id.org/specl/tool/spec> ;
+    dct:title "The maintainer accountable for specl's specification and releases" ;
+    dct:description "The maintainer accountable for specl's specification and releases." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "127"^^xsd:integer ;
+    skos:prefLabel "Maintainer" .
 
 spec:component-core_ttl a specl:Component ;
     dct:identifier "core_ttl" .
@@ -297,6 +349,9 @@ spec:test-2ac14e7b a specl:Test ;
 spec:test-2d1c2438 a specl:Test ;
     dct:identifier "tests/test_spec_base.py::test_no_node_is_minted_under_the_retired_namespace" .
 
+spec:test-63bb3a4e a specl:Test ;
+    dct:identifier "tests/test_badge.py::test_every_score_renders_legibly" .
+
 spec:test-66125139 a specl:Test ;
     dct:identifier "tests/test_score.py::test_score_and_gate_never_disagree_in_sign" .
 
@@ -305,6 +360,9 @@ spec:test-8213dfec a specl:Test ;
 
 spec:test-8521bcd5 a specl:Test ;
     dct:identifier "tests/test_migrate.py::test_diff_ignore_base_sees_a_rebased_graph_as_the_same_items" .
+
+spec:test-94401fb8 a specl:Test ;
+    dct:identifier "tests/test_explorer.py::test_the_explorer_is_one_self_contained_file_under_30_kb" .
 
 spec:test-9b0013ce a specl:Test ;
     dct:identifier "tests/test_exit_criteria.py::test_criterion_3_a_decisions_section_validates" .
@@ -320,6 +378,9 @@ spec:test-c29032e5 a specl:Test ;
 
 spec:test-db5f33a3 a specl:Test ;
     dct:identifier "tests/test_warnings.py::test_fail_on_warning_gates" .
+
+spec:test-f20a4e93 a specl:Test ;
+    dct:identifier "tests/test_check_docs.py::test_the_bundled_data_files_are_declared_as_package_data" .
 
 spec:test-f4605846 a specl:Test ;
     dct:identifier "tests/test_references.py::test_external_artifacts_become_typed_nodes_with_readable_iris" .

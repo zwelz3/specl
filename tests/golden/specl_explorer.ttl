@@ -13,6 +13,7 @@
     specl:status "prototype" ;
     dct:identifier "explorer-001" ;
     specl:prefix "EXPL" ;
+    dct:created "2026-08-19"^^xsd:date ;
     specl:intent """Define a single-file, zero-dependency HTML tool that lets a reader load a specl-generated `spec.ttl` file and understand its content, structure, raw Turtle representation, and production maturity in one view without any build step, server, or network access.""" ;
     specl:purpose """Replace the current drag-and-drop viewer (which only lists subject IDs and short descriptions) with an actual reading tool. A spec author, reviewer, or downstream AI agent should be able to open the explorer, drop a `spec.ttl`, and immediately see the spec's metadata, every requirement and user story with full detail, where gaps exist, and how close the spec is to production-ready — with the raw Turtle one tab away for verification.""" .
 
@@ -24,196 +25,196 @@ spec:R1.1 a specl:Requirement ;
     dct:title "The explorer must be a single self-contained `.html` file with no external…" ;
     dct:description "The explorer must be a single self-contained `.html` file with no external runtime dependencies (no CDN scripts, no fonts, no network calls)." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "19"^^xsd:integer .
+    specl:sourceLine "23"^^xsd:integer .
 
 spec:R1.2 a specl:Requirement ;
     specl:partOf <https://w3id.org/specl/explorer/spec> ;
     dct:title "It must open and function correctly from the local filesystem (`file://`) in…" ;
     dct:description "It must open and function correctly from the local filesystem (`file://`) in modern Chromium, Firefox, and Safari." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "20"^^xsd:integer .
+    specl:sourceLine "24"^^xsd:integer .
 
 spec:R1.3 a specl:Requirement ;
     specl:partOf <https://w3id.org/specl/explorer/spec> ;
     dct:title "It must ship as `src/specl/explorer.html` inside the specl Python package and…" ;
     dct:description "It must ship as `src/specl/explorer.html` inside the specl Python package and be included as package data in `pyproject.toml`." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "21"^^xsd:integer .
+    specl:sourceLine "25"^^xsd:integer .
 
 spec:R1.4 a specl:Requirement ;
     specl:partOf <https://w3id.org/specl/explorer/spec> ;
     dct:title "Total file size should stay under 30 KB uncompressed" ;
     dct:description "Total file size should stay under 30 KB uncompressed." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "22"^^xsd:integer .
+    specl:sourceLine "26"^^xsd:integer .
 
 spec:R1.5 a specl:Requirement ;
     specl:partOf <https://w3id.org/specl/explorer/spec> ;
     dct:title "No build step" ;
     dct:description "No build step. Vanilla HTML, CSS, and JavaScript only." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "23"^^xsd:integer .
+    specl:sourceLine "27"^^xsd:integer .
 
 spec:R2.1 a specl:Requirement ;
     specl:partOf <https://w3id.org/specl/explorer/spec> ;
     dct:title "The explorer must accept a `spec.ttl` file via a file input control and via…" ;
     dct:description "The explorer must accept a `spec.ttl` file via a file input control and via drag-and-drop onto the window." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "26"^^xsd:integer .
+    specl:sourceLine "30"^^xsd:integer .
 
 spec:R2.2 a specl:Requirement ;
     specl:partOf <https://w3id.org/specl/explorer/spec> ;
     dct:title "It must include a minimal Turtle parser sufficient for the specl output format…" ;
     dct:description "It must include a minimal Turtle parser sufficient for the specl output format (subject + indented predicates, `@prefix` declarations, `\"...\"` and `\"\"\"...\"\"\"` string literals, IRIs with `spec:` and `specl:` prefixes)." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "27"^^xsd:integer .
+    specl:sourceLine "31"^^xsd:integer .
 
 spec:R2.3 a specl:Requirement ;
     specl:partOf <https://w3id.org/specl/explorer/spec> ;
     dct:title "The parser must extract all `specl:Specification`, `specl:Requirement`…" ;
     dct:description "The parser must extract all `specl:Specification`, `specl:Requirement`, `specl:UserStory`, `specl:OpenIssue`, `specl:DecisionRecord`, `specl:DesignNote`, and `specl:Comment` individuals with their full property sets." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "28"^^xsd:integer .
+    specl:sourceLine "32"^^xsd:integer .
 
 spec:R2.4 a specl:Requirement ;
     specl:partOf <https://w3id.org/specl/explorer/spec> ;
     dct:title "Parse failures on individual statements must not crash the tool" ;
     dct:description "Parse failures on individual statements must not crash the tool; log to console and skip the malformed statement." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "29"^^xsd:integer .
+    specl:sourceLine "33"^^xsd:integer .
 
 spec:R2.5 a specl:Requirement ;
     specl:partOf <https://w3id.org/specl/explorer/spec> ;
     dct:title "The raw file text must be retained in memory so the Raw Turtle tab can display…" ;
     dct:description "The raw file text must be retained in memory so the Raw Turtle tab can display it exactly as loaded." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "30"^^xsd:integer .
+    specl:sourceLine "34"^^xsd:integer .
 
 spec:R3.1 a specl:Requirement ;
     specl:partOf <https://w3id.org/specl/explorer/spec> ;
     dct:title "A fixed header shows spec title, version, status badge, and a maturity progress…" ;
     dct:description "A fixed header shows spec title, version, status badge, and a maturity progress bar." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "33"^^xsd:integer .
+    specl:sourceLine "37"^^xsd:integer .
 
 spec:R3.2 a specl:Requirement ;
     specl:partOf <https://w3id.org/specl/explorer/spec> ;
     dct:title "A left sidebar (approximately 320 px wide) contains the file input, a live text…" ;
     dct:description "A left sidebar (approximately 320 px wide) contains the file input, a live text filter, and the grouped item list." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "34"^^xsd:integer .
+    specl:sourceLine "38"^^xsd:integer .
 
 spec:R3.3 a specl:Requirement ;
     specl:partOf <https://w3id.org/specl/explorer/spec> ;
     dct:title "A main panel to the right of the sidebar contains tabbed content (Detail, Raw…" ;
     dct:description "A main panel to the right of the sidebar contains tabbed content (Detail, Raw Turtle, Summary)." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "35"^^xsd:integer .
+    specl:sourceLine "39"^^xsd:integer .
 
 spec:R3.4 a specl:Requirement ;
     specl:partOf <https://w3id.org/specl/explorer/spec> ;
     dct:title "The layout must use CSS Grid or Flexbox so the sidebar and main panel scroll…" ;
     dct:description "The layout must use CSS Grid or Flexbox so the sidebar and main panel scroll independently." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "36"^^xsd:integer .
+    specl:sourceLine "40"^^xsd:integer .
 
 spec:R3.5 a specl:Requirement ;
     specl:partOf <https://w3id.org/specl/explorer/spec> ;
     dct:title "A dark theme is the default" ;
     dct:description "A dark theme is the default. Color tokens must be declared as CSS custom properties at `:root` so a future light theme can be added without rewriting the stylesheet." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "37"^^xsd:integer .
+    specl:sourceLine "41"^^xsd:integer .
 
 spec:R4.1 a specl:Requirement ;
     specl:partOf <https://w3id.org/specl/explorer/spec> ;
     dct:title "Items are grouped by type, with group headers showing the type label and count…" ;
     dct:description "Items are grouped by type, with group headers showing the type label and count (e.g., \"Requirements (8)\")." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "40"^^xsd:integer .
+    specl:sourceLine "44"^^xsd:integer .
 
 spec:R4.2 a specl:Requirement ;
     specl:partOf <https://w3id.org/specl/explorer/spec> ;
     dct:title "Each item row shows its short ID (e.g., `R1.2`, `US3`) and a truncated preview…" ;
     dct:description "Each item row shows its short ID (e.g., `R1.2`, `US3`) and a truncated preview of its description." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "41"^^xsd:integer .
+    specl:sourceLine "45"^^xsd:integer .
 
 spec:R4.3 a specl:Requirement ;
     specl:partOf <https://w3id.org/specl/explorer/spec> ;
     dct:title "Each type has a distinct color dot indicator" ;
     dct:description "Each type has a distinct color dot indicator. Colors must be defined as CSS variables so they can be themed." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "42"^^xsd:integer .
+    specl:sourceLine "46"^^xsd:integer .
 
 spec:R4.4 a specl:Requirement ;
     specl:partOf <https://w3id.org/specl/explorer/spec> ;
     dct:title "Items must sort naturally within their group, so `R1.10` follows `R1.9`, not…" ;
     dct:description "Items must sort naturally within their group, so `R1.10` follows `R1.9`, not `R1.1`." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "43"^^xsd:integer .
+    specl:sourceLine "47"^^xsd:integer .
 
 spec:R4.5 a specl:Requirement ;
     specl:partOf <https://w3id.org/specl/explorer/spec> ;
     dct:title "The filter input must match against item ID and description, case-insensitive…" ;
     dct:description "The filter input must match against item ID and description, case-insensitive, updating the list on every keystroke." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "44"^^xsd:integer .
+    specl:sourceLine "48"^^xsd:integer .
 
 spec:R4.6 a specl:Requirement ;
     specl:partOf <https://w3id.org/specl/explorer/spec> ;
     dct:title "Clicking a sidebar item selects it, highlights the row, and updates the main…" ;
     dct:description "Clicking a sidebar item selects it, highlights the row, and updates the main panel. The selection must persist across tab changes." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "45"^^xsd:integer .
+    specl:sourceLine "49"^^xsd:integer .
 
 spec:R5.1 a specl:Requirement ;
     specl:partOf <https://w3id.org/specl/explorer/spec> ;
     dct:title "The header must display the spec's `dct:title`, `dct:hasVersion`, and…" ;
     dct:description "The header must display the spec's `dct:title`, `dct:hasVersion`, and `specl:status` properties." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "48"^^xsd:integer .
+    specl:sourceLine "52"^^xsd:integer .
 
 spec:R5.2 a specl:Requirement ;
     specl:partOf <https://w3id.org/specl/explorer/spec> ;
     dct:title "A maturity score must be computed client-side as the percentage of…" ;
     dct:description "A maturity score must be computed client-side as the percentage of `specl:Requirement` individuals that carry all four production properties: `specl:priority`, `specl:acceptanceCriterion`, `specl:verifiedBy`, and `specl:constrains`." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "49"^^xsd:integer .
+    specl:sourceLine "53"^^xsd:integer .
 
 spec:R5.3 a specl:Requirement ;
     specl:partOf <https://w3id.org/specl/explorer/spec> ;
     dct:title "The score must render as both a numeric percentage and a horizontal progress bar" ;
     dct:description "The score must render as both a numeric percentage and a horizontal progress bar." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "50"^^xsd:integer .
+    specl:sourceLine "54"^^xsd:integer .
 
 spec:R5.4 a specl:Requirement ;
     specl:partOf <https://w3id.org/specl/explorer/spec> ;
     dct:title "The bar color must shift: red below 50%, amber from 50% to 84%, green at 85%…" ;
     dct:description "The bar color must shift: red below 50%, amber from 50% to 84%, green at 85% and above. Thresholds must be declared as constants at the top of the script for easy tuning." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "51"^^xsd:integer .
+    specl:sourceLine "55"^^xsd:integer .
 
 spec:R5.5 a specl:Requirement ;
     specl:partOf <https://w3id.org/specl/explorer/spec> ;
     dct:title "If the loaded spec has zero requirements, the maturity score displays as \"—\"…" ;
     dct:description "If the loaded spec has zero requirements, the maturity score displays as \"—\" and the bar is empty, not zero." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "52"^^xsd:integer .
+    specl:sourceLine "56"^^xsd:integer .
 
 spec:R6.1 a specl:Requirement ;
     specl:partOf <https://w3id.org/specl/explorer/spec> ;
     dct:title "When an item is selected, the Detail tab shows its ID as a heading, its type as…" ;
     dct:description "When an item is selected, the Detail tab shows its ID as a heading, its type as a subtitle, and all known properties as a definition list." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "55"^^xsd:integer .
+    specl:sourceLine "59"^^xsd:integer .
 
 spec:R6.2 a specl:Requirement ;
     specl:partOf <https://w3id.org/specl/explorer/spec> ;
     dct:title "Type-specific fields must render in a sensible order" ;
     dct:description "Type-specific fields must render in a sensible order:" ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "56"^^xsd:integer ;
+    specl:sourceLine "60"^^xsd:integer ;
     specl:detail spec:R6.2-detail-1 .
 
 spec:R6.2-detail-1
@@ -237,175 +238,175 @@ spec:R6.3 a specl:Requirement ;
     dct:title "Properties that exist in the expected set but are absent in the data must…" ;
     dct:description "Properties that exist in the expected set but are absent in the data must render as an italic \"not set\" placeholder in a muted warning color, so gaps are visually obvious." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "61"^^xsd:integer .
+    specl:sourceLine "65"^^xsd:integer .
 
 spec:R6.4 a specl:Requirement ;
     specl:partOf <https://w3id.org/specl/explorer/spec> ;
     dct:title "For requirements specifically, the tab must show a \"production-ready\" chip in…" ;
     dct:description "For requirements specifically, the tab must show a \"production-ready\" chip in green when all four production properties are present, or a \"needs work\" chip in amber otherwise." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "62"^^xsd:integer .
+    specl:sourceLine "66"^^xsd:integer .
 
 spec:R6.5 a specl:Requirement ;
     specl:partOf <https://w3id.org/specl/explorer/spec> ;
     dct:title "Long text values must wrap cleanly and remain selectable for copy" ;
     dct:description "Long text values must wrap cleanly and remain selectable for copy." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "63"^^xsd:integer .
+    specl:sourceLine "67"^^xsd:integer .
 
 spec:R7.1 a specl:Requirement ;
     specl:partOf <https://w3id.org/specl/explorer/spec> ;
     dct:title "When an item is selected, the tab shows that item's Turtle statement block…" ;
     dct:description "When an item is selected, the tab shows that item's Turtle statement block, extracted from the raw text by locating the subject IRI and taking characters through the next statement terminator (`\\n.` or ` .\\n`)." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "66"^^xsd:integer .
+    specl:sourceLine "70"^^xsd:integer .
 
 spec:R7.2 a specl:Requirement ;
     specl:partOf <https://w3id.org/specl/explorer/spec> ;
     dct:title "When no item is selected, the tab shows the full raw file" ;
     dct:description "When no item is selected, the tab shows the full raw file." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "67"^^xsd:integer .
+    specl:sourceLine "71"^^xsd:integer .
 
 spec:R7.3 a specl:Requirement ;
     specl:partOf <https://w3id.org/specl/explorer/spec> ;
     dct:title "The displayed Turtle must be syntax-highlighted: distinct colors for prefixes…" ;
     dct:description "The displayed Turtle must be syntax-highlighted: distinct colors for prefixes, IRIs, predicates, string literals, and comments." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "68"^^xsd:integer .
+    specl:sourceLine "72"^^xsd:integer .
 
 spec:R7.4 a specl:Requirement ;
     specl:partOf <https://w3id.org/specl/explorer/spec> ;
     dct:title "Highlighting must be implemented with a small inline function (regex-based is…" ;
     dct:description "Highlighting must be implemented with a small inline function (regex-based is acceptable); no external highlighter library." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "69"^^xsd:integer .
+    specl:sourceLine "73"^^xsd:integer .
 
 spec:R7.5 a specl:Requirement ;
     specl:partOf <https://w3id.org/specl/explorer/spec> ;
     dct:title "The Turtle block must render in a monospace font and allow horizontal scrolling…" ;
     dct:description "The Turtle block must render in a monospace font and allow horizontal scrolling for long lines." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "70"^^xsd:integer .
+    specl:sourceLine "74"^^xsd:integer .
 
 spec:R8.1 a specl:Requirement ;
     specl:partOf <https://w3id.org/specl/explorer/spec> ;
     dct:title "Shows total item count, requirement count, and production-ready ratio (e.g…" ;
     dct:description "Shows total item count, requirement count, and production-ready ratio (e.g., \"3/8 production-ready\") as chips." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "73"^^xsd:integer .
+    specl:sourceLine "77"^^xsd:integer .
 
 spec:R8.2 a specl:Requirement ;
     specl:partOf <https://w3id.org/specl/explorer/spec> ;
     dct:title "Shows the spec's `specl:intent` and `specl:purpose` prose in full" ;
     dct:description "Shows the spec's `specl:intent` and `specl:purpose` prose in full." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "74"^^xsd:integer .
+    specl:sourceLine "78"^^xsd:integer .
 
 spec:R8.3 a specl:Requirement ;
     specl:partOf <https://w3id.org/specl/explorer/spec> ;
     dct:title "Shows a per-type breakdown (how many requirements, stories, open issues, etc.)" ;
     dct:description "Shows a per-type breakdown (how many requirements, stories, open issues, etc.)." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "75"^^xsd:integer .
+    specl:sourceLine "79"^^xsd:integer .
 
 spec:R8.4 a specl:Requirement ;
     specl:partOf <https://w3id.org/specl/explorer/spec> ;
     dct:title "Must render regardless of whether a sidebar item is selected" ;
     dct:description "Must render regardless of whether a sidebar item is selected." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "76"^^xsd:integer .
+    specl:sourceLine "80"^^xsd:integer .
 
 spec:R9.1 a specl:Requirement ;
     specl:partOf <https://w3id.org/specl/explorer/spec> ;
     dct:title "Before any file is loaded, the main panel shows a centered \"Drop a spec.ttl…" ;
     dct:description "Before any file is loaded, the main panel shows a centered \"Drop a spec.ttl file to begin\" message." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "79"^^xsd:integer .
+    specl:sourceLine "83"^^xsd:integer .
 
 spec:R9.2 a specl:Requirement ;
     specl:partOf <https://w3id.org/specl/explorer/spec> ;
     dct:title "If the dropped file fails to parse (no Specification individual found), show an…" ;
     dct:description "If the dropped file fails to parse (no Specification individual found), show an error message explaining the expected format and linking to the specl README convention." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "80"^^xsd:integer .
+    specl:sourceLine "84"^^xsd:integer .
 
 spec:R9.3 a specl:Requirement ;
     specl:partOf <https://w3id.org/specl/explorer/spec> ;
     dct:title "If the file is empty or contains no recognized items, show \"No items found in…" ;
     dct:description "If the file is empty or contains no recognized items, show \"No items found in this file.\"" ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "81"^^xsd:integer .
+    specl:sourceLine "85"^^xsd:integer .
 
 spec:R10.1 a specl:Requirement ;
     specl:partOf <https://w3id.org/specl/explorer/spec> ;
     dct:title "First paint after file drop must complete in under 200 ms for specs up to 500…" ;
     dct:description "First paint after file drop must complete in under 200 ms for specs up to 500 items on mid-tier hardware." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "84"^^xsd:integer .
+    specl:sourceLine "88"^^xsd:integer .
 
 spec:R10.2 a specl:Requirement ;
     specl:partOf <https://w3id.org/specl/explorer/spec> ;
     dct:title "No data leaves the browser" ;
     dct:description "No data leaves the browser. No telemetry, no network requests, no external resource loads." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "85"^^xsd:integer .
+    specl:sourceLine "89"^^xsd:integer .
 
 spec:R10.3 a specl:Requirement ;
     specl:partOf <https://w3id.org/specl/explorer/spec> ;
     dct:title "The tool must be keyboard accessible: tab to the file input, filter, and…" ;
     dct:description "The tool must be keyboard accessible: tab to the file input, filter, and sidebar items; arrow keys to navigate the item list." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "86"^^xsd:integer .
+    specl:sourceLine "90"^^xsd:integer .
 
 spec:R10.4 a specl:Requirement ;
     specl:partOf <https://w3id.org/specl/explorer/spec> ;
     dct:title "Must function offline" ;
     dct:description "Must function offline. Opening the HTML file from a USB drive on an air-gapped machine is a supported use case." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "87"^^xsd:integer .
+    specl:sourceLine "91"^^xsd:integer .
 
 spec:US1 a specl:UserStory ;
     specl:partOf <https://w3id.org/specl/explorer/spec> ;
     dct:title "As a spec author, I open the explorer, drop my spec.ttl, and immediately see…" ;
     dct:description "As a spec author, I open the explorer, drop my spec.ttl, and immediately see which requirements are missing acceptance criteria so I know where to focus." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "91"^^xsd:integer .
+    specl:sourceLine "95"^^xsd:integer .
 
 spec:US2 a specl:UserStory ;
     specl:partOf <https://w3id.org/specl/explorer/spec> ;
     dct:title "As a reviewer, I filter the sidebar by a keyword to find all requirements…" ;
     dct:description "As a reviewer, I filter the sidebar by a keyword to find all requirements touching authentication, click through each one, and read their full detail without opening the markdown file." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "92"^^xsd:integer .
+    specl:sourceLine "96"^^xsd:integer .
 
 spec:US3 a specl:UserStory ;
     specl:partOf <https://w3id.org/specl/explorer/spec> ;
     dct:title "As an AI agent integrator, I open the explorer to verify that the Turtle…" ;
     dct:description "As an AI agent integrator, I open the explorer to verify that the Turtle generated by `spec_to_rdf.py` matches what I expect before feeding it to a downstream tool." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "93"^^xsd:integer .
+    specl:sourceLine "97"^^xsd:integer .
 
 spec:US4 a specl:UserStory ;
     specl:partOf <https://w3id.org/specl/explorer/spec> ;
     dct:title "As a program manager, I glance at the maturity bar to gauge how close the spec…" ;
     dct:description "As a program manager, I glance at the maturity bar to gauge how close the spec is to production-ready without asking the author." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "94"^^xsd:integer .
+    specl:sourceLine "98"^^xsd:integer .
 
 spec:US5 a specl:UserStory ;
     specl:partOf <https://w3id.org/specl/explorer/spec> ;
     dct:title "As an auditor with no development tools installed, I open the explorer from a…" ;
     dct:description "As an auditor with no development tools installed, I open the explorer from a USB drive on a locked-down workstation and read the spec." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "95"^^xsd:integer .
+    specl:sourceLine "99"^^xsd:integer .
 
 spec:OQ1 a specl:OpenIssue ;
     specl:partOf <https://w3id.org/specl/explorer/spec> ;
     dct:title "Whether to support slash namespaces (`/`) as an alternative to the current hash…" ;
     dct:description "Whether to support slash namespaces (`/`) as an alternative to the current hash namespaces (`#`) for spec instances. Hash namespaces resolve all terms to a single document and are the right default for specs authored as a unit. Slash namespaces (as used by Schema.org, where `https://schema.org/Person` returns a dedicated page) would let specs host each requirement, story, or decision at its own dereferenceable URL. This matters for large, multi-team specs where individual elements need independent linking, versioning, or API-driven resolution." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "107"^^xsd:integer ;
+    specl:sourceLine "111"^^xsd:integer ;
     specl:recommendation "support a `namespace_style: hash | slash` front-matter key in a future release; default to `hash`; document the tradeoffs in SYNTAX.md" ;
     specl:resolutionStatus "open" .
 
@@ -414,7 +415,7 @@ spec:OQ2 a specl:OpenIssue ;
     dct:title "Whether to support loading the companion `spec.md` alongside the `.ttl` for…" ;
     dct:description "Whether to support loading the companion `spec.md` alongside the `.ttl` for side-by-side reading." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "110"^^xsd:integer ;
+    specl:sourceLine "114"^^xsd:integer ;
     specl:recommendation "defer to v2" ;
     specl:resolutionStatus "open" .
 
@@ -423,7 +424,7 @@ spec:OQ3 a specl:OpenIssue ;
     dct:title "Whether to render Mermaid diagrams embedded in description strings" ;
     dct:description "Whether to render Mermaid diagrams embedded in description strings." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "113"^^xsd:integer ;
+    specl:sourceLine "117"^^xsd:integer ;
     specl:recommendation "defer; out of scope for a read-only viewer" ;
     specl:resolutionStatus "open" .
 
@@ -432,7 +433,7 @@ spec:OQ4 a specl:OpenIssue ;
     dct:title "Whether to show SHACL validation results inline by also loading a `shapes.ttl`" ;
     dct:description "Whether to show SHACL validation results inline by also loading a `shapes.ttl`." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "116"^^xsd:integer ;
+    specl:sourceLine "120"^^xsd:integer ;
     specl:recommendation "defer to v2 as a separate \"Validation\" tab" ;
     specl:resolutionStatus "open" .
 
@@ -441,7 +442,7 @@ spec:OQ5 a specl:OpenIssue ;
     dct:title "Light theme toggle" ;
     dct:description "Light theme toggle." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "119"^^xsd:integer ;
+    specl:sourceLine "123"^^xsd:integer ;
     specl:recommendation "defer, but ensure CSS variables are structured to support it" ;
     specl:resolutionStatus "open" .
 
@@ -450,7 +451,7 @@ spec:OQ6 a specl:OpenIssue ;
     dct:title "Export of the current view (selected item as PDF or HTML snippet)" ;
     dct:description "Export of the current view (selected item as PDF or HTML snippet)." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "122"^^xsd:integer ;
+    specl:sourceLine "126"^^xsd:integer ;
     specl:recommendation "defer; browser print is sufficient for v1" ;
     specl:resolutionStatus "open" .
 
@@ -459,33 +460,33 @@ spec:DN1 a specl:DesignNote ;
     dct:title "The Turtle parser does not need to be RFC-compliant" ;
     dct:description "The Turtle parser does not need to be RFC-compliant. It only needs to handle the output of `specl.spec_to_rdf`, which is deterministic and well-formed. A 30-line parser is sufficient." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "99"^^xsd:integer .
+    specl:sourceLine "103"^^xsd:integer .
 
 spec:DN2 a specl:DesignNote ;
     specl:partOf <https://w3id.org/specl/explorer/spec> ;
     dct:title "Prefer declarative CSS over runtime style manipulation" ;
     dct:description "Prefer declarative CSS over runtime style manipulation. Use CSS classes and variables; avoid setting styles via JavaScript except for the maturity bar width and color." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "100"^^xsd:integer .
+    specl:sourceLine "104"^^xsd:integer .
 
 spec:DN3 a specl:DesignNote ;
     specl:partOf <https://w3id.org/specl/explorer/spec> ;
     dct:title "Keep the JavaScript in a single `<script>` block at the bottom of the file" ;
     dct:description "Keep the JavaScript in a single `<script>` block at the bottom of the file. No modules, no imports, no bundler." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "101"^^xsd:integer .
+    specl:sourceLine "105"^^xsd:integer .
 
 spec:DN4 a specl:DesignNote ;
     specl:partOf <https://w3id.org/specl/explorer/spec> ;
     dct:title "Treat the explorer as read-only" ;
     dct:description "Treat the explorer as read-only. Editing, saving, or uploading is explicitly out of scope for v1." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "102"^^xsd:integer .
+    specl:sourceLine "106"^^xsd:integer .
 
 spec:DN5 a specl:DesignNote ;
     specl:partOf <https://w3id.org/specl/explorer/spec> ;
     dct:title "The existing broken `explorer.html` placeholder in the package should be…" ;
     dct:description "The existing broken `explorer.html` placeholder in the package should be replaced wholesale, not patched." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "103"^^xsd:integer .
+    specl:sourceLine "107"^^xsd:integer .
 

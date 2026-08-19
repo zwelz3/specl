@@ -7,6 +7,10 @@ version: 0.1.0
 status: prototype
 ---
 
+<!--specl
+created: 2026-08-19
+-->
+
 # Intent
 Define a single-file, zero-dependency HTML tool that lets a reader load a specl-generated `spec.ttl` file and understand its content, structure, raw Turtle representation, and production maturity in one view without any build step, server, or network access.
 
