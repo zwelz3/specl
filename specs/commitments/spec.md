@@ -4,7 +4,7 @@ spec_base: https://w3id.org/specl/commitments/spec#
 prefix: COMMIT
 item_prefix: UR
 spec_id: commitments-001
-version: 0.5.0
+version: 0.6.0
 status: review
 ---
 

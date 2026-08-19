@@ -9,7 +9,7 @@
 <https://w3id.org/specl/commitments/spec> a specl:Specification ;
     dct:conformsTo <https://w3id.org/specl/contract/2> ;
     dct:title "Downstream commitments" ;
-    dct:hasVersion "0.5.0" ;
+    dct:hasVersion "0.6.0" ;
     specl:status "review" ;
     dct:identifier "commitments-001" ;
     specl:prefix "COMMIT" ;

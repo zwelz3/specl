@@ -574,3 +574,15 @@ Counting it as unanswered would penalise recording a known unknown, so a specifi
 `specl-validate layering` exits 0 on pass, 1 on a violation, and 3 when a peer could not be read. A specification declaring no references passes with nothing checked, which is accurate and reads as coverage it is not providing. `--require-references` fails in that case, so the check can be wired before the references exist and mean something once they do.
 
 A prefix used in a reference-valued field that the specification does not declare is a violation rather than merely a parser warning: the author attempted a cross-specification reference and none was resolvable.
+
+## What `version:` means
+
+The version of the thing being specified, not of specl and not of the markdown file. A specification of a library at 1.0.0 says `version: 1.0.0`; a register with its own lifecycle carries its own number.
+
+Nothing checks it, deliberately: specl does not know what your specification describes. It went stale here anyway. `specs/specl_tool/spec.md` said `0.3.0` through nine releases of edits to the tool it specifies, which is the failure this note exists to make less likely.
+
+## Recording what is built
+
+`implementation:` takes `not-started`, `in-progress`, `implemented`, or `verified`, and rolls up into the progress figure. Nothing infers it: a requirement naming a passing test still reports `not-started` unless it says otherwise, because specl cannot tell whether the test covers what the requirement claims.
+
+That is a real cost of the design and it caught specl itself. Fifteen of nineteen requirements in `specs/specl_tool/spec.md` named a passing test and the specification reported 0% built, because none of them said so.

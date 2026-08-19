@@ -25,6 +25,16 @@ a rule about, found while checking readiness for this release.
 here the contract does not move without consensus, and `GOVERNANCE.md` is the
 mechanism. See `docs/decisions/0009-what-1.0-means.md`.
 
+### specl's own specifications
+- `specs/specl_tool/spec.md` declared `version: 0.3.0` through nine releases of
+  edits to the tool it specifies. All three specifications now carry a version
+  that means something, and `docs/SYNTAX.md` says what the key is for.
+- Requirements record `implementation:`. Fifteen of nineteen in the tool
+  specification name a passing test and the specification reported 0% built,
+  because progress is declared rather than inferred and nothing declared it.
+  Progress is 77%; the four exceptions are the ones whose status the suite
+  cannot assert.
+
 ### Downstream observations
 - **The accepted half of UR8, eight releases late.** `constrains` and
   `verifiedBy` warn only when the graph declares a component or a verification
@@ -176,6 +186,16 @@ mechanism. See `docs/decisions/0009-what-1.0-means.md`.
 - `docs/decisions/0009-what-1.0-means.md` recasts 1.0 as a change in who may
   change the specification, replacing criteria that asked for adoption evidence
   as a precondition for the release that makes adoption reasonable.
+
+### specl's own specifications
+- `specs/specl_tool/spec.md` declared `version: 0.3.0` through nine releases of
+  edits to the tool it specifies. All three specifications now carry a version
+  that means something, and `docs/SYNTAX.md` says what the key is for.
+- Requirements record `implementation:`. Fifteen of nineteen in the tool
+  specification name a passing test and the specification reported 0% built,
+  because progress is declared rather than inferred and nothing declared it.
+  Progress is 77%; the four exceptions are the ones whose status the suite
+  cannot assert.
 
 ### Downstream observations
 - **The accepted half of UR8, eight releases late.** `constrains` and

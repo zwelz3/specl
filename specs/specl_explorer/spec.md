@@ -3,7 +3,7 @@ spec_base: https://w3id.org/specl/explorer/spec#
 prefix: EXPL
 spec_id: explorer-001
 title: specl Spec Explorer
-version: 0.1.0
+version: 1.0.0
 status: prototype
 ---
 

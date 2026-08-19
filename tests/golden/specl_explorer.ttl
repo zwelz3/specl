@@ -9,7 +9,7 @@
 <https://w3id.org/specl/explorer/spec> a specl:Specification ;
     dct:conformsTo <https://w3id.org/specl/contract/2> ;
     dct:title "specl Spec Explorer" ;
-    dct:hasVersion "0.1.0" ;
+    dct:hasVersion "1.0.0" ;
     specl:status "prototype" ;
     dct:identifier "explorer-001" ;
     specl:prefix "EXPL" ;
