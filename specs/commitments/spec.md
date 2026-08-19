@@ -142,6 +142,19 @@ conversation about UR11 resolves to one IRI on both sides.
   - verifiedBy: tests/test_references.py::test_a_reference_prefix_used_for_a_component_warns
   - constrains: spec_to_rdf
 
+- UR25 The `constrains` and `verifiedBy` warnings are conditional on the graph containing something of the kind they are about. This is the half of UR8 that was accepted in exchange for declining a per-item suppression facility, and it did not ship with the declination.
+  - title: Conditional constrains and verifiedBy warnings
+  - priority: MUST
+  - acceptance: Given a specification declaring no components and no verification artifacts, validation at production status raises neither warning and the gate is reachable.
+  - verifiedBy: tests/test_shapes_coverage.py::test_a_component_free_specification_can_reach_production
+  - constrains: shapes.ttl
+- UR26 A section that models items and contains prose producing no item warns, naming the section and the first line. `<!--specl: prose-->` under the heading declares the text deliberate.
+  - title: Warn on prose that produced no item
+  - priority: MUST
+  - acceptance: Given three paragraphs under a recognized item heading, translation warns; given the same with the prose marker, it does not.
+  - verifiedBy: tests/test_warnings.py::test_prose_under_an_item_heading_warns
+  - constrains: spec_to_rdf
+
 # Decisions
 
 - UR8 Per-item shape suppression is declined as requested, and the root cause is accepted instead. A suppression key with a reason field is a warning made invisible, and specl already has decision records for recording a judgment.
@@ -169,6 +182,7 @@ conversation about UR11 resolves to one IRI on both sides.
   - status: open
 
 # Design Considerations
+<!--specl: prose-->
 
 The consumer is a federated RDF memory substrate specification, currently
 pre-publication under an embargo. The original term was that the embargo lifts

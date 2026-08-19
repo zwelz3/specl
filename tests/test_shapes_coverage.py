@@ -74,3 +74,60 @@ def test_every_targeted_class_is_reachable(coverage):
         "shapes target classes the maximal fixture does not produce; either the "
         f"fixture is incomplete or the shapes are dead: {unreachable}"
     )
+
+
+def test_a_component_free_specification_can_reach_production(tmp_path):
+    """UR25, and the accepted half of UR8.
+
+    `docs/proposals/0002-downstream-request-disposition.md` declined a per-item
+    suppression facility a second party asked for, on the grounds that making
+    these two warnings conditional would clear them without one. The refusal was
+    accepted on those terms and the shapes never changed, so a specification
+    declaring no components carried one warning of each kind per requirement,
+    and every warning blocks at `production`. No `verifiedBy` bound the accepted
+    half, so nothing in CI could notice for eight releases.
+    """
+    pytest.importorskip("pyshacl")
+    from specl.validate_spec import gate, load, run_shacl
+
+    source = tmp_path / "s.md"
+    source.write_text(
+        "---\ntitle: T\nspec_base: https://example.org/specs/t#\nspec_id: t-001\n"
+        "status: production\nversion: 1.0.0\n---\n\n"
+        "# Intent\nA specification that names no components.\n\n"
+        "# Purpose\nTo reach production without them.\n\n"
+        "# Requirements\n\n- R1 The library must expose a stable public interface.\n"
+        "  - priority: MUST\n"
+        "  - acceptance: Given the package when imported then the interface is present\n",
+        encoding="utf-8",
+    )
+    target = tmp_path / "s.ttl"
+    translate(source, target)
+    graph = Graph().parse(target)
+    _, results, _ = run_shacl(graph, load(SHAPES))
+
+    for prop in ("constrains", "verifiedBy"):
+        assert not [r for r in results if r["path"].endswith(prop)], (
+            f"{prop} warns in a specification that declares none"
+        )
+
+
+def test_the_conditions_activate_once_the_graph_declares_them(tmp_path):
+    """The other half. A specification that declares components and omits them
+    on a requirement is failing to link, and should still be told."""
+    pytest.importorskip("pyshacl")
+    from specl.validate_spec import load, run_shacl
+
+    source = tmp_path / "s.md"
+    source.write_text(
+        "---\ntitle: T\nspec_base: https://example.org/specs/t#\nspec_id: t-001\n---\n\n"
+        "# Requirements\n\n- R1 A requirement naming a component and a test.\n"
+        "  - constrains: engine\n  - verifiedBy: tests/t.py::t\n"
+        "- R2 A requirement naming neither.\n",
+        encoding="utf-8",
+    )
+    target = tmp_path / "s.ttl"
+    translate(source, target)
+    _, results, _ = run_shacl(Graph().parse(target), load(SHAPES))
+    flagged = {r["path"].rsplit("#", 1)[-1] for r in results if r["focus"].endswith("R2")}
+    assert {"constrains", "verifiedBy"} <= flagged

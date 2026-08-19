@@ -10,6 +10,29 @@ its release is tagged.
 The second and final graph-breaking release. Graphs move from contract 1 to
 contract 2 with `specl-migrate contract`.
 
+### Downstream observations
+- **The accepted half of UR8, eight releases late.** `constrains` and
+  `verifiedBy` warn only when the graph declares a component or a verification
+  artifact. `docs/proposals/0002-downstream-request-disposition.md` declined a
+  per-item suppression facility a second party asked for, on the grounds that
+  this change would clear the warnings without one; the refusal was accepted on
+  those terms and the shapes never changed, so `production` stayed unreachable
+  for a specification declaring no components. `UR25`.
+- **Prose under an item heading warns** rather than vanishing. A downstream
+  migration lost three paragraphs with zero parser warnings, so
+  `--fail-on-warning` passed over silent content loss. `<!--specl: prose-->`
+  declares it deliberate. Found one real instance in specl's own commitments
+  register. `UR26`.
+- **`specl-validate layering` reports an unresolvable prefix** in a
+  reference-valued field as a violation. It was a parser warning only, so
+  layering reported zero references checked and passed over a specification
+  that had plainly attempted a cross-specification reference.
+- **`layering --require-references`** fails when a specification declares none,
+  so the check can be wired into CI without passing vacuously. No new exit
+  status: three already carry meaning.
+- Four false entries under 0.3.0 are annotated rather than rewritten. That
+  section was written as a plan and read since as a record.
+
 ### Shared components across specifications
 - An absolute IRI in `constrains` or `verifiedBy` is used as written rather than
   hashed into a local node. Three specifications naming one IRI name one node,
@@ -130,6 +153,29 @@ contract 2 with `specl-migrate contract`.
 - `docs/decisions/0009-what-1.0-means.md` recasts 1.0 as a change in who may
   change the specification, replacing criteria that asked for adoption evidence
   as a precondition for the release that makes adoption reasonable.
+
+### Downstream observations
+- **The accepted half of UR8, eight releases late.** `constrains` and
+  `verifiedBy` warn only when the graph declares a component or a verification
+  artifact. `docs/proposals/0002-downstream-request-disposition.md` declined a
+  per-item suppression facility a second party asked for, on the grounds that
+  this change would clear the warnings without one; the refusal was accepted on
+  those terms and the shapes never changed, so `production` stayed unreachable
+  for a specification declaring no components. `UR25`.
+- **Prose under an item heading warns** rather than vanishing. A downstream
+  migration lost three paragraphs with zero parser warnings, so
+  `--fail-on-warning` passed over silent content loss. `<!--specl: prose-->`
+  declares it deliberate. Found one real instance in specl's own commitments
+  register. `UR26`.
+- **`specl-validate layering` reports an unresolvable prefix** in a
+  reference-valued field as a violation. It was a parser warning only, so
+  layering reported zero references checked and passed over a specification
+  that had plainly attempted a cross-specification reference.
+- **`layering --require-references`** fails when a specification declares none,
+  so the check can be wired into CI without passing vacuously. No new exit
+  status: three already carry meaning.
+- Four false entries under 0.3.0 are annotated rather than rewritten. That
+  section was written as a plan and read since as a record.
 
 ### Shared components across specifications
 - An absolute IRI in `constrains` or `verifiedBy` is used as written rather than
@@ -451,10 +497,11 @@ Do not ship until the test suite lands; see `HANDOFF.md`.
   traceability to string matching. References now resolve against the
   specification base by concatenation, with a parser warning on references that
   do not resolve.
-- **Conditional `constrains` and `verifiedBy` shapes.** Both warned
-  unconditionally, so a specification declaring no components accumulated
-  warnings no authoring could clear. Since all warnings block at `production`,
-  this made that status unreachable for such specifications.
+- **Conditional `constrains` and `verifiedBy` shapes.** *Planned for 0.3.0 and
+  not shipped; it landed later, see the entry under the current release. This
+  section was written ahead of the work and read afterwards as a record, which
+  is how the accepted half of UR8 sat unshipped while the disposition that
+  declined the alternative cited it as done.*
 - **`score` denominator.** The finding set was built from all focus nodes while
   the denominator counted requirements only.
 
@@ -467,11 +514,7 @@ Do not ship until the test suite lands; see `HANDOFF.md`.
   covers requirements only, and the spec contains no decisions, open
   issues, or design notes; see `docs/proposals/0001-defects-and-enhancements.md`
   on what that score does and does not measure.
-- **Maturity badges auto-committed by CI.** The `spec.yml` workflow
-  generates SVG badges for every spec and commits them to
-  `static/badges/` on pushes to `main`. Badges are git-tracked and
-  referenced in the README via `raw.githubusercontent.com` so they
-  render without depending on GitHub Pages.
+- **Maturity badges auto-committed by CI.** *Reversed; badges are published by the Pages build. See `docs/decisions/0010-badges-are-published-not-committed.md`.*
 - **GitHub Pages deployment.** The `pages.yml` workflow publishes the
   ontology (`ns.ttl`), SHACL shapes (`shapes.ttl`), the spec explorer
   (`explorer.html`), committed badges, and a vocabulary landing page

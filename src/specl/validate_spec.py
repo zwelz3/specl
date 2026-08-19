@@ -18,7 +18,7 @@ import re
 import sys, json, argparse
 from pathlib import Path
 from rdflib.collection import Collection
-from rdflib import Graph, Namespace, RDF, RDFS
+from rdflib import Graph, Literal, Namespace, RDF, RDFS
 from pyshacl import validate
 
 SPECL = Namespace("https://w3id.org/specl/ns#")
@@ -569,6 +569,25 @@ def cmd_layering(args):
                     f"{subject} governs {target}, which {prefix} does not define"
                 )
 
+    # A CURIE-shaped literal in a reference-valued field is a cross-specification
+    # reference the author attempted and the parser could not resolve. It warned
+    # at translation and was invisible here, so layering reported zero
+    # references checked and passed over a specification that plainly tried to
+    # reach another one.
+    for prop in (SPECL.affects, SPECL.constrains, SPECL.verifiedBy,
+                 SPECL.supersededBy, SPECL.gates, SPECL.role, SPECL.owner):
+        for subject, obj in g.subject_objects(prop):
+            if not isinstance(obj, Literal):
+                continue
+            token = str(obj)
+            if not re.match(r"^[A-Za-z][\w-]*:[A-Za-z][\w.-]*$", token):
+                continue
+            checked += 1
+            violations.append(
+                f"{subject} names {token!r}, whose prefix this specification "
+                "does not declare under references: or vocabularies:"
+            )
+
     print(f"Layering: {checked} external reference(s) checked")
     for v in violations:
         print(f"  [violation]    {v}")
@@ -577,6 +596,16 @@ def cmd_layering(args):
 
     if violations:
         return LAYERING_FAIL
+    if getattr(args, "require_references", False) and checked == 0:
+        # Vacuous passes read as coverage while providing none, and the check
+        # that does catch the mistake starts looking redundant beside a green
+        # one. Opt-in, so the command keeps meaning the same thing by default.
+        print(
+            "Result: fail. --require-references was given and this "
+            "specification declares none, so nothing was checked."
+        )
+        return 1
+
     if unresolved:
         print("Result: inconclusive. A peer that could not be read is never a pass.")
         return LAYERING_INCONCLUSIVE
@@ -849,7 +878,12 @@ def main():
     c.set_defaults(func=cmd_conformance)
     l = sub.add_parser("layering", help="check cross-specification references "
                        "against declared upstream and downstream relations")
-    l.add_argument("data"); l.set_defaults(func=cmd_layering)
+    l.add_argument("data")
+    l.add_argument("--require-references", action="store_true",
+                   help="fail when a specification declares no cross-specification "
+                        "references, so the check means something in CI rather "
+                        "than passing vacuously")
+    l.set_defaults(func=cmd_layering)
     b = sub.add_parser("badge"); b.add_argument("data"); b.add_argument("shapes", nargs="?", default=None,
                        help="SHACL shapes graph; defaults to the shapes bundled with specl")
     b.add_argument("--out", default="spec-badge.svg")

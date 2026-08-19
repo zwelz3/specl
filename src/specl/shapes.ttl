@@ -111,16 +111,8 @@ specl:RequirementShape a sh:NodeShape ;
         sh:minCount 1 ; sh:datatype xsd:string ;
         sh:severity sh:Warning ;
         sh:message "Requirement should have at least one acceptance criterion." ] ;
-    sh:property [
-        sh:path specl:verifiedBy ;
-        sh:minCount 1 ;
-        sh:severity sh:Warning ;
-        sh:message "Requirement should point to a test or verification artifact via specl:verifiedBy." ] ;
-    sh:property [
-        sh:path specl:constrains ;
-        sh:minCount 1 ;
-        sh:severity sh:Warning ;
-        sh:message "Requirement should link to at least one component it constrains." ] ;
+
+
     sh:property [
         sh:path specl:itemStatus ;
         sh:in ( "active" "superseded" "withdrawn" ) ;
@@ -407,3 +399,56 @@ specl:AgentShape a sh:NodeShape ;
         sh:minCount 1 ;
         sh:severity sh:Violation ;
         sh:message "Agent must have a dct:title." ] .
+
+
+# UR8's accepted half, shipped. `docs/proposals/0002-downstream-request-disposition.md`
+# declined a per-item suppression facility a second party asked for, on the
+# grounds that making these two warnings conditional would clear them without
+# one. The refusal was accepted on those terms and the shapes never changed, so
+# a specification declaring no components carried one warning of each kind per
+# requirement, and every warning blocks at `production`.
+#
+# Each condition asks whether the graph contains anything of the kind the
+# warning is about. A specification that declares no components is not failing
+# to link to them; one that declares some and omits them on a requirement is.
+specl:ConditionalConstrainsShape a sh:NodeShape ;
+    sh:target [ a sh:SPARQLTarget ;
+        sh:select """
+            SELECT ?this WHERE {
+                ?this a <https://w3id.org/specl/ns#Requirement> .
+                FILTER NOT EXISTS {
+                    ?this <https://w3id.org/specl/ns#itemStatus> ?st .
+                    FILTER(?st IN ("superseded", "withdrawn"))
+                }
+                FILTER EXISTS { ?any a <https://w3id.org/specl/ns#Component> }
+            }
+        """ ] ;
+    sh:property [
+        sh:path specl:constrains ;
+        sh:minCount 1 ;
+        sh:severity sh:Warning ;
+        sh:message "Requirement should link to at least one component it constrains." ] .
+
+# The disposition tied this one to acceptance queries "arriving in 0.6.0". They
+# have, so the condition covers both verification kinds rather than tests alone.
+specl:ConditionalVerifiedByShape a sh:NodeShape ;
+    sh:target [ a sh:SPARQLTarget ;
+        sh:select """
+            SELECT ?this WHERE {
+                ?this a <https://w3id.org/specl/ns#Requirement> .
+                FILTER NOT EXISTS {
+                    ?this <https://w3id.org/specl/ns#itemStatus> ?st .
+                    FILTER(?st IN ("superseded", "withdrawn"))
+                }
+                FILTER EXISTS {
+                    ?any a ?vc .
+                    FILTER(?vc IN (<https://w3id.org/specl/ns#Test>,
+                                   <https://w3id.org/specl/ns#AcceptanceQuery>))
+                }
+            }
+        """ ] ;
+    sh:property [
+        sh:path specl:verifiedBy ;
+        sh:minCount 1 ;
+        sh:severity sh:Warning ;
+        sh:message "Requirement should point to a test or verification artifact via specl:verifiedBy." ] .

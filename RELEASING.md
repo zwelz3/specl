@@ -14,6 +14,8 @@ Tagged in this repository, never published. See
    `owl:versionInfo`. The doc checker fails if they disagree with the newest
    changelog heading, so it will tell you if you miss one.
 3. Date the changelog heading.
+
+**Write changelog entries when you tag, not before.** The 0.3.0 section was written as a plan and read afterwards as a record, so four of its entries describe things that never shipped or were later reversed. One of them was the accepted half of a downstream request, cited as done in the disposition that declined the alternative, and it sat unshipped for eight releases because the changelog said otherwise and nothing checked. An unreleased section is a plan; label it as one or leave it empty.
 4. `git tag -a vX.Y.Z`, push the tag.
 
 Do not create a GitHub *release* before 1.0. The publish workflow fires on one

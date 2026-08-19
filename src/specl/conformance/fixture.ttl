@@ -36,6 +36,15 @@ spec:R3 a specl:Requirement ;
     dct:description "Retired with nothing named in its place." ;
     specl:itemStatus "superseded" .
 
+# Declared so that the conditional constrains and verifiedBy shapes activate.
+# Without these the warnings against R2 correctly do not fire, and a processor
+# that reported them would be wrong rather than conforming.
+spec:upload-api a specl:Component ;
+    dct:identifier "upload_api" .
+
+spec:test-upload a specl:Test ;
+    dct:identifier "tests/test_upload.py::test_accepts" .
+
 # A decision with no title: the Violation-severity case.
 spec:D1 a specl:DecisionRecord ;
     specl:partOf <https://example.org/specs/conformance> ;

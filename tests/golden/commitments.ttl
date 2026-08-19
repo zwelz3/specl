@@ -226,12 +226,34 @@ spec:UR24 a specl:Requirement ;
     specl:verifiedBy spec:test-1a78f530 ;
     specl:constrains spec:component-spec_to_rdf .
 
+spec:UR25 a specl:Requirement ;
+    specl:partOf <https://w3id.org/specl/commitments/spec> ;
+    dct:title "Conditional constrains and verifiedBy warnings" ;
+    dct:description "The `constrains` and `verifiedBy` warnings are conditional on the graph containing something of the kind they are about. This is the half of UR8 that was accepted in exchange for declining a per-item suppression facility, and it did not ship with the declination." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "145"^^xsd:integer ;
+    specl:priority "MUST" ;
+    specl:acceptanceCriterion "Given a specification declaring no components and no verification artifacts, validation at production status raises neither warning and the gate is reachable." ;
+    specl:verifiedBy spec:test-42183a63 ;
+    specl:constrains spec:component-85cee12e .
+
+spec:UR26 a specl:Requirement ;
+    specl:partOf <https://w3id.org/specl/commitments/spec> ;
+    dct:title "Warn on prose that produced no item" ;
+    dct:description "A section that models items and contains prose producing no item warns, naming the section and the first line. `` under the heading declares the text deliberate." ;
+    prov:wasDerivedFrom spec:source-e9e453bf ;
+    specl:sourceLine "151"^^xsd:integer ;
+    specl:priority "MUST" ;
+    specl:acceptanceCriterion "Given three paragraphs under a recognized item heading, translation warns; given the same with the prose marker, it does not." ;
+    specl:verifiedBy spec:test-c94643b5 ;
+    specl:constrains spec:component-spec_to_rdf .
+
 spec:UR22 a specl:OpenIssue ;
     specl:partOf <https://w3id.org/specl/commitments/spec> ;
     dct:title "Whether the process commitment under UR16 should itself be verifiable, given…" ;
     dct:description "Whether the process commitment under UR16 should itself be verifiable, given that release notes are prose and the observable condition for removing a compensation is stated in words rather than checked." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "167"^^xsd:integer ;
+    specl:sourceLine "180"^^xsd:integer ;
     specl:recommendation "Bind each compensation to a test the way the contract page binds its guarantees" ;
     specl:resolutionStatus "open" .
 
@@ -240,7 +262,7 @@ spec:UR8 a specl:DecisionRecord ;
     dct:title "No per-item shape suppression" ;
     dct:description "Per-item shape suppression is declined as requested, and the root cause is accepted instead. A suppression key with a reason field is a warning made invisible, and specl already has decision records for recording a judgment." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "147"^^xsd:integer ;
+    specl:sourceLine "160"^^xsd:integer ;
     specl:decisionStatus "accepted" ;
     specl:rationale "The requester's own framing was that the warnings were unclearable; the answer is to make them clearable rather than to hide them." .
 
@@ -249,7 +271,7 @@ spec:UR14 a specl:DecisionRecord ;
     dct:title "No namespace registry" ;
     dct:description "specl does not model a namespace registry and will not. `spec_base` and `prefix` live in front matter, and foreign prefixes live in the front matter of the referencing specification. There is no tool-level registry and none is planned." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "151"^^xsd:integer ;
+    specl:sourceLine "164"^^xsd:integer ;
     specl:decisionStatus "accepted" ;
     specl:rationale "A registry is a second source of truth for a value the specification already declares." .
 
@@ -258,7 +280,7 @@ spec:UR7 a specl:DecisionRecord ;
     dct:title "Status-conditional severity model" ;
     dct:description "The severity gate is driven by the specification's own status rather than by a fixed severity threshold, with the original premise corrected." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "155"^^xsd:integer ;
+    specl:sourceLine "168"^^xsd:integer ;
     specl:decisionStatus "accepted" ;
     specl:rationale "A fixed threshold makes every warning either blocking or ignorable, and neither is a representable target." .
 
@@ -267,11 +289,14 @@ spec:UR10 a specl:DecisionRecord ;
     dct:title "Pre-adoption path per planned class" ;
     dct:description "Each planned class has a pre-adoption path: content is authored under a prose marker before the class exists, and adoption becomes moving the section rather than rewriting it." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "159"^^xsd:integer ;
+    specl:sourceLine "172"^^xsd:integer ;
     specl:decisionStatus "accepted" ;
     specl:affects spec:UR9 ;
     specl:affects spec:UR20 ;
     specl:rationale "Adoption should be a mechanical lift rather than a rewrite." .
+
+spec:component-85cee12e a specl:Component ;
+    dct:identifier "shapes.ttl" .
 
 spec:component-migrate a specl:Component ;
     dct:identifier "migrate" .
@@ -299,6 +324,9 @@ spec:test-1a78f530 a specl:Test ;
 
 spec:test-400ba476 a specl:Test ;
     dct:identifier "tests/test_spec_base.py::test_rejections" .
+
+spec:test-42183a63 a specl:Test ;
+    dct:identifier "tests/test_shapes_coverage.py::test_a_component_free_specification_can_reach_production" .
 
 spec:test-65070211 a specl:Test ;
     dct:identifier "tests/test_sections_and_queries.py::test_a_requirement_is_reachable_from_the_query_that_gates_it" .
@@ -329,6 +357,9 @@ spec:test-c417493e a specl:Test ;
 
 spec:test-c8f47e56 a specl:Test ;
     dct:identifier "tests/test_spec_base.py::test_the_specification_is_the_base_without_its_terminator" .
+
+spec:test-c94643b5 a specl:Test ;
+    dct:identifier "tests/test_warnings.py::test_prose_under_an_item_heading_warns" .
 
 spec:test-cb4bec55 a specl:Test ;
     dct:identifier "tests/test_references.py::test_an_item_reference_resolves_against_the_base" .

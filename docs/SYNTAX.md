@@ -110,6 +110,23 @@ Documents are identified by path relative to the root, so a companion in a
 subdirectory sharing a basename with the root does not collide with it, and no
 identifier depends on the working directory.
 
+## Prose under a heading that models items
+
+A section mapped to an item class expects bullets, and prose there produces nothing. That used to be silent; it now warns, naming the section and the first line.
+
+If the text is deliberate, a lead-in before the bullets rather than content that should have been one, say so:
+
+```
+# Design Considerations
+<!--specl: prose-->
+
+Everything below assumes the reader has read the intent.
+
+- DN1 Prefer declarative CSS.
+```
+
+Subheadings are not flagged. A long section grouped with `##` headings is organised, not lossy.
+
 ## Sections the map does not know
 
 A heading the translator does not recognize warns and names itself, rather than
@@ -551,3 +568,9 @@ checkout. Pass a path to use your own.
 Counting it as unanswered would penalise recording a known unknown, so a specification that never asked scored higher than one that asked and postponed. The deferral still has to be a real decision, though: the shapes want an owner and a recommendation on an open issue, so a bare `resolutionStatus: deferred` is flagged there and stays unclean.
 
 `open` and `in-review` are the unsettled half of the same enum.
+
+## Wiring layering into CI
+
+`specl-validate layering` exits 0 on pass, 1 on a violation, and 3 when a peer could not be read. A specification declaring no references passes with nothing checked, which is accurate and reads as coverage it is not providing. `--require-references` fails in that case, so the check can be wired before the references exist and mean something once they do.
+
+A prefix used in a reference-valued field that the specification does not declare is a violation rather than merely a parser warning: the author attempted a cross-specification reference and none was resolvable.

@@ -339,6 +339,14 @@ PARKED_RE = re.compile(
     re.I | re.M,
 )
 
+# Declares that prose under an item heading is deliberate. Same shape as the
+# parked marker, and needed for the same reason: the alternative to a marker is
+# a warning nobody can clear.
+PROSE_RE = re.compile(
+    r"^#\s+(?P<heading>.+?)\s*$\s*^<!--\s*specl:\s*prose\b[^>]*-->",
+    re.I | re.M,
+)
+
 
 def derive_title(description: str) -> str:
     """The fallback specified in docs/DOWNSTREAM-COMMITMENTS.md.
@@ -369,6 +377,7 @@ def slug(s: str) -> str:
 def parse(md: str):
     warnings: list[str] = []
     parked = {m.group("heading").strip() for m in PARKED_RE.finditer(md)}
+    prose_ok = {m.group("heading").strip() for m in PROSE_RE.finditer(md)}
     front: dict = {}
     if md.startswith("---"):
         end = md.find("---", 3)
@@ -408,7 +417,7 @@ def parse(md: str):
             starts[cur] = n
         elif cur is not None:
             sections[cur].append(line)
-    return front, sections, fm_comments, warnings, parked, starts
+    return front, sections, fm_comments, warnings, parked, starts, prose_ok
 
 
 def parse_bullets(lines, warnings, section_name="", start=0):
@@ -669,11 +678,11 @@ def load_documents(root: Path, warnings):
     directory.
     """
     documents = []
-    front, sections, fm, warnings_root, parked, starts = parse(
+    front, sections, fm, warnings_root, parked, starts, prose_ok = parse(
         root.read_text(encoding="utf-8")
     )
     warnings.extend(warnings_root)
-    documents.append((root.name, sections, starts, parked))
+    documents.append((root.name, sections, starts, parked, prose_ok))
 
     declared = front.get("companion_files") or []
     if isinstance(declared, str):
@@ -686,7 +695,7 @@ def load_documents(root: Path, warnings):
                 f"{root.name}. A specification missing part of itself is not a "
                 "specification with a warning; it is a different specification."
             )
-        c_front, c_sections, c_fm, c_warnings, c_parked, c_starts = parse(
+        c_front, c_sections, c_fm, c_warnings, c_parked, c_starts, c_prose = parse(
             path.read_text(encoding="utf-8")
         )
         warnings.extend(f"{rel}: {w}" for w in c_warnings)
@@ -698,7 +707,7 @@ def load_documents(root: Path, warnings):
                     "root file."
                 )
         fm.update(c_fm)
-        documents.append((str(rel), c_sections, c_starts, c_parked))
+        documents.append((str(rel), c_sections, c_starts, c_parked, c_prose))
     return front, documents, fm
 
 
@@ -735,7 +744,7 @@ def emit(front, sections, fm_comments, warnings, parked=(), starts=None, source=
     # One source node per document. 0.7.0 emitted one because there was one
     # file; the shape did not have to change to hold several.
     docs = documents if documents is not None else [
-        (source, sections, starts or {}, set(parked))
+        (source, sections, starts or {}, set(parked), set())
     ]
     source_nodes = {
         name: f"spec:source-{slug(name)}" for name, *_ in docs if name
@@ -747,7 +756,41 @@ def emit(front, sections, fm_comments, warnings, parked=(), starts=None, source=
     )
 
     known = {name for name, *_ in section_map} | set(PROSE_SECTIONS)
-    for doc_name, doc_sections, _, doc_parked in docs:
+    # Prose under a heading that models items is consumed and produces nothing.
+    # Two warnings already cover the adjacent cases, a bullet that looks like an
+    # item and does not parse, and an unrecognized heading, and neither fires
+    # here because the heading is recognized and the content is not a bullet.
+    #
+    # A downstream migration lost three paragraphs this way with zero parser
+    # warnings, so `--fail-on-warning` passed over silent content loss. Under
+    # 0.2.0 those paragraphs became content-hash design notes, which makes it a
+    # regression across a version boundary that `specl-validate diff` could not
+    # see either, because the namespace changed in the same step.
+    item_sections = {name: cls for name, cls, prefixes in section_map if prefixes}
+    for doc_name, doc_sections, doc_starts, _, doc_prose in docs:
+        for name, lines in doc_sections.items():
+            if name not in item_sections or name in doc_prose:
+                continue
+            # A subheading organises a long section into groups and is not
+            # lost content. specl's own specifications use them heavily, and
+            # flagging them would have made this warning noise on the first run.
+            orphan = next(
+                (line.strip() for line in lines
+                 if line.strip()
+                 and not line.lstrip().startswith(("-", "*", "#"))),
+                None,
+            )
+            if orphan is None:
+                continue
+            where = f"{doc_name}: " if doc_name else ""
+            warnings.append(
+                f"{where}section '{name}' contains prose that produced no "
+                f"{item_sections[name]}, starting {orphan[:60]!r}. Make it a "
+                "bullet with an identifier, or mark the section "
+                "<!--specl: prose--> if the text is deliberate"
+            )
+
+    for doc_name, doc_sections, _, doc_parked, _prose in docs:
         for name in doc_sections:
             if name in known or name in doc_parked:
                 continue
@@ -771,7 +814,7 @@ def emit(front, sections, fm_comments, warnings, parked=(), starts=None, source=
     # specification split into parts reads as one.
     def prose(name):
         return " ".join(
-            line for _, doc_sections, _, _ in docs
+            line for _, doc_sections, _, _, _ in docs
             for line in doc_sections.get(name, [])
         ).strip()
 
@@ -853,7 +896,7 @@ def emit(front, sections, fm_comments, warnings, parked=(), starts=None, source=
     for section_name, cls, prefixes in section_map:
         if prefixes is None:
             continue
-        for doc_name, doc_sections, doc_starts, _ in docs:
+        for doc_name, doc_sections, doc_starts, _, _ in docs:
             lines = doc_sections.get(section_name)
             if not lines:
                 continue
@@ -867,7 +910,7 @@ def emit(front, sections, fm_comments, warnings, parked=(), starts=None, source=
     externals: dict[str, str] = {}
     for section_name, cls, prefixes in section_map:
         if prefixes is None:
-            for doc_name, doc_sections, doc_starts, _ in docs:
+            for doc_name, doc_sections, doc_starts, _, _ in docs:
                 lines = doc_sections.get(section_name)
                 if not lines:
                     continue

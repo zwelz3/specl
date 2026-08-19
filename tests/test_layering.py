@@ -35,9 +35,9 @@ def downstream(peer_path, relation="dependsOn", token="UP:R1"):
     )
 
 
-def layering(graph_path):
+def layering(graph_path, *extra):
     return subprocess.run(
-        [sys.executable, "-m", "specl.validate_spec", "layering", str(graph_path)],
+        [sys.executable, "-m", "specl.validate_spec", "layering", str(graph_path), *extra],
         env={"PYTHONPATH": str(SRC), "PATH": "/usr/bin:/bin"},
         capture_output=True, text=True,
     )
@@ -95,3 +95,36 @@ def test_a_specification_with_no_references_passes(tmp_path):
     translate(source, target)
     result = layering(target)
     assert result.returncode == OK and "0 external reference" in result.stdout
+
+
+def test_an_unresolvable_prefix_is_a_layering_finding(tmp_path):
+    """It was a parser warning only, so layering reported zero references
+    checked and passed over a specification that had plainly attempted a
+    cross-specification reference."""
+    source = tmp_path / "s.md"
+    source.write_text(
+        "---\ntitle: T\nspec_base: https://example.org/specs/t#\nspec_id: t-001\n---\n\n"
+        "# Requirements\n\n- R1 A requirement referencing an undeclared peer.\n"
+        "  - affects: SBL:D14\n",
+        encoding="utf-8",
+    )
+    target = tmp_path / "s.ttl"
+    translate(source, target)
+    result = layering(target)
+    assert result.returncode == FAIL
+    assert "does not declare under references:" in result.stdout
+
+
+def test_require_references_fails_on_a_vacuous_pass(tmp_path):
+    """A vacuous pass reads as coverage while providing none, and the check that
+    does catch the mistake starts looking redundant beside a green one."""
+    source = tmp_path / "s.md"
+    source.write_text(
+        "---\ntitle: T\nspec_base: https://example.org/specs/t#\nspec_id: t-001\n---\n\n"
+        "# Requirements\n\n- R1 A requirement referencing nothing external.\n",
+        encoding="utf-8",
+    )
+    target = tmp_path / "s.ttl"
+    translate(source, target)
+    assert layering(target).returncode == OK
+    assert layering(target, "--require-references").returncode == FAIL

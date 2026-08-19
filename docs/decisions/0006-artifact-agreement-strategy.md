@@ -41,6 +41,8 @@ list, so the check cannot itself go stale.
 names the test that asserts it, and both halves are checked: no claim without a
 test, no named test that does not exist.
 
+**The changelog was never in this inventory, and it should have been.** A downstream adopter found that its 0.3.0 section claims a shape change that never shipped, and the disposition declining their alternative cited that claim as done. Four entries in that section are false. Most changelog prose cannot be checked mechanically, which is exactly why it was left out and exactly why it drifted: an artifact excluded because it is hard to verify is an artifact nothing verifies. The partial tier above is honest rather than complete, and the process rule in `RELEASING.md` carries the rest.
+
 **A check derived from an artifact beats a check that names its parts.** Every
 range check written before `tests/test_ontology.py` named one property, so the
 next property added was unchecked by construction, and two were. Derive the
@@ -79,6 +81,7 @@ the same rule applies to anything added here.
 | `SECTION_MAP`, the section table in `docs/SYNTAX.md` | unassigned | see below |
 | `PROP_MAP`, the annotation table in `docs/SYNTAX.md` | unassigned | see below |
 | explorer field map, the vocabulary | 2 | `tests/test_explorer.py`, both directions |
+| changelog claims, behaviour | 3, partial | `Breaking` entries carry `verified-by`; the rest is prose nothing can check |
 | assistant prompts, the shapes they target | unassigned | deferred beyond 1.0; see `docs/ROADMAP.md` |
 | commitments register, behavior | 2 and 3 | `specs/commitments/spec.md`, `verifiedBy` checked in `tests/test_drift.py` |
 
