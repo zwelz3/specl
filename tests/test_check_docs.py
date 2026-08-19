@@ -149,3 +149,18 @@ def test_a_badge_url_for_a_missing_specification_is_caught(tmp_path):
     result = run(tree)
     assert result.returncode == 1
     assert "names no specification" in result.stdout
+
+
+def test_the_commitments_pointer_does_not_name_a_stale_range():
+    """It said `UR1` through `UR17` while the register held 26. A pointer that
+    states a count is a pointer that goes stale, so it states the boundary
+    between requested and self-raised commitments instead."""
+    import re
+
+    pointer = (ROOT / "docs" / "DOWNSTREAM-COMMITMENTS.md").read_text(encoding="utf-8")
+    register = (ROOT / "specs" / "commitments" / "spec.md").read_text(encoding="utf-8")
+    highest = max(int(m) for m in re.findall(r"UR(\d+)", register))
+    claimed = [int(m) for m in re.findall(r"UR(\d+)", pointer)]
+    assert max(claimed) <= highest, (
+        f"the pointer names UR{max(claimed)} and the register stops at UR{highest}"
+    )

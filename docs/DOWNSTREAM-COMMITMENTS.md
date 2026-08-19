@@ -3,9 +3,7 @@
 This register is a specl specification. It lives at `specs/commitments/spec.md`
 and is translated, validated, and scored in CI alongside the other two.
 
-Each commitment carries the consumer's own request identifier, `UR1` through
-`UR17`, plus `UR18` onward for commitments this register makes that no request
-asked for. A conversation about `UR11` resolves to one IRI on both sides:
+Each commitment carries the consumer's own request identifier, `UR1` through `UR17`, plus `UR18` onward for commitments this register makes that no request asked for, whether raised by a downstream report or by specl itself. A conversation about `UR11` resolves to one IRI on both sides:
 `https://w3id.org/specl/commitments/spec#UR11`.
 
 The move is recorded in `docs/decisions/0008-commitments-as-a-specification.md`.

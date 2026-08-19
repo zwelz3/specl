@@ -22,16 +22,19 @@ before changing any emitted behavior.
    author against them, and the consumer did. Changing one is a migration for
    someone else, not a design revision.
 
-4. **Do not ship 0.3.0 as its CHANGELOG entry originally described.** Its
-   headline feature, the move to `https://w3id.org/specl/spec#`, is the defect,
-   not the fix. Publishing it commits permanent identifiers that the next release
-   would have to migrate away from. The entry has been amended in place; see the
-   handoff.
+4. **A changelog entry written before the work is a plan, not a record.** 0.3.0's
+   headline feature, a single shared instance namespace at
+   `https://w3id.org/specl/spec#`, was the defect rather than the fix, and the
+   entry was amended before it shipped. Four other entries in that section were
+   never caught the same way and describe things that never happened. Write
+   entries at tag time; `RELEASING.md` says so.
 
-5. **Dogfood the broken paths, not only the working ones.** None of the five
-   self-specs in `specs/` contains a `# Decisions` section, which is why a
-   Violation-severity shape that no markdown-authored decision could satisfy
-   survived two releases. Any new item class needs a self-spec that exercises it.
+5. **Dogfood the broken paths, not only the working ones.** A Violation-severity
+   shape that no markdown-authored decision could satisfy survived two releases
+   because no self-specification used a `# Decisions` section. Any new item class
+   needs a specification that exercises it, and
+   `tests/test_exit_criteria.py` now asserts that every section type and
+   annotation key is used somewhere in the corpus.
 
 6. **A Violation-severity shape must be satisfiable through the primary authoring
    path.** Assert this structurally: every property any shape requires at
@@ -131,3 +134,22 @@ an error.
 
 Section headings are sentences. No em-dashes for sentence flow. State material
 impersonally in documentation. Do not estimate work in days.
+
+11. **A green suite says the artifacts agree, not that any of them is right.**
+    `specl:owner` was declared a datatype property and emitted a literal for
+    eleven releases while every consistency check passed, because the
+    declaration and the emission agreed and the declaration was wrong. When a
+    check derives one artifact from another, it cannot see a shared mistake.
+
+12. **Claims about the environment need testing in that environment.** Every
+    check here compares artifacts inside one container, and several defects
+    reached an adopter through that blind spot: repository-relative paths in
+    the README, a Python floor CI never ran, a publish workflow contradicting a
+    written policy, and text I/O assuming the locale encoding. CI runs Windows
+    and Linux across three Python versions because of the last one.
+
+13. **From 1.0, the specification is not yours alone to change.**
+    `GOVERNANCE.md` governs the graph contract, the authoring syntax, and the
+    commitments register. It deliberately does not govern implementation,
+    ergonomics, documentation, or defect fixes, because a process that gated
+    those would obstruct the promises it protects.

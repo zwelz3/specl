@@ -1,9 +1,19 @@
 # specl changelog
 
-Releases from 0.3.0 onward are tagged in this repository and not published.
-PyPI carries 0.2.0 until 1.0; see
-`docs/decisions/0007-internal-releases-until-1.0.md`. A section is dated when
-its release is tagged.
+## What you can install
+
+PyPI carries **0.2.0** and **1.0.0** and nothing between. Every version from 0.3.0 to 0.11.0 was tagged in this repository and deliberately not published, under `docs/decisions/0007-internal-releases-until-1.0.md`, so a consumer upgrading goes from 0.2.0 straight to 1.0.0 and crosses two contract changes at once. `NAMESPACE-MIGRATION.md` and `docs/contracts/2.md` cover both, and `specl-migrate` automates what can be automated.
+
+| Versions | State | Contract |
+| --- | --- | --- |
+| 0.2.0 | on PyPI | pre-contract, `example.org/ekga` namespaces |
+| 0.3.0 – 0.10.0 | tagged, never published | contract 1 |
+| 0.11.0 | tagged, never published | contract 2 |
+| 1.0.0 | on PyPI | contract 2 |
+
+The nine unpublished versions keep their own sections below rather than being collapsed into one. They are real tags, the decision records and roadmap navigate by them in more than fifty places, and a changelog that disagrees with `git tag` would be one more pair of artifacts saying different things.
+
+A section is dated when its release is tagged. An undated section is a plan, not a record.
 
 ## 1.0.0 — 2026-08-19
 
