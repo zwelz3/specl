@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import pytest
 
-from conftest import SHAPES, translate
+from conftest import SHAPES, subprocess_env, translate
 
 pytest.importorskip("pyshacl")
 from rdflib import Graph, Literal, Namespace, URIRef  # noqa: E402
@@ -202,7 +202,7 @@ def test_reusing_a_withdrawn_identifier_fails_the_diff(tmp_path):
     new = write("new", "# Requirements\n\n- R1 Something else entirely.\n  - itemStatus: active\n")
     result = subprocess.run(
         [_sys.executable, "-m", "specl.validate_spec", "diff", str(old), str(new)],
-        cwd=tmp_path, env={"PYTHONPATH": str(SRC), "PATH": "/usr/bin:/bin"},
+        cwd=tmp_path, env=subprocess_env(),
         capture_output=True, text=True,
     )
     assert result.returncode == 1
@@ -224,7 +224,7 @@ def test_a_withdrawn_identifier_staying_withdrawn_is_not_reuse(tmp_path):
     old, new = write("old", body), write("new", body)
     result = subprocess.run(
         [_sys.executable, "-m", "specl.validate_spec", "diff", str(old), str(new)],
-        cwd=tmp_path, env={"PYTHONPATH": str(SRC), "PATH": "/usr/bin:/bin"},
+        cwd=tmp_path, env=subprocess_env(),
         capture_output=True, text=True,
     )
     assert result.returncode == 0 and "reused" not in result.stdout

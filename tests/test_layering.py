@@ -13,7 +13,7 @@ import sys
 
 import pytest
 
-from conftest import SRC, translate
+from conftest import SRC, subprocess_env, translate
 
 pytest.importorskip("rdflib")
 
@@ -38,7 +38,7 @@ def downstream(peer_path, relation="dependsOn", token="UP:R1"):
 def layering(graph_path, *extra):
     return subprocess.run(
         [sys.executable, "-m", "specl.validate_spec", "layering", str(graph_path), *extra],
-        env={"PYTHONPATH": str(SRC), "PATH": "/usr/bin:/bin"},
+        env=subprocess_env(),
         capture_output=True, text=True,
     )
 

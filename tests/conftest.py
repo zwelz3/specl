@@ -6,6 +6,7 @@ the golden diff is exactly the change and nothing else.
 """
 from __future__ import annotations
 
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -45,12 +46,40 @@ def spec_path(name: str) -> Path:
     return published if published.exists() else FIXTURES / name / "spec.md"
 
 
+def subprocess_env() -> dict[str, str]:
+    """The parent environment with `src` on the path.
+
+    Replacing the environment wholesale broke on Windows. A hardcoded
+    `PATH=/usr/bin:/bin` is meaningless there, and dropping the variables an
+    interpreter uses to locate its own installation made `site` emit
+    `Unexpected value in sys.prefix` to stderr on every subprocess. Tests
+    asserting stderr was empty then failed on a warning that had nothing to do
+    with specl.
+
+    Inherit and add rather than replace: the point was ever only to put the
+    working tree ahead of any installed copy.
+    """
+    env = dict(os.environ)
+    existing = env.get("PYTHONPATH")
+    env["PYTHONPATH"] = f"{SRC}{os.pathsep}{existing}" if existing else str(SRC)
+    return env
+
+
+def specl_warnings(stderr: str) -> list[str]:
+    """specl's own warnings, ignoring anything the interpreter says.
+
+    `assert result.stderr == ""` asserts that nothing anywhere wrote to stderr,
+    which is a claim about the whole environment rather than about specl.
+    """
+    return [line for line in stderr.splitlines() if line.startswith(("warning:", "error:"))]
+
+
 def translate(source: Path, target: Path, *extra: str) -> subprocess.CompletedProcess:
     """Run the translator as a subprocess, the way CI and users invoke it."""
     return subprocess.run(
         [sys.executable, "-m", "specl.spec_to_rdf", str(source), str(target), *extra],
         cwd=ROOT,
-        env={"PYTHONPATH": str(SRC), "PATH": "/usr/bin:/bin"},
+        env=subprocess_env(),
         capture_output=True,
         text=True,
     )

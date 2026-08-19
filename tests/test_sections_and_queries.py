@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import pytest
 
-from conftest import translate
+from conftest import specl_warnings, translate
 
 rdflib = pytest.importorskip("rdflib")
 from rdflib import Graph, Namespace, URIRef  # noqa: E402
@@ -42,7 +42,7 @@ def test_a_parked_heading_does_not_warn(tmp_path):
         tmp_path,
         "# Verification Notes\n<!--specl: parked, no class models this yet-->\n\nProse.\n",
     )
-    assert result.returncode == 0 and result.stderr == ""
+    assert result.returncode == 0 and not specl_warnings(result.stderr)
 
 
 def test_a_heading_mapped_in_front_matter_produces_items(tmp_path):

@@ -11,7 +11,7 @@ import sys
 
 import pytest
 
-from conftest import PUBLISHED, FIXTURE_SPECS, ROOT, SRC, spec_path, translate
+from conftest import FIXTURE_SPECS, PUBLISHED, ROOT, SRC, spec_path, subprocess_env, translate
 
 rdflib = pytest.importorskip("rdflib")
 from rdflib import Graph, Literal, Namespace, URIRef  # noqa: E402
@@ -47,7 +47,7 @@ def build(tmp_path, body):
 def migrate(*args):
     return subprocess.run(
         [sys.executable, "-m", "specl.migrate", *args],
-        cwd=ROOT, env={"PYTHONPATH": str(SRC), "PATH": "/usr/bin:/bin"},
+        cwd=ROOT, env=subprocess_env(),
         capture_output=True, text=True,
     )
 

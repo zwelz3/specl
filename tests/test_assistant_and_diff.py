@@ -11,7 +11,7 @@ import sys
 
 import pytest
 
-from conftest import ROOT, SHAPES, SRC, translate
+from conftest import ROOT, SHAPES, SRC, subprocess_env, translate
 
 pytest.importorskip("rdflib")
 
@@ -21,7 +21,7 @@ HEAD = "---\ntitle: T\nspec_base: https://example.org/specs/t#\nspec_id: t-001\n
 def run(module, *args, cwd=None):
     return subprocess.run(
         [sys.executable, "-m", module, *args],
-        cwd=cwd or ROOT, env={"PYTHONPATH": str(SRC), "PATH": "/usr/bin:/bin"},
+        cwd=cwd or ROOT, env=subprocess_env(),
         capture_output=True, text=True,
     )
 

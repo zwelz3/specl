@@ -109,6 +109,14 @@ mechanism. See `docs/decisions/0009-what-1.0-means.md`.
   GitHub release is what publishes to PyPI.
 
 ### Portability
+- Test subprocesses inherit the environment instead of replacing it. Fourteen
+  call sites passed a hardcoded `PATH=/usr/bin:/bin`, which is meaningless on
+  Windows and left the interpreter unable to locate its own virtualenv, so
+  `site` wrote `Unexpected value in sys.prefix` to stderr on every subprocess.
+- Tests assert on specl's own warnings rather than on stderr being empty. The
+  interpreter warning above failed five tests that had nothing to do with it.
+- Both patterns are guarded, and the guards are checked against a deliberate
+  offender so they cannot pass by matching nothing.
 - Every text read and write declares an encoding. Python falls back to the
   locale encoding, which is cp1252 on most Windows installs, so 110 calls were
   reading files as cp1252 off Linux. An adopter running the suite on Windows hit

@@ -17,7 +17,7 @@ import sys
 
 import pytest
 
-from conftest import PUBLISHED, ROOT, SRC, spec_path, translate
+from conftest import PUBLISHED, ROOT, SRC, spec_path, subprocess_env, translate
 
 rdflib = pytest.importorskip("rdflib")
 from rdflib import Graph, Namespace, URIRef  # noqa: E402
@@ -62,7 +62,7 @@ def emitted(tmp_path_factory) -> Graph:
         [sys.executable, "-m", "specl.validate_spec", "score",
          str(work / f"{PUBLISHED[0]}.ttl"), str(SRC / "specl" / "shapes.ttl"),
          "--history", str(history), "--at", "2026-01-01T00:00:00Z"],
-        cwd=ROOT, env={"PYTHONPATH": str(SRC), "PATH": "/usr/bin:/bin"},
+        cwd=ROOT, env=subprocess_env(),
         capture_output=True, text=True,
     )
     if history.exists():

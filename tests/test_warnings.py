@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import pytest
 
-from conftest import PUBLISHED, spec_path, translate
+from conftest import PUBLISHED, spec_path, specl_warnings, translate
 
 WARNING_SPEC = (
     "---\ntitle: T\nspec_base: https://example.org/specs/t#\n"
@@ -53,7 +53,7 @@ def test_fail_on_warning_gates(tmp_path):
 def test_fail_on_warning_is_silent_when_clean(tmp_path):
     result = translate(write(tmp_path, CLEAN_SPEC), tmp_path / "s.ttl", "--fail-on-warning")
     assert result.returncode == 0
-    assert result.stderr == ""
+    assert not specl_warnings(result.stderr)
 
 
 @pytest.mark.parametrize("name", PUBLISHED)

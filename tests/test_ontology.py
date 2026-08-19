@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import pytest
 
-from conftest import PUBLISHED, ROOT, SRC, spec_path, translate
+from conftest import PUBLISHED, ROOT, SRC, spec_path, subprocess_env, translate
 
 rdflib = pytest.importorskip("rdflib")
 from rdflib import Graph, Literal, Namespace, RDF, RDFS, URIRef, XSD  # noqa: E402
@@ -267,7 +267,7 @@ def test_the_conformance_command_passes_against_the_bundled_processor():
 
     result = subprocess.run(
         [_sys.executable, "-m", "specl.validate_spec", "conformance"],
-        cwd=ROOT, env={"PYTHONPATH": str(SRC), "PATH": "/usr/bin:/bin"},
+        cwd=ROOT, env=subprocess_env(),
         capture_output=True, text=True,
     )
     assert result.returncode == 0, result.stdout + result.stderr
@@ -323,7 +323,7 @@ def test_the_exported_bundle_explains_itself():
     with tempfile.TemporaryDirectory() as out:
         subprocess.run(
             [_sys.executable, "-m", "specl.validate_spec", "conformance", "--export", out],
-            cwd=ROOT, env={"PYTHONPATH": str(SRC), "PATH": "/usr/bin:/bin"},
+            cwd=ROOT, env=subprocess_env(),
             capture_output=True, text=True, check=True,
         )
         from pathlib import Path as _P

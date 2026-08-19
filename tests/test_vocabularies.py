@@ -14,7 +14,7 @@ import sys
 
 import pytest
 
-from conftest import ROOT, SRC, translate
+from conftest import ROOT, SRC, subprocess_env, translate
 
 rdflib = pytest.importorskip("rdflib")
 from rdflib import Graph, Literal, Namespace, URIRef  # noqa: E402
@@ -125,7 +125,7 @@ def test_a_governed_term_the_vocabulary_does_not_define_is_reported(tmp_path):
     )
     result = subprocess.run(
         [sys.executable, "-m", "specl.validate_spec", "layering", str(target)],
-        cwd=ROOT, env={"PYTHONPATH": str(SRC), "PATH": "/usr/bin:/bin"},
+        cwd=ROOT, env=subprocess_env(),
         capture_output=True, text=True,
     )
     assert result.returncode == 3
@@ -144,7 +144,7 @@ def test_a_term_the_vocabulary_defines_passes(tmp_path):
     )
     result = subprocess.run(
         [sys.executable, "-m", "specl.validate_spec", "layering", str(target)],
-        cwd=ROOT, env={"PYTHONPATH": str(SRC), "PATH": "/usr/bin:/bin"},
+        cwd=ROOT, env=subprocess_env(),
         capture_output=True, text=True,
     )
     assert result.returncode == 0, result.stdout

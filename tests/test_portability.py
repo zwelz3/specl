@@ -129,3 +129,41 @@ def test_no_f_string_nests_the_same_quote():
         "f-strings nesting their own delimiter parse only on 3.12 and later:\n  "
         + "\n  ".join(sorted(set(offenders)))
     )
+
+
+def test_no_test_replaces_the_subprocess_environment():
+    """Fourteen call sites passed `env={"PYTHONPATH": ..., "PATH": "/usr/bin:/bin"}`.
+
+    On Windows that path is meaningless, and dropping the variables an
+    interpreter uses to locate its own installation made `site` write
+    `Unexpected value in sys.prefix` to stderr on every subprocess. Inherit and
+    add; the point was ever only to put the working tree ahead of an installed
+    copy.
+    """
+    offenders = [
+        f"{path.relative_to(ROOT)}:{number}"
+        for path in python_files()
+        if path.name != "test_portability.py"  # it quotes the pattern it forbids
+        for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1)
+        if '"PATH": "/usr' in line
+    ]
+    assert not offenders, (
+        "subprocess environments should inherit rather than be replaced:\n  "
+        + "\n  ".join(offenders)
+    )
+
+
+def test_no_test_asserts_that_stderr_is_entirely_empty():
+    """That is a claim about the whole environment rather than about specl. An
+    interpreter warning unrelated to the tool failed five tests on Windows."""
+    offenders = [
+        f"{path.relative_to(ROOT)}:{number}"
+        for path in python_files()
+        if path.name not in ("test_portability.py", "conftest.py")
+        for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1)
+        if 'stderr == ""' in line
+    ]
+    assert not offenders, (
+        "assert on specl's own warnings with specl_warnings(), not on empty stderr:\n  "
+        + "\n  ".join(offenders)
+    )

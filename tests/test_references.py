@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import pytest
 
-from conftest import PUBLISHED, FIXTURE_SPECS, spec_path, translate
+from conftest import FIXTURE_SPECS, PUBLISHED, spec_path, specl_warnings, translate
 
 rdflib = pytest.importorskip("rdflib")
 from rdflib import Graph, Literal, Namespace, URIRef  # noqa: E402
@@ -73,7 +73,7 @@ def test_a_pytest_node_id_is_not_read_as_a_prefixed_token(tmp_path):
         tmp_path,
         "# Requirements\n\n- R1 Verified.\n  - verifiedBy: tests/test_a.py::test_b\n",
     )
-    assert result.returncode == 0 and result.stderr == ""
+    assert result.returncode == 0 and not specl_warnings(result.stderr)
     node = graph.value(URIRef("https://example.org/specs/t#R1"), SPECL.verifiedBy)
     assert isinstance(node, URIRef)
     assert (node, rdflib.RDF.type, SPECL.Test) in graph
@@ -125,7 +125,7 @@ def test_a_declared_prefix_resolves_to_the_peer_base(tmp_path):
     , encoding="utf-8")
     target = tmp_path / "s.ttl"
     result = translate(source, target)
-    assert result.returncode == 0 and result.stderr == ""
+    assert result.returncode == 0 and not specl_warnings(result.stderr)
     graph = Graph().parse(target)
     assert graph.value(URIRef("https://example.org/specs/t#R1"), SPECL.affects) == URIRef(
         "https://example.org/specs/up#R1"
@@ -216,7 +216,7 @@ def test_an_absolute_iri_is_used_as_written(tmp_path):
         "# Requirements\n\n- R1 Names a shared component.\n"
         "  - constrains: https://g3t.example/components#geometry\n",
     )
-    assert result.returncode == 0 and result.stderr == ""
+    assert result.returncode == 0 and not specl_warnings(result.stderr)
     assert graph.value(URIRef(BASE + "R1"), SPECL.constrains) == URIRef(
         "https://g3t.example/components#geometry"
     )

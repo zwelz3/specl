@@ -14,7 +14,7 @@ import sys
 
 import pytest
 
-from conftest import ROOT, SHAPES, SRC, translate
+from conftest import ROOT, SHAPES, SRC, subprocess_env, translate
 
 pytest.importorskip("pyshacl")
 from rdflib import Graph, Namespace, URIRef  # noqa: E402
@@ -47,7 +47,7 @@ def score(tmp_path, body, name="s"):
 def run_score(target, *extra):
     return subprocess.run(
         [sys.executable, "-m", "specl.validate_spec", "score", str(target), str(SHAPES), *extra],
-        cwd=ROOT, env={"PYTHONPATH": str(SRC), "PATH": "/usr/bin:/bin"},
+        cwd=ROOT, env=subprocess_env(),
         capture_output=True, text=True,
     )
 
@@ -134,7 +134,7 @@ def test_the_badge_renders_the_latest_recorded_assessment(tmp_path):
     result = subprocess.run(
         [sys.executable, "-m", "specl.validate_spec", "badge", str(target), str(SHAPES),
          "--history", str(history), "--out", str(out)],
-        cwd=ROOT, env={"PYTHONPATH": str(SRC), "PATH": "/usr/bin:/bin"},
+        cwd=ROOT, env=subprocess_env(),
         capture_output=True, text=True,
     )
     assert result.returncode == 0
