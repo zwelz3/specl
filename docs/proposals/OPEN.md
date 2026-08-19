@@ -4,16 +4,19 @@ Substantive changes proposed since the last major release, all sharing one
 closing date. Additive changes are not listed here: they land whenever they are
 ready and appear in the changelog, because nobody has to migrate for them.
 
-**Window opens:** on the day 1.0 ships.
-**Window closes:** one year later. Set the date here when 1.0 is tagged.
+**Window opens:** 2026-08-19, the day 1.0 was tagged.
+**Window closes:** 2027-08-19.
 **Locks to:** 2.0.
+
+A proposal raised after 2027-06-20, sixty days before the close, rolls to the
+window after this one.
 
 A shared deadline is something an adopter can put in a calendar. This file is
 where they check what is in it, without having watched the discussions.
 
 | Proposal | Raised | Breaks the contract | Objections | Issue |
 | --- | --- | --- | --- | --- |
-| *none yet; the window opens at 1.0* | | | | |
+| *none yet* | | | | |
 
 A proposal raised in the last sixty days before the closing date rolls to the
 following window. A proposal nobody has had time to object to has not been

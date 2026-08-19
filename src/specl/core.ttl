@@ -15,7 +15,7 @@
     dct:title "SPECL Core Ontology" ;
     owl:versionIRI <https://w3id.org/specl/ns/2> ;
     rdfs:comment "Constraints live in the shapes graph rather than here. OWL axioms in this file state what terms mean; what a specification must contain is a validation question and SHACL answers it." ;
-    owl:versionInfo "0.11.0" .
+    owl:versionInfo "1.0.0" .
 
 # --- Classes ---
 specl:Specification   a owl:Class ; rdfs:label "Specification" .

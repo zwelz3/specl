@@ -97,18 +97,11 @@ releases; drive it through the commands below.
 
 ## Install
 
-Install from the repository. PyPI carries 0.2.0 and will carry only 0.2.0 until
-1.0; see `docs/decisions/0007-internal-releases-until-1.0.md`.
-
 ```bash
-pip install git+https://github.com/zwelz3/specl
+pip install specl
 ```
 
-`pip install specl` returns 0.2.0, which predates the 0.3.0 corrections: item
-IRIs collide across specifications, decision records cannot pass their own gate,
-reference-valued properties carry literals instead of IRIs, and every graph is
-stamped with the time it was translated. It is outdated rather than dangerous
-and stays on PyPI for anyone pinned to it.
+Everything between 0.2.0 and 1.0 was tagged and not published, so PyPI goes from 0.2.0 straight to 1.0; see `docs/decisions/0007-internal-releases-until-1.0.md`. If you are pinned to 0.2.0, read `NAMESPACE-MIGRATION.md` and `docs/contracts/2.md` before upgrading: item IRIs moved in 0.3.0 and again in 0.11.0, and `specl-migrate` covers both.
 
 ## Quick start
 

@@ -5,10 +5,15 @@ PyPI carries 0.2.0 until 1.0; see
 `docs/decisions/0007-internal-releases-until-1.0.md`. A section is dated when
 its release is tagged.
 
-## 0.11.0 — tagged 2026-08-16
+## 1.0.0 — UNRELEASED
 
-The second and final graph-breaking release. Graphs move from contract 1 to
-contract 2 with `specl-migrate contract`.
+Everything here landed after `v0.11.0` was tagged and before 1.0. It was filed
+under the 0.11.0 heading by mistake, which is the defect `RELEASING.md` now has
+a rule about, found while checking readiness for this release.
+
+1.0 does not add features. It changes who may change the specification: from
+here the contract does not move without consensus, and `GOVERNANCE.md` is the
+mechanism. See `docs/decisions/0009-what-1.0-means.md`.
 
 ### Downstream observations
 - **The accepted half of UR8, eight releases late.** `constrains` and
@@ -278,6 +283,12 @@ contract 2 with `specl-migrate contract`.
 - The PyPI badge is removed from the README, where it advertised 0.2.0 two lines
   above the section explaining not to install it.
 - Documented that specl is a command-line tool with no supported public API.
+
+
+## 0.11.0 — tagged 2026-08-16
+
+The second and final graph-breaking release. Graphs move from contract 1 to
+contract 2 with `specl-migrate contract`.
 
 ### Breaking
 - **P8.** Design notes and comments require `DN` and `C` identifiers. Their IRIs

@@ -17,7 +17,7 @@
     owl:imports <https://w3id.org/specl/ns> ;
     dct:title "SPECL Spec Shapes" ;
     owl:versionIRI <https://w3id.org/specl/shapes/2> ;
-    owl:versionInfo "0.11.0" .
+    owl:versionInfo "1.0.0" .
 
 # =============================================================================
 # SPECL Spec Shapes

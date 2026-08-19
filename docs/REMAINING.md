@@ -7,25 +7,9 @@ feature list.
 
 ## Blocking 1.0
 
-1.0 marks a change in who may change the specification rather than a claim that
-it is finished; see `docs/decisions/0009-what-1.0-means.md`. Three of its five
-criteria are met. The three open items below are all achievable now, which the
-previous criteria were not.
+Nothing. All five criteria are met; `docs/ROADMAP.md` carries the table. The w3id pull request merged on 2026-08-19, which closed the last one.
 
-**Published IRIs must resolve. This is the only criterion still open.** One pull request against perma-id/w3id.org.
-Nine rules are new and one target changes; `tools/w3id/README.md` carries the
-measured delta, the ordering constraint that Pages must serve a target before a
-redirect to it merges, and the verification loop. A stability promise over
-identifiers that return 404 is not worth making.
-
-**Done: known limitations.** `LIMITATIONS.md`, linked from the top of the
-README.
-
-**Done: the governance mechanism.** `GOVERNANCE.md`. Additive changes land
-whenever ready; substantive ones are collected in a one-year window opening at
-1.0 and released as 2.0. An adopter registry so silence means something, an
-explicit list of what is not governed, issue templates, a register of collected
-proposals, and a test asserting the window length agrees across artifacts.
+Verify the redirects resolve before tagging anyway, with the loop in `tools/w3id/README.md`. A merge is not the same as a live redirect, and this is the one criterion nothing in CI can check.
 
 ## Deferred to 2.0
 

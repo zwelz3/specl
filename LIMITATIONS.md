@@ -5,11 +5,11 @@ made with the costs visible rather than discovered afterwards. Everything here
 is recorded in `docs/ROADMAP.md` with more reasoning; this is the version to
 read before deciding.
 
-## One entity across several specifications becomes several nodes
+## Sharing an entity across specifications is verbose
 
 `constrains` and `verifiedBy` mint a node under the referencing specification's own base when given a bare name, so three specifications naming `engine` produce three unrelated nodes. This is not a spelling problem: it happens when everyone spells it identically.
 
-**There is a way to share one.** Write the absolute IRI, and every specification naming it names the same node. The verbosity is the cost, and the front-matter abbreviation for it is 2.0 work. Personas and agents were never affected: `role:` and `owner:` resolve a `PREFIX:ID` token against a base declared under `references:`, so declaring one in a parent specification and referencing it from peers already gives one node per entity.
+**Write the absolute IRI** and every specification naming it names the same node. The verbosity is the cost, and the front-matter abbreviation for it is 2.0 work. An absolute IRI is also unchecked: a typo is a valid IRI naming a node nothing else references, and nothing catches it. Personas and agents were never affected: `role:` and `owner:` resolve a `PREFIX:ID` token against a base declared under `references:`, so declaring one in a parent specification and referencing it from peers already gives one node per entity.
 
 Visible in specl's own repository, where `specl_tool` declares
 `component-explorer` while `specl_explorer` is that component with its own
@@ -37,17 +37,9 @@ fixture before trusting a green result.
 classes and properties across releases. What it may not do is move an IRI or
 change a property's range. If you need byte stability, vendor a copy.
 
-## An owner is a literal
-
-`specl:owner` is declared a datatype property. Every other reference-valued
-property resolves to an IRI; this one holds a name, joinable only by string
-equality. Fixing it is a range change and both pre-1.0 breaking releases are
-spent, so it waits for 2.0.
-
 ## Some things the format cannot express
 
-A `constrains` value containing a parenthesised list splits on the commas inside
-the parentheses, producing fragments. Seen in a real specification.
+A `constrains` value containing a parenthesised list splits on the commas inside the parentheses, producing fragments. Seen in a real specification, and still true: `constrains: a.py (one, two)` yields two components, one of them the dangling `two)`.
 
 There is no relation for a file as distinct from a software component or a
 vocabulary term. Projects use `constrains` for all three.
@@ -76,8 +68,7 @@ specification is written in and will not guess.
 
 ## Scale is untested
 
-The largest specification specl has translated is roughly 750 lines and 120
-items. Nothing is known about behaviour at ten times that, and validation is
+The largest specification specl has translated is roughly 750 lines and 120 items, and the largest family is three. Nothing is known about behaviour at ten times that, and validation is
 SHACL over an in-memory graph, so expect it to be the first thing that hurts.
 
 ## It has one author

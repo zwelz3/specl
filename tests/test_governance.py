@@ -146,5 +146,7 @@ def test_limitations_are_collected_and_linked():
     assert limitations.exists()
     assert "LIMITATIONS.md" in (ROOT / "README.md").read_text(encoding="utf-8")
     text = limitations.read_text(encoding="utf-8")
-    for topic in ("Advanced Features", "several nodes", "one author"):
-        assert topic in text
+    # Substance rather than headings, which move. Each is a limitation an
+    # adopter would want to know before committing rather than after.
+    for topic in ("Advanced Features", "absolute IRI", "one author", "Scale is untested"):
+        assert topic in text, f"LIMITATIONS.md no longer covers {topic!r}"
