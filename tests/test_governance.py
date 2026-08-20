@@ -150,3 +150,38 @@ def test_limitations_are_collected_and_linked():
     # adopter would want to know before committing rather than after.
     for topic in ("Advanced Features", "absolute IRI", "one author", "Scale is untested"):
         assert topic in text, f"LIMITATIONS.md no longer covers {topic!r}"
+
+
+def test_the_adopter_registry_is_a_file_the_workflow_can_read():
+    """A registry living in issue search is enumerable by nothing without API
+    access, reviewable in no pull request, and not diffable. Every other
+    register here is a file."""
+    registry = ROOT / "ADOPTERS.md"
+    assert registry.exists()
+    text = registry.read_text(encoding="utf-8")
+    assert "| GitHub |" in text, "the registry has no table for the workflow to parse"
+    assert "GOVERNANCE.md" in text
+
+
+def test_notification_is_automated_rather_than_remembered():
+    """Silence counts as assent across a year-long window. Leaving the
+    notification to memory is how that promise stops being kept."""
+    workflow = ROOT / ".github" / "workflows" / "notify-adopters.yml"
+    assert workflow.exists()
+    text = workflow.read_text(encoding="utf-8")
+    assert "specification-change" in text, "the workflow is not triggered by the label"
+    assert "ADOPTERS.md" in text, "the workflow does not read the registry"
+    assert "OPEN.md" in text, "the closing date should be read, not restated"
+
+
+def test_the_registration_template_says_closing_is_not_dismissal():
+    """An adopter whose issue is closed without explanation reasonably reads
+    that as being turned away. Matched on the parsed body rather than the raw
+    file, since the sentence wraps and a substring search misses it."""
+    form = yaml.safe_load((TEMPLATES / "adopter-registration.yml").read_text(encoding="utf-8"))
+    prose = " ".join(
+        " ".join(item.get("attributes", {}).get("value", "").split())
+        for item in form["body"]
+    )
+    assert "not a dismissal" in prose
+    assert "ADOPTERS.md" in prose

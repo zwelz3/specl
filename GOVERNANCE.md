@@ -76,10 +76,7 @@ at least one review cycle of every adopter who has one.
 1. **Propose.** Open an issue using the specification change template. It states
    what changes, who it affects, whether it breaks the graph contract, and what
    migration it would need.
-2. **Announce.** The author notifies every registered adopter on the issue, and
-   lists the proposal in `docs/proposals/OPEN.md` against the current window's
-   closing date. Silence only counts as assent if the people whose assent
-   matters were told, and a register nobody can find is not telling them.
+2. **Announce.** Label the issue `specification-change`; a workflow posts the adopter roll from `ADOPTERS.md` and the window's closing date. Add the proposal to `docs/proposals/OPEN.md` by hand. Silence only counts as assent if the people whose assent matters were told, and a register nobody can find is not telling them.
 3. **Land it, or collect it.** An additive change is implemented once it is
    agreed and ships in the next ordinary release. A substantive one waits for
    the window to close.
@@ -102,10 +99,11 @@ the register exists rather than a label on some issues.
 
 ## Who is consulted
 
-Anyone may comment. **Registered adopters** are those who have opened an adopter
-registration issue, and they are the ones whose objection blocks and whose
-notification is required. Registering costs nothing and is not a commitment to
-keep using specl.
+Anyone may comment. **Registered adopters** are the rows in `ADOPTERS.md`, and they are the ones whose objection blocks and whose notification is required. Registering costs nothing and is not a commitment to keep using specl.
+
+An adopter registration issue is the intake, not the registry. It is transcribed into `ADOPTERS.md` and then closed, because a registry has to be enumerable at proposal time, reviewable in a pull request, and readable by something without API access. Closing it is bookkeeping and not a dismissal, and the issue says so.
+
+Notification is automated. Labelling a proposal `specification-change` posts the adopter roll and the window's closing date to that issue. Leaving it to the author's memory across a year-long window is how a promise of this kind quietly stops being kept.
 
 With no registered adopters, the period still runs and the decision record notes
 that none were registered. The process does not become a formality that is

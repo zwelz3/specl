@@ -24,8 +24,7 @@ that opens when 1.0 ships and closes a year later, and are released together as
 ergonomics, and documentation are not governed at all, so a defect fix does not
 need permission.
 
-See [GOVERNANCE.md](GOVERNANCE.md) and `docs/proposals/OPEN.md` for what is
-currently collected. Register as an adopter if you want to be notified.
+See [GOVERNANCE.md](GOVERNANCE.md) and `docs/proposals/OPEN.md` for what is currently collected. [Register as an adopter](ADOPTERS.md) if you want to be notified when something is proposed.
 
 ## Before you adopt
 

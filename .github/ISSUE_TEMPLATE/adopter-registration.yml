@@ -12,6 +12,11 @@ body:
 
         Silence during a comment period counts as assent, which is only fair if
         you were told. This is how you get told.
+
+        This issue is the intake rather than the registry. It is transcribed
+        into `ADOPTERS.md` and then closed, which is bookkeeping and not a
+        dismissal: the row in that file is what makes you a registered adopter,
+        and it is what the notification workflow reads.
   - type: input
     id: project
     attributes:

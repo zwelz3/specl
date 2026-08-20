@@ -165,6 +165,15 @@ mechanism. See `docs/decisions/0009-what-1.0-means.md`.
   it. The link cannot live in the SVG, because GitHub sanitizes images.
 
 ### Governance
+- `ADOPTERS.md` is the registry. A registration issue is the intake: it is
+  transcribed and then closed, because a registry has to be enumerable at
+  proposal time, reviewable in a pull request, and readable without API access.
+  The template says the closing is bookkeeping rather than a dismissal.
+- Notification is automated. Labelling a proposal `specification-change` posts
+  the adopter roll and the window's closing date to that issue, both read from
+  the repository rather than restated. Silence counts as assent across a
+  year-long window, and leaving the notification to memory is how a promise of
+  that kind quietly stops being kept.
 - `GOVERNANCE.md`. From 1.0 the author does not change the specification
   unilaterally. Additive changes, which leave every existing graph valid, land
   whenever they are ready. Substantive ones are collected in a window that opens

@@ -1,0 +1,62 @@
+name: notify adopters
+
+# Silence counts as assent under GOVERNANCE.md, which is only defensible if
+# everyone whose assent is inferred was actually told. Leaving that to the
+# author's memory across a year-long window is how the promise quietly stops
+# being kept, so the notification is mechanical.
+on:
+  issues:
+    types: [labeled]
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  notify:
+    if: github.event.label.name == 'specification-change'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Comment with the adopter roll and the closing date
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+
+            // Handles come from the table in ADOPTERS.md. A row that is a
+            // placeholder or a heading contributes nothing.
+            const adopters = fs.readFileSync('ADOPTERS.md', 'utf8')
+              .split('\n')
+              .filter(line => line.startsWith('| @'))
+              .map(line => line.split('|')[1].trim())
+              .filter(handle => handle.startsWith('@'));
+
+            // The window's closing date is stated once, in OPEN.md, so this
+            // reads it rather than restating it and drifting.
+            const open = fs.readFileSync('docs/proposals/OPEN.md', 'utf8');
+            const closes = (open.match(/\*\*Window closes:\*\*\s*([0-9-]+)/) || [])[1];
+
+            const roll = adopters.length
+              ? `${adopters.join(' ')} — a specification change has been proposed.`
+              : `No adopters are registered. The window still runs, and the decision record will note that none were registered.`;
+
+            const body = [
+              roll,
+              '',
+              closes
+                ? `This proposal is collected against the window closing **${closes}**. Silence at the close counts as assent.`
+                : `This proposal joins the current collection window. Silence at the close counts as assent.`,
+              '',
+              'A substantive objection from a registered adopter blocks ratification until it is withdrawn or addressed; substantive means it says what breaks or what is wrong. An unresolved objection at the close drops the proposal to the next window rather than shipping over it.',
+              '',
+              'Add this proposal to `docs/proposals/OPEN.md`. See `GOVERNANCE.md` for the process and `ADOPTERS.md` for who is on this roll.',
+            ].join('\n');
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body,
+            });
