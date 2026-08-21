@@ -36,11 +36,12 @@ validate, and there are no inverse properties.
 
 ## Open in the agreement inventory
 
-Three pairs in `0006` are unassigned. The section table and the annotation table
-in `docs/SYNTAX.md` restate `SECTION_MAP` and `PROP_MAP` in prose; both are
-straightforward tier 2 checks. The assistant's prompts assert what a good
+One pair in `0006` is unassigned. The assistant's prompts assert what a good
 specification looks like and nothing compares them to the shapes they exist to
 help satisfy.
+
+The two `docs/SYNTAX.md` tables are now tier 2, held by
+`tests/test_syntax_tables.py`. Both had drifted before the check existed.
 
 ## Open in the commitments register
 

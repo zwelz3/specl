@@ -40,9 +40,18 @@ the class they produce:
 | `# Requirements` | Requirement | `R` |
 | `# User Stories` | UserStory | `US` |
 | `# Open Issues` / `# Open Questions` | OpenIssue | `OQ` |
+| `# Open Questions and Gaps` / `# Open Questions and Gaps (flag for follow-up)` | OpenIssue | `OQ` |
 | `# Decisions` | DecisionRecord | `D` |
-| `# Design Considerations` | DesignNote | auto-hash |
-| `# Comments` | Comment | auto-hash |
+| `# Design Considerations` | DesignNote | `DN` |
+| `# Comments` | Comment | `C` |
+| `# Acceptance Queries` | AcceptanceQuery | `Q` |
+| `# Personas` | Persona | `P` |
+| `# Agents` | Agent | `AG` |
+
+A bullet in any of these sections carries the section's ID prefix. A section
+that holds prose rather than identified bullets still produces items, keyed by
+content hash; that is how `# Design Considerations` and `# Comments` are most
+often written, and `- DN1 ...` is equally valid.
 
 ## Front matter
 
@@ -320,8 +329,13 @@ inside each value preserved.
 | `owner` | `specl:owner` | any item | identifier of a declared agent |
 | `recommendation` | `specl:recommendation` | OpenIssue | single |
 | `status` | `specl:resolutionStatus` or `specl:decisionStatus` | OpenIssue / DecisionRecord | single |
+| `decisionStatus` | `specl:decisionStatus` | DecisionRecord | single |
+| `resolutionStatus` | `specl:resolutionStatus` | OpenIssue | single |
 | `rationale` | `specl:rationale` | DecisionRecord | single |
 | `affects` | `specl:affects` | DecisionRecord | comma-split |
+| `gates` | `specl:gates` | AcceptanceQuery | comma-split, resolves to IRIs |
+| `governs` | `specl:governs` | Requirement | comma-split, a vocabulary term |
+| `implementation` | `specl:implementationStatus` | all item classes | `not-started`, `in-progress`, `implemented`, `verified` |
 
 ### The four things called status
 

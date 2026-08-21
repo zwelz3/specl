@@ -78,8 +78,8 @@ the same rule applies to anything added here.
 | documentation references, code and paths | 2 | `tools/check_docs.py` |
 | roadmap exit criteria, behavior | 2 | `tests/test_exit_criteria.py` |
 | contract page guarantees, behavior | 3 | `verified-by` comments, checked both ways |
-| `SECTION_MAP`, the section table in `docs/SYNTAX.md` | unassigned | see below |
-| `PROP_MAP`, the annotation table in `docs/SYNTAX.md` | unassigned | see below |
+| `SECTION_MAP`, the section table in `docs/SYNTAX.md` | 2 | `tests/test_syntax_tables.py`, both directions |
+| `PROP_MAP` and `CONTEXTUAL_KEYS`, the annotation table in `docs/SYNTAX.md` | 2 | `tests/test_syntax_tables.py`, both directions |
 | explorer field map, the vocabulary | 2 | `tests/test_explorer.py`, both directions |
 | changelog claims, behaviour | 3, partial | `Breaking` entries carry `verified-by`; the rest is prose nothing can check |
 | assistant prompts, the shapes they target | unassigned | deferred beyond 1.0; see `docs/ROADMAP.md` |
@@ -87,7 +87,7 @@ the same rule applies to anything added here.
 
 ## What is not covered yet
 
-Three pairs remain unassigned, and naming them is the point of the inventory.
+One pair remains unassigned, and naming it is the point of the inventory.
 
 The two tables in `docs/SYNTAX.md` restate `SECTION_MAP` and `PROP_MAP` in prose.
 Both are tier 2 candidates: parse the markdown table, compare to the map. The
@@ -95,14 +95,28 @@ Both are tier 2 candidates: parse the markdown table, compare to the map. The
 catch, and it was found only because the vocabulary happened to declare a
 property nothing could produce.
 
+*Closed.* `tests/test_syntax_tables.py` is that check, and both tables had
+drifted by the time it was written. The section table was missing
+`Acceptance Queries`, `Personas`, and `Agents`, omitted two
+`Open Questions and Gaps` aliases, and gave `auto-hash` where `DesignNote` and
+`Comment` carry the reserved prefixes `DN` and `C`. The annotation table was
+missing `gates`, `governs`, `implementation`, `decisionStatus`, and
+`resolutionStatus`. Each of those five keys and three sections is documented in
+prose elsewhere in the same file, which is what let the omission survive: the
+reference table is the artifact a reader consults and the one nobody re-read.
+The comparison derives from the maps rather than from a restated list, so a
+section or key added to the translator is covered the moment it exists, and the
+extraction is anchored on the heading and the first column so a table that moves
+fails the test rather than comparing an empty set.
+
 *Closed.* The commitments register became a specl specification in 0.5.0. Its
 clauses are items carrying the consumer's own request identifiers, and
 `verifiedBy` binds each implemented one to a test that
 `tests/test_drift.py` checks exists. See
-`docs/decisions/0008-commitments-as-a-specification.md`. Three pairs remain unassigned: the section table and the annotation table in
-`docs/SYNTAX.md`, and the assistant's prompts, which assert what a good
-specification looks like while nothing compares them to the shapes they exist to
-help satisfy.
+`docs/decisions/0008-commitments-as-a-specification.md`. One pair remains
+unassigned: the assistant's prompts, which assert what a good specification
+looks like while nothing compares them to the shapes they exist to help
+satisfy.
 
 ## Alternatives
 
