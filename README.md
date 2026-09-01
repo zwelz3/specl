@@ -172,7 +172,16 @@ specl/
 
 ## Spec explorer
 
-Open `src/specl/explorer.html` in a browser and drop a generated `spec.ttl` file to browse requirements, user stories, and open issues. Read-only, zero build, no server.
+Open `src/specl/explorer.html` in a browser. It opens on its own
+specification; drop any generated `spec.ttl` on it to read that instead.
+The header figure is the same maturity `specl-validate score` reports,
+computed from a dropped validation report (`specl-validate validate --json`)
+or estimated from the shapes when none is loaded, with its definition one
+click from the figure. A syntax reference generated from the translator's
+tables is behind the "syntax" button. Read-only, zero build, no server, no
+network. To hand a specification to someone with nothing installed,
+`node explorer/build/compose.mjs specs/<name>/spec.md --out review.html`
+produces one file that opens on it with its findings attached.
 
 ## Authoring
 

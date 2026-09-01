@@ -15,6 +15,26 @@ The nine unpublished versions keep their own sections below rather than being co
 
 A section is dated when its release is tagged. An undated section is a plan, not a record.
 
+## Unreleased
+
+A plan, not a record, and labelled as one under `RELEASING.md`. What is written
+here has landed on the working branch and not been tagged; it is rewritten at
+tag time rather than promoted as it stands.
+
+- explorer: rewritten against `specs/specl_explorer/spec.md` (three review
+  rounds, disposition under `specs/specl_explorer/review/`). Fixes silent
+  content loss on repeated predicates and sub-bullets, a class counted but
+  unreachable, an unread contract version, and a maturity figure that
+  disagreed with `specl-validate score`; adds navigation across references,
+  findings from a validation report, a generated syntax reference, and a
+  compose command. Toolchain under `explorer/` is Node with no packages. No
+  change to emitted output or to the graph contract.
+- `specl_tool` R4.1 no longer bounds the explorer at 30 KB. The rewritten file
+  embeds its own example graph and is an order of magnitude larger without
+  being less self-contained, so the requirement states the property the bound
+  stood in for. The identifier does not move and no adopter is affected; the
+  hashed node for its `verifiedBy` test changes with the test's name.
+
 ## 1.0.0 — 2026-08-19
 
 Everything here landed after `v0.11.0` was tagged and before 1.0. It was filed
