@@ -125,6 +125,10 @@ def check_w3id_targets() -> list[str]:
     another repository, so a dead target here becomes a live 404 that nobody
     here would notice. Site targets are checked against what the Pages workflow
     builds rather than against the tree, since the site is assembled.
+
+    The site also carries a preview built from dev, which the workflow builds
+    and no identifier may point at. That case is rejected explicitly rather
+    than left to the existence check, which would pass it.
     """
     path = ROOT / "tools" / "w3id" / "specl.htaccess"
     if not path.exists():
@@ -138,6 +142,18 @@ def check_w3id_targets() -> list[str]:
                 f"tools/w3id/specl.htaccess: redirects to {target!r}, which is not in the tree"
             )
     for asset in sorted(set(SITE_RE.findall(text))):
+        # /preview/ is built from dev and is not part of the identifier
+        # surface. The existence check below would accept it, since the
+        # workflow does build it, and that is precisely the hole: a permanent
+        # identifier resolving to unreleased work would look correct to every
+        # check here. The preview may be linked; it may not be resolved to.
+        if asset == "preview" or asset.startswith("preview/"):
+            failures.append(
+                f"tools/w3id/specl.htaccess: redirects to site asset {asset!r}; "
+                "/preview/ is built from dev and must never be what a w3id "
+                "identifier resolves to"
+            )
+            continue
         # Badges are written by a loop over specs/, so the build guarantees one
         # per specification and nothing else. Exempting the whole directory
         # would let a badge URL for a specification that does not exist pass.

@@ -1,8 +1,13 @@
 name: pages
 
+# The trigger decides when the site is rebuilt. It never decides what goes
+# where: the root is always built from main and dev reaches only /preview/.
+# Pages replaces the whole site on every deploy, and the root is where the w3id
+# identifiers land, so a run triggered by dev must not be able to serve dev's
+# vocabulary at https://w3id.org/specl/ns.
 on:
   push:
-    branches: [main]
+    branches: [main, dev]
   workflow_dispatch:
 
 env:
@@ -15,13 +20,20 @@ permissions:
 
 concurrency:
   group: pages
-  cancel-in-progress: true
+  # A superseded preview build is cheap. A cancelled deploy of the vocabulary
+  # and shapes is not, and a push to dev must not be able to cancel one.
+  cancel-in-progress: false
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      # Explicitly main rather than the triggering ref. Without this the root
+      # content is decided by whichever branch fired the run, which is what
+      # makes adding a second trigger dangerous.
       - uses: actions/checkout@v6
+        with:
+          ref: main
 
       - name: Install specl
         # The badges are generated here, so the package is needed rather than
@@ -60,6 +72,67 @@ jobs:
           done
           echo "Site contents:"
           ls -la _site/
+
+      # Everything below builds /preview/ from dev. Both steps continue on
+      # error: the identifier surface must publish whatever state dev is in, so
+      # a broken working branch costs the preview and nothing else.
+      - name: Check out dev for the preview
+        continue-on-error: true
+        uses: actions/checkout@v6
+        with:
+          ref: dev
+          path: dev-src
+
+      - name: Build the dev preview
+        continue-on-error: true
+        run: |
+          set -e
+          if [ ! -f dev-src/src/specl/explorer.html ]; then
+            echo "no explorer on dev; skipping the preview"
+            exit 0
+          fi
+          mkdir -p _site/preview
+          # Copied, not rebuilt. dev carries the built file as package data, and
+          # rebuilding here would need Node and would produce a different file
+          # from the one dev actually ships.
+          cp dev-src/src/specl/explorer.html _site/preview/explorer.html
+          sha=$(git -C dev-src rev-parse --short HEAD)
+          built=$(date -u +"%Y-%m-%d %H:%M UTC")
+          cat > _site/preview/index.html <<HTML
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+          <meta charset="utf-8">
+          <meta name="robots" content="noindex">
+          <title>specl preview (unreleased)</title>
+          <style>
+            body { font-family: system-ui, sans-serif; max-width: 720px; margin: 3em auto; padding: 0 1.5em; color: #222; line-height: 1.6; }
+            .warn { border-left: 4px solid #b35900; background: #fff6ec; padding: 1em 1.2em; }
+            code { background: #f4f4f4; padding: 2px 6px; border-radius: 3px; font-size: 0.9em; }
+          </style>
+          </head>
+          <body>
+          <h1>specl preview</h1>
+          <div class="warn">
+            <p><strong>This is unreleased work.</strong> It is built from the
+            <code>dev</code> branch at <code>$sha</code>, $built, and it changes
+            without notice or disappears entirely.</p>
+            <p>It is not a release channel. Nothing here is what a
+            <code>w3id.org/specl</code> identifier resolves to, and nothing here
+            should be cited, pinned or linked from anything durable.</p>
+          </div>
+          <h2>What is here</h2>
+          <p><a href="explorer.html">Spec explorer</a>, opening on its own
+          specification. Drop any generated <code>spec.ttl</code> on it to read
+          that instead.</p>
+          <h2>The released version</h2>
+          <p><a href="../explorer.html">The explorer as released</a>, and
+          <a href="../">the vocabulary site</a>. Those are the ones to link to.</p>
+          </body>
+          </html>
+          HTML
+          echo "Preview contents:"
+          ls -la _site/preview/
 
       - uses: actions/configure-pages@v5
 

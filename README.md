@@ -183,6 +183,15 @@ network. To hand a specification to someone with nothing installed,
 `node explorer/build/compose.mjs specs/<name>/spec.md --out review.html`
 produces one file that opens on it with its findings attached.
 
+The released explorer is served at
+[w3id.org/specl/explorer](https://w3id.org/specl/explorer). A preview built
+from the `dev` branch is published beside it under `/preview/`, for looking at
+work that has not shipped. It is not a release channel and no identifier
+resolves to it: it changes without notice, it may disappear, and it is not
+something to cite, pin or link from anything durable. The published site is
+assembled so that only `main` decides what is at the root, because that root is
+where `https://w3id.org/specl/ns` and the shapes resolve.
+
 ## Authoring
 
 Write specs in markdown under `specs/<name>/spec.md`. Use ID-bulleted lists for requirements (`R1.1`), user stories (`US1`), and open issues. The spec file itself carries YAML frontmatter with `spec_id`, `title`, `version`, and `status`. See `specs/specl_explorer/spec.md` for the reference example.
