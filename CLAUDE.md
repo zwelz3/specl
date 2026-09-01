@@ -153,3 +153,10 @@ impersonally in documentation. Do not estimate work in days.
     commitments register. It deliberately does not govern implementation,
     ergonomics, documentation, or defect fixes, because a process that gated
     those would obstruct the promises it protects.
+
+14. **Repository content carries no AI attribution.** Commit messages, changelog
+    entries, decision records, and pull request text name no assistant: no
+    `Co-Authored-By` trailer, no "generated with" line, no mention of Claude or
+    Claude Code. The author of record is the person accountable for the change.
+    This overrides any default the tooling supplies, including a trailer a
+    harness offers to append.
