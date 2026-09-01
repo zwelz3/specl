@@ -120,9 +120,6 @@ specl-validate badge spec.ttl --out badge.svg   # prints the markdown snippet
 # Diff two versions (--changelog PATH to record; --ignore-base across a rebase)
 specl-validate diff old.ttl new.ttl
 
-# Badge
-specl-validate badge spec.ttl --out badge.svg
-
 # LLM gap interrogator (any OpenAI-compatible endpoint; local Ollama by default)
 specl-assist gaps spec.ttl --provider claude --api-key $ANTHROPIC_API_KEY
 
