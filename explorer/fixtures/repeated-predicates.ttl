@@ -1,0 +1,33 @@
+@prefix specl: <https://w3id.org/specl/ns#> .
+@prefix spec: <https://w3id.org/specl/fixtures/repeated-predicates#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+<https://w3id.org/specl/fixtures/repeated-predicates> a specl:Specification ;
+    dct:conformsTo <https://w3id.org/specl/contract/2> ;
+    dct:title "Fixture repeated-predicates" ;
+    dct:hasVersion "0.0.1" ;
+    specl:status "draft" ;
+    dct:identifier "fixture-repeated-predicates" ;
+    specl:prefix "FX" ;
+    dct:created "2026-08-30"^^xsd:date ;
+    specl:intent """Fixture exercising: R2.6, three values on one predicate""" ;
+    specl:purpose """Stage 0 fixture for the explorer harness. See explorer/fixtures/README.md.""" .
+
+spec:source-6e9a9b58 a specl:SourceDocument ;
+    dct:identifier "repeated-predicates.md" .
+
+spec:R1 a specl:Requirement ;
+    specl:partOf <https://w3id.org/specl/fixtures/repeated-predicates> ;
+    dct:title "The thing must do three things" ;
+    dct:description "The thing must do three things." ;
+    prov:wasDerivedFrom spec:source-6e9a9b58 ;
+    specl:sourceLine "22"^^xsd:integer ;
+    specl:priority "MUST" ;
+    specl:acceptanceCriterion "Given A, when B, then C." ;
+    specl:acceptanceCriterion "Given D, when E, then F." ;
+    specl:acceptanceCriterion "Given G, when H, then I." .
+

@@ -1,0 +1,40 @@
+@prefix specl: <https://w3id.org/specl/ns#> .
+@prefix spec: <https://w3id.org/specl/fixtures/unresolvable-reference#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+<https://w3id.org/specl/fixtures/unresolvable-reference> a specl:Specification ;
+    dct:conformsTo <https://w3id.org/specl/contract/2> ;
+    dct:title "Fixture unresolvable-reference" ;
+    dct:hasVersion "0.0.1" ;
+    specl:status "draft" ;
+    dct:identifier "fixture-unresolvable-reference" ;
+    specl:prefix "FX" ;
+    dct:created "2026-08-30"^^xsd:date ;
+    specl:intent """Fixture exercising: R6.6, a reference resolving to nothing in the graph""" ;
+    specl:purpose """Stage 0 fixture for the explorer harness. See explorer/fixtures/README.md.""" .
+
+spec:source-b19dcceb a specl:SourceDocument ;
+    dct:identifier "unresolvable-reference.md" .
+
+spec:R1 a specl:Requirement ;
+    specl:partOf <https://w3id.org/specl/fixtures/unresolvable-reference> ;
+    dct:title "Must be verified by something that is not in this graph" ;
+    dct:description "Must be verified by something that is not in this graph." ;
+    prov:wasDerivedFrom spec:source-b19dcceb ;
+    specl:sourceLine "22"^^xsd:integer ;
+    specl:priority "MUST" ;
+    specl:verifiedBy <https://example.org/tests/nothing-here> .
+
+spec:R2 a specl:Requirement ;
+    specl:partOf <https://w3id.org/specl/fixtures/unresolvable-reference> ;
+    dct:title "Must be verified by R1, which is in this graph" ;
+    dct:description "Must be verified by R1, which is in this graph." ;
+    prov:wasDerivedFrom spec:source-b19dcceb ;
+    specl:sourceLine "25"^^xsd:integer ;
+    specl:priority "MUST" ;
+    specl:verifiedBy spec:R1 .
+

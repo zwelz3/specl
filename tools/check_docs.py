@@ -51,6 +51,13 @@ EXCLUDE = {
     # Verbatim archive of the g3-toolkit request. Its references describe that
     # project's repository and must not be rewritten to match this one.
     "docs/proposals/0003a-g3t-component-identity-as-received.md",
+    # Verbatim archive of the explorer rewrite's planning record. Its table
+    # classifies options considered under governance, including a `specl
+    # explore` umbrella command that was weighed and never built: composition
+    # shipped as explorer/build/compose.mjs and was then withdrawn. The
+    # reference records what was proposed, so rewriting it to match what
+    # exists would falsify the record rather than correct it.
+    "specs/specl_explorer/review/explorer-implementation-plan.md",
 }
 
 # Documents that legitimately reference another repository's paths. Command
@@ -259,7 +266,10 @@ def main() -> int:
     # published URL the build does not produce is a broken image.
     for doc in sorted(ROOT.rglob("*.md")):
         rel = doc.relative_to(ROOT).as_posix()
-        if ".git" in doc.parts or rel in EXCLUDE:
+        # node_modules is installed, not authored. explorer/test/ pulls jsdom
+        # for the optional smoke tests, and a dependency's own README describes
+        # its repository rather than this one.
+        if ".git" in doc.parts or "node_modules" in doc.parts or rel in EXCLUDE:
             continue
         text = doc.read_text(encoding="utf-8")
 

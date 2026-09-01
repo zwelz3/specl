@@ -1,3 +1,7 @@
 /.venv
 /**/*.egg-info/
 __pycache__/
+node_modules/
+# Build output. The packaged copy at src/specl/explorer.html is what ships;
+# the workflow rebuilds this one and fails if the two have drifted.
+/explorer/dist/

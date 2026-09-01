@@ -1,0 +1,7 @@
+{
+  "name": "specl-explorer-tests",
+  "private": true,
+  "description": "Dev-only. The explorer itself and test/run.mjs need nothing; jsdom is for test/dom.smoke.mjs only.",
+  "devDependencies": { "jsdom": "^24.1.0" },
+  "scripts": { "test": "node run.mjs", "smoke": "node dom.smoke.mjs" }
+}

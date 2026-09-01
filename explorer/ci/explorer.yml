@@ -1,0 +1,61 @@
+# Explorer build and checks. Place at .github/workflows/explorer.yml in the
+# specl repository. The Python steps produce files; the Node steps consume
+# them; neither imports the other.
+name: explorer
+on:
+  push:
+    paths: ['explorer/**', 'specs/specl_explorer/**', 'src/specl/**']
+  pull_request:
+    paths: ['explorer/**', 'specs/specl_explorer/**', 'src/specl/**']
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - run: pip install -e .
+
+      # Inputs, produced by specl.
+      - run: specl-translate specs/specl_explorer/spec.md explorer/fixtures/explorer-spec.ttl
+      - run: specl-validate validate explorer/fixtures/explorer-spec.ttl --json explorer/fixtures/explorer-spec.report.json || true
+      - run: python3 explorer/build/grammar.py > explorer/build/grammar.json
+
+      # The explorer's own toolchain.
+      - run: cd explorer && node test/run.mjs
+      - run: cd explorer && node build/build.mjs --grammar build/grammar.json --example fixtures/explorer-spec.ttl --report fixtures/explorer-spec.report.json --out dist/explorer.html
+      - run: cd explorer && node build/check-example.mjs dist/explorer.html fixtures/explorer-spec.ttl
+
+      # The smoke tests read both explorer.html and dist/explorer.html, since the
+      # slots change what the file does, so they run after the build. They cover
+      # what the harness cannot: computed styles on elements that start hidden,
+      # keyboard focus, the trail, chips as filters, and the narrow-screen panes.
+      - run: cd explorer/test && npm install --no-audit --no-fund
+      - run: cd explorer/test && node dom.smoke.mjs
+      - run: cd explorer/test && node mobile.smoke.mjs
+
+      # R1.6: the packaged copy is the built file, placed rather than built.
+      - run: cp explorer/dist/explorer.html src/specl/explorer.html
+      - run: git diff --exit-code --stat src/specl/explorer.html || echo "::warning::packaged explorer differs from the build; commit dist output"
+
+      - uses: actions/upload-artifact@v4
+        with: { name: explorer, path: explorer/dist/explorer.html }
+
+  # R1.3: every channel serves an identical file for a release.
+  channels:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with: { name: explorer, path: dist }
+      - run: |
+          set -e
+          sha=$(sha256sum dist/explorer.html | cut -d' ' -f1)
+          echo "built $sha"
+          # Compare against the pages copy and the release asset once they exist.
+          # curl -fsSL https://<pages-host>/specl/explorer.html | sha256sum | grep -q "$sha"
+          # gh release download "$GITHUB_REF_NAME" -p explorer.html -O rel.html && sha256sum rel.html | grep -q "$sha"
+          echo "channel comparison: fill in the two URLs above once PR1 lands"

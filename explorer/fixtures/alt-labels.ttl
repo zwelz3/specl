@@ -1,0 +1,40 @@
+@prefix specl: <https://w3id.org/specl/ns#> .
+@prefix spec: <https://w3id.org/specl/fixtures/alt-labels#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+<https://w3id.org/specl/fixtures/alt-labels> a specl:Specification ;
+    dct:conformsTo <https://w3id.org/specl/contract/2> ;
+    dct:title "Fixture alt-labels" ;
+    dct:hasVersion "0.0.1" ;
+    specl:status "draft" ;
+    dct:identifier "fixture-alt-labels" ;
+    specl:prefix "FX" ;
+    dct:created "2026-08-30"^^xsd:date ;
+    specl:intent """Fixture exercising: R4.5, a persona whose skos:altLabel differs from its title""" ;
+    specl:purpose """Stage 0 fixture for the explorer harness. See explorer/fixtures/README.md.""" .
+
+spec:source-a3c6474c a specl:SourceDocument ;
+    dct:identifier "alt-labels.md" .
+
+spec:US1 a specl:UserStory ;
+    specl:partOf <https://w3id.org/specl/fixtures/alt-labels> ;
+    dct:title "As a reviewer I want to find things, so that I can read them" ;
+    dct:description "As a reviewer I want to find things, so that I can read them." ;
+    prov:wasDerivedFrom spec:source-a3c6474c ;
+    specl:sourceLine "29"^^xsd:integer ;
+    specl:role spec:P1 .
+
+spec:P1 a specl:Persona ;
+    specl:partOf <https://w3id.org/specl/fixtures/alt-labels> ;
+    dct:title "Reviewer" ;
+    dct:description "Someone who reads specifications for a living." ;
+    prov:wasDerivedFrom spec:source-a3c6474c ;
+    specl:sourceLine "22"^^xsd:integer ;
+    skos:prefLabel "Reviewer" ;
+    skos:altLabel "Auditor" ;
+    skos:altLabel "Assessor" .
+

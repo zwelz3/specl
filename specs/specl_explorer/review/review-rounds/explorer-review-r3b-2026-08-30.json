@@ -1,0 +1,119 @@
+{
+ "spec": "specl Spec Explorer — review round 3b",
+ "version": "1.0.0",
+ "scope": "whole specification",
+ "exported": "2026-08-30T22:00:55.195Z",
+ "filter": "needs review only",
+ "answered": 31,
+ "total": 31,
+ "items": {
+  "US1": {
+   "verdict": "keep"
+  },
+  "US2": {
+   "verdict": "keep"
+  },
+  "US3": {
+   "verdict": "keep"
+  },
+  "US4": {
+   "verdict": "keep"
+  },
+  "US5": {
+   "verdict": "keep"
+  },
+  "R1.3": {
+   "verdict": "keep"
+  },
+  "R1.6": {
+   "verdict": "keep"
+  },
+  "R2.6": {
+   "verdict": "keep"
+  },
+  "R2.7": {
+   "verdict": "keep"
+  },
+  "R2.8": {
+   "verdict": "keep"
+  },
+  "R2.9": {
+   "verdict": "keep"
+  },
+  "R2.10": {
+   "verdict": "keep"
+  },
+  "R3.6": {
+   "verdict": "keep"
+  },
+  "R4.5": {
+   "verdict": "keep"
+  },
+  "R4.7": {
+   "verdict": "keep"
+  },
+  "R4.8": {
+   "verdict": "keep"
+  },
+  "R4.9": {
+   "verdict": "keep"
+  },
+  "R5.7": {
+   "verdict": "keep"
+  },
+  "R5.8": {
+   "verdict": "change",
+   "comment": "Open and/or report"
+  },
+  "R5.9": {
+   "verdict": "keep"
+  },
+  "R6.6": {
+   "verdict": "keep"
+  },
+  "R6.7": {
+   "verdict": "keep"
+  },
+  "R6.8": {
+   "verdict": "keep"
+  },
+  "R7.6": {
+   "verdict": "keep"
+  },
+  "R9.4": {
+   "verdict": "keep"
+  },
+  "R11.1": {
+   "verdict": "keep"
+  },
+  "R11.2": {
+   "verdict": "keep"
+  },
+  "R12.1": {
+   "verdict": "keep"
+  },
+  "R12.2": {
+   "verdict": "keep"
+  },
+  "R13.1": {
+   "verdict": "keep"
+  },
+  "R13.2": {
+   "verdict": "keep"
+  },
+  "R13.3": {
+   "verdict": "keep"
+  },
+  "R13.4": {
+   "verdict": "keep"
+  },
+  "R13.6": {
+   "verdict": "keep"
+  },
+  "OQ9": {
+   "verdict": "keep",
+   "comment": "Agreed "
+  }
+ },
+ "proposals": {}
+}

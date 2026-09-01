@@ -1,0 +1,53 @@
+@prefix specl: <https://w3id.org/specl/ns#> .
+@prefix spec: <https://w3id.org/specl/fixtures/detail-list#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+<https://w3id.org/specl/fixtures/detail-list> a specl:Specification ;
+    dct:conformsTo <https://w3id.org/specl/contract/2> ;
+    dct:title "Fixture detail-list" ;
+    dct:hasVersion "0.0.1" ;
+    specl:status "draft" ;
+    dct:identifier "fixture-detail-list" ;
+    specl:prefix "FX" ;
+    dct:created "2026-08-30"^^xsd:date ;
+    specl:intent """Fixture exercising: R2.7, sub-bullets producing an rdf:List""" ;
+    specl:purpose """Stage 0 fixture for the explorer harness. See explorer/fixtures/README.md.""" .
+
+spec:source-98a8dea7 a specl:SourceDocument ;
+    dct:identifier "detail-list.md" .
+
+spec:R1 a specl:Requirement ;
+    specl:partOf <https://w3id.org/specl/fixtures/detail-list> ;
+    dct:title "Fields must render in order" ;
+    dct:description "Fields must render in order:" ;
+    prov:wasDerivedFrom spec:source-98a8dea7 ;
+    specl:sourceLine "22"^^xsd:integer ;
+    specl:detail spec:R1-detail-1 .
+
+spec:R1-detail-1
+    rdf:first "description" ;
+    rdf:rest  spec:R1-detail-2 .
+
+spec:R1-detail-2
+    rdf:first "priority" ;
+    rdf:rest  spec:R1-detail-3 .
+
+spec:R1-detail-3
+    rdf:first "acceptance" ;
+    rdf:rest  spec:R1-detail-4 .
+
+spec:R1-detail-4
+    rdf:first "verified by" ;
+    rdf:rest  rdf:nil .
+
+spec:R2 a specl:Requirement ;
+    specl:partOf <https://w3id.org/specl/fixtures/detail-list> ;
+    dct:title "A plain requirement with no detail" ;
+    dct:description "A plain requirement with no detail." ;
+    prov:wasDerivedFrom spec:source-98a8dea7 ;
+    specl:sourceLine "27"^^xsd:integer .
+

@@ -1,0 +1,9 @@
+# HAND-AUTHORED FIXTURE. Not translator output and must not be regenerated.
+# Condition under test: R9.2, a file with no specl:Specification individual
+@prefix specl: <https://w3id.org/specl/ns#> .
+@prefix spec: <https://w3id.org/specl/fixtures/no-specification#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+
+spec:R1 a specl:Requirement ;
+    dct:title "An orphan" ;
+    dct:description "There is no specification individual in this file." .

@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark"><head><meta charset="utf-8"><title>specl explorer</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root{color-scheme:dark;--bg:#0f1115;--panel:#161a22;--border:#262b36;--text:#e6e8ee;--muted:#8a92a6;
+--accent:#4ea1ff;--good:#3fb950;--warn:#d29922;--bad:#f85149;
+--req:#3fb950;--us:#4ea1ff;--issue:#d29922;--adr:#a371f7;--note:#8a92a6;--query:#3fb6d8;--persona:#e2796f;--agent:#e2796f;--spec:#e6e8ee;
+--hl-c:#8b949e;--hl-s:#a5d6ff;--hl-i:#a5d6ff;--hl-k:#ff7b72;--hl-p:#79c0ff}
+/* Light. Dark is the default; the header control switches, and "auto" follows
+   the system. Every hue is a token, so a theme is one block and nothing else
+   in the stylesheet knows which one is applied (R3.5, D4). */
+:root[data-theme="light"]{color-scheme:light;--bg:#ffffff;--panel:#f4f6f9;--border:#d5dae2;--text:#12161c;--muted:#5a6472;
+--accent:#0a5fd6;--good:#1a7f37;--warn:#8a5a00;--bad:#b42318;
+--req:#1a7f37;--us:#0a5fd6;--issue:#8a5a00;--adr:#6b3fc0;--note:#5a6472;--query:#0d6d86;--persona:#b1453a;--agent:#b1453a;--spec:#12161c;
+--hl-c:#5a6472;--hl-s:#0a4a8f;--hl-i:#0a4a8f;--hl-k:#b42318;--hl-p:#0d6d86}
+@media (prefers-color-scheme:light){
+:root[data-theme="auto"]{color-scheme:light;--bg:#ffffff;--panel:#f4f6f9;--border:#d5dae2;--text:#12161c;--muted:#5a6472;
+--accent:#0a5fd6;--good:#1a7f37;--warn:#8a5a00;--bad:#b42318;
+--req:#1a7f37;--us:#0a5fd6;--issue:#8a5a00;--adr:#6b3fc0;--note:#5a6472;--query:#0d6d86;--persona:#b1453a;--agent:#b1453a;--spec:#12161c;
+--hl-c:#5a6472;--hl-s:#0a4a8f;--hl-i:#0a4a8f;--hl-k:#b42318;--hl-p:#0d6d86}
+}
+*{box-sizing:border-box}
+[hidden]{display:none !important}
+body{margin:0;font:14px/1.5 -apple-system,system-ui,sans-serif;background:var(--bg);color:var(--text);height:100vh;height:100dvh;display:flex;flex-direction:column}
+header{padding:10px 20px;background:var(--panel);border-bottom:1px solid var(--border);display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.hrow{display:contents}
+header h1{margin:0;font-size:16px;font-weight:600}
+#title{background:none;border:none;color:var(--text);font:inherit;font-size:16px;font-weight:600;padding:0;cursor:pointer;text-align:left}
+#title:disabled{cursor:default}
+#title:hover:not(:disabled){text-decoration:underline}
+.status{padding:2px 8px;border-radius:3px;background:var(--border);font-size:11px;text-transform:uppercase;letter-spacing:.5px}
+.meta{color:var(--muted);font-size:12px}
+.meta.bad{color:var(--bad)}
+.nav{margin-left:auto;display:flex;gap:6px}
+.btn{padding:4px 10px;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:3px;font:inherit;font-size:12px;cursor:pointer}
+.btn:disabled{opacity:.4;cursor:default}
+.btn.on{border-color:var(--accent);color:var(--accent)}
+main{flex:1;display:grid;grid-template-columns:340px 1fr;overflow:hidden;min-height:0}
+main>aside{border-right:1px solid var(--border);overflow:hidden;background:var(--panel);display:flex;flex-direction:column}
+main>aside input{width:100%;padding:10px 14px;background:var(--bg);color:var(--text);border:none;border-bottom:1px solid var(--border);font:inherit;outline:none}
+main>aside input:focus{border-bottom-color:var(--accent)}
+#list{flex:1;overflow-y:auto}
+.group{padding:6px 0}
+.group.pinned{border-bottom:1px solid var(--border);background:rgba(255,255,255,.02)}
+.group-label{padding:6px 16px;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.group-label .n{color:var(--text);opacity:.6}
+.item{padding:7px 16px 7px 14px;cursor:pointer;border-left:3px solid transparent;outline:none}
+.item:hover{background:var(--bg)}
+.item:focus{background:var(--bg);box-shadow:inset 0 0 0 1px var(--accent)}
+.item.active{background:var(--bg);border-left-color:var(--accent)}
+.item .row{display:flex;gap:8px;align-items:baseline}
+.item .id{font-weight:500;font-size:13px}
+.item .sub{color:var(--muted);font-size:11px}
+.glyph{font:600 9px/1 ui-monospace,Menlo,monospace;letter-spacing:.5px;padding:2px 4px;border-radius:2px;background:var(--border);color:var(--text);min-width:28px;text-align:center;display:inline-block}
+.item.req .glyph{color:var(--req)}.item.us .glyph{color:var(--us)}.item.issue .glyph{color:var(--issue)}.item.adr .glyph{color:var(--adr)}.item.note .glyph{color:var(--note)}.item.query .glyph{color:var(--query)}.item.persona .glyph,.item.agent .glyph{color:var(--persona)}
+.item .preview{color:var(--muted);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:1px}
+.item .why{color:var(--warn);font-size:11px;font-style:italic;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+section{overflow-y:auto;padding:0 32px 24px;min-width:0}
+.tabbar{display:flex;gap:4px;margin:0 -32px 20px;padding:0 32px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:2}
+.tabs{display:flex;gap:4px}
+.tabs [role=tab]{padding:10px 16px;background:none;border:none;color:var(--muted);cursor:pointer;font:inherit;border-bottom:2px solid transparent;margin-bottom:-1px}
+.tabs [role=tab].active{color:var(--text);border-bottom-color:var(--accent)}
+.tabs [role=tab]:focus-visible{outline:1px solid var(--accent)}
+h2{margin:0 0 4px;font-size:20px;display:flex;gap:8px;align-items:baseline}
+h2 .glyph{font-size:10px}
+h3{margin:24px 0 8px;font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.type{color:var(--muted);font-size:12px;margin-bottom:4px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.type .iri{font:11px ui-monospace,Menlo,monospace;opacity:.7;overflow:hidden;text-overflow:ellipsis;max-width:60ch}
+.prov{color:var(--muted);font-size:12px;margin-bottom:16px}
+dl{display:grid;grid-template-columns:180px 1fr;gap:10px 20px;margin:0}
+dt{color:var(--muted);font-size:12px;padding-top:2px}
+dt.absent{color:var(--warn)}
+dd{margin:0;word-wrap:break-word;white-space:pre-wrap;user-select:text}
+dd .v{display:block}dd .v+.v{margin-top:6px}
+.missing{color:var(--warn);font-style:italic;opacity:.85}
+.details{margin:6px 0 0;padding-left:18px}
+.ref{color:var(--accent);text-decoration:none;font-weight:500}
+.ref:hover{text-decoration:underline}
+.reflabel{color:var(--muted)}
+.ref.unresolved{color:var(--warn);text-decoration:underline dotted}
+.ref.node{color:var(--text);text-decoration:underline dotted}
+.chips{display:flex;gap:8px;margin:12px 0 20px;flex-wrap:wrap}
+.chip{padding:3px 10px;border-radius:12px;font-size:11px;background:var(--border);color:var(--text);border:1px solid transparent;cursor:pointer;font-family:inherit}
+.chip.on{border-color:var(--accent);color:var(--accent)}
+.chip.muted{cursor:default;color:var(--muted);font-style:italic}
+.rawbar{display:flex;gap:6px;align-items:center;margin:12px 0}
+pre{background:var(--panel);padding:16px;border-radius:6px;overflow-x:auto;font:12px/1.5 ui-monospace,Menlo,monospace;border:1px solid var(--border);white-space:pre}
+/* The number is generated content, so selecting the block copies the Turtle and not the gutter. */
+pre.numbered{padding-left:0}
+pre.numbered .line{display:block;padding-left:.75em}
+pre.numbered .line::before{content:attr(data-n);display:inline-block;width:4ch;margin-right:1.25em;text-align:right;color:var(--muted);opacity:.65;user-select:none;-webkit-user-select:none}
+pre.numbered .line.gap::before{opacity:.35}
+pre .c{color:var(--hl-c);font-style:italic}pre .s{color:var(--hl-s)}pre .i{color:var(--hl-i);text-decoration:underline dotted}pre .k{color:var(--hl-k);font-weight:600}pre .p{color:var(--hl-p)}pre .subj{color:var(--hl-k);font-weight:600}
+.empty{color:var(--muted);text-align:center;padding:60px 20px;max-width:56ch;margin:0 auto}
+.empty.error{color:var(--bad)}
+.filterbar{display:flex;align-items:center;gap:10px;padding:8px 16px;font-size:12px;color:var(--muted);border-bottom:1px solid var(--border);background:var(--bg)}
+.filterbar .btn{margin-left:auto}
+.chip.figure{cursor:pointer}
+.report{margin:0;padding:10px 16px;background:rgba(210,153,34,.12);border-bottom:1px solid var(--border);font-size:12px;color:var(--warn)}
+.report ul{margin:6px 0 0;padding-left:18px}
+.report.bad{background:rgba(248,81,73,.12);color:var(--bad)}
+.drop-overlay{position:fixed;inset:0;background:rgba(78,161,255,.1);border:3px dashed var(--accent);display:none;align-items:center;justify-content:center;font-size:18px;color:var(--accent);z-index:100;pointer-events:none}
+.drop-overlay.active{display:flex}
+code{font:12px ui-monospace,Menlo,monospace}
+.tabbar[hidden]{display:none}
+.file-btn{position:relative;display:inline-block;cursor:pointer}
+.file-btn input{position:absolute;opacity:0;width:1px;height:1px;left:0;top:0}
+#panes{display:none}
+@media print{
+  :root{--bg:#fff;--panel:#fff;--border:#bbb;--text:#000;--muted:#444;--accent:#000;--warn:#000;--bad:#000;--good:#000}
+  body{height:auto;display:block;font-size:11pt}
+  header{border:none;padding:0 0 8pt}
+  .nav,.maturity .bar,#panes,.tabs,aside,#drawer,.drop-overlay,.btn,button.chip{display:none !important}
+  main{display:block;overflow:visible}
+  section{overflow:visible;padding:0}
+  .type .iri{display:inline;max-width:none}
+  a.ref{color:var(--text);text-decoration:underline}
+  a.ref::after{content:" (" attr(href) ")";font-size:9pt;color:var(--muted)}
+  pre{white-space:pre-wrap;border:1px solid var(--border)}
+  details{display:block}details>summary{display:none}details.def dl{display:grid}
+  .chip{border:1px solid var(--border);background:none}
+  h3{page-break-after:avoid}
+}
+@media (max-width:720px){
+  body{font-size:15px}
+  /* Block layout for the header: title with the status badge floated
+     right, then the maturity bar filling the space left of the buttons. */
+  /* Two header rows on a phone: title with the status badge, then the
+     maturity bar beside the buttons. The title cell is the only one that
+     shrinks, and it truncates rather than pushing the badge off-screen. */
+  header{display:block;padding:8px 12px 6px}
+  .hrow{display:flex;align-items:center;gap:8px;min-width:0}
+  .hrow2{margin-top:6px}
+  header h1{flex:1 1 0;min-width:0}
+  #title{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;display:block}
+  .hrow1 .status,.hrow1 #version{flex:0 0 auto;white-space:nowrap}
+  #contract{display:none}
+  .maturity{flex:1 1 0;min-width:0;margin:0;display:flex;align-items:center;gap:8px}
+  .mbtn{flex:0 0 auto;white-space:nowrap;line-height:1.3}
+  .bar{flex:1 1 40px;width:auto;min-width:40px}
+  .nav{flex:0 0 auto;display:flex;gap:6px;margin-left:0}
+  .nav .lbl{display:none}
+  #theme{display:none}
+  .nav .btn{min-width:44px}
+  .btn{padding:8px 12px;font-size:13px;min-height:40px}
+  /* One natural page scroll on a phone: no nested scroll regions. */
+  body{display:block;height:auto;min-height:100vh;min-height:100dvh}
+  main{display:block;overflow:visible}
+  main>aside,section{height:auto;overflow:visible}
+  #list{overflow:visible}
+  main:not(.mode-list)>aside{display:none}
+  main.mode-list section{display:none}
+  main>aside{border-right:none;display:block}
+  main>aside input{padding:12px 14px;font-size:16px;min-height:44px}
+  .item{padding:12px 14px;min-height:44px}
+  .item .preview{white-space:normal}
+  .item .why{white-space:normal}
+  section{padding:0 14px calc(24px + env(safe-area-inset-bottom))}
+  .tabbar{margin:0 -14px 16px;padding:0 6px;gap:0}
+  .tabs{flex:1 1 auto}
+  .tabs [role=tab]{padding:12px 12px;min-height:44px;flex:1 1 auto;text-align:center}
+  #panes{display:inline-block;padding:10px 12px;background:none;border:none;border-bottom:2px solid transparent;color:var(--accent);font:inherit;cursor:pointer;min-height:44px}
+  h2{font-size:18px}
+  .type .iri{display:none}
+  dl{display:block}
+  dt{margin-top:10px}
+  dd{margin:2px 0 0}
+  dl.tight{display:block}
+  .chip{padding:8px 12px;font-size:12px;min-height:36px}
+  .chips{gap:6px}
+  pre{font-size:11px;padding:12px}
+  pre.numbered{padding-left:0}
+  pre.numbered .line::before{width:3ch;margin-right:.75em}
+  .drawer{width:100vw;left:0;padding:14px;box-shadow:none}
+  .drawer table{display:block;overflow-x:auto}
+  .drawer input,.drawer select{font-size:16px;min-height:40px}
+  .drawer textarea{font-size:13px}
+  .rawbar{flex-wrap:wrap}
+  .empty{padding:32px 8px}
+  .empty .btn{width:100%;min-height:48px;font-size:15px;margin-top:8px}
+  .drop-overlay{font-size:15px;padding:20px;text-align:center}
+}
+.maturity{display:flex;align-items:center;gap:8px;margin-left:8px}
+.mbtn{background:none;border:none;cursor:pointer;font:inherit;font-size:12px;padding:0}
+.mbtn:hover{text-decoration:underline}
+.bar{width:140px;height:8px;background:var(--border);border-radius:4px;overflow:hidden;display:inline-block}
+.bar>i{display:block;height:100%;transition:width .3s,background .3s}
+.chip.figure{border:1px solid var(--border);font-weight:600}
+.chip.good{background:rgba(63,185,80,.15);color:var(--good)}
+.chip.warn{background:rgba(210,153,34,.15);color:var(--warn)}
+.fmark{font:600 10px ui-monospace,Menlo,monospace;color:var(--warn);border:1px solid var(--warn);border-radius:8px;padding:0 5px;margin-left:auto}
+.muted{color:var(--muted)}.small{font-size:12px}
+details.def{margin:4px 0 16px;font-size:13px}
+details.def summary{cursor:pointer;color:var(--muted)}
+dl.tight{grid-template-columns:110px 1fr;gap:4px 14px;margin-top:8px;font-size:12px}
+.contrib{margin:4px 0 0;padding-left:20px}
+.contrib li{margin-bottom:6px}
+.contrib ul{margin:2px 0 0;padding-left:18px;font-size:12px}
+.sev{font:600 10px ui-monospace,Menlo,monospace;padding:1px 5px;border-radius:2px;background:var(--border)}
+.sev.Violation{color:var(--bad)}.sev.Warning{color:var(--warn)}.sev.Info{color:var(--muted)}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(560px,90vw);background:var(--panel);border-left:1px solid var(--border);overflow-y:auto;padding:16px 20px;z-index:50;box-shadow:-8px 0 24px rgba(0,0,0,.4);font-size:13px}
+.drawer-head{display:flex;gap:12px;align-items:center;margin-bottom:12px}
+.drawer-head .btn{margin-left:auto}
+.drawer h4{margin:18px 0 6px;font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)}
+.drawer table{border-collapse:collapse;width:100%;font-size:12px}
+.drawer th,.drawer td{text-align:left;padding:3px 6px;border-bottom:1px solid var(--border);vertical-align:top}
+.drawer details{margin:4px 0}.drawer details.sel{border-left:2px solid var(--accent);padding-left:8px}
+.drawer summary{cursor:pointer}
+.expect{margin:6px 0 0;padding-left:18px}
+.expect li{margin-bottom:6px}
+.expect li.absent>code{color:var(--warn)}.expect li.absent .state{color:var(--warn)}
+.expect li.present .state{color:var(--good)}
+.expect li.optional .state{color:var(--muted)}.expect li.n\/a{opacity:.5}
+.tag{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--accent);margin-left:6px}
+.drawer textarea{width:100%;background:var(--bg);color:var(--text);border:1px solid var(--border);font:12px/1.4 ui-monospace,Menlo,monospace;padding:8px;margin-top:8px}
+.drawer select,.drawer input{background:var(--bg);color:var(--text);border:1px solid var(--border);font:inherit;font-size:12px;padding:4px 6px}
+</style></head><body>
+<header>
+  <div class="hrow hrow1">
+    <h1><button id="title" type="button" disabled title="Select the specification">specl explorer</button></h1>
+    <span class="status" id="status">no spec</span>
+    <span class="meta" id="version"></span>
+    <span class="meta" id="contract"></span>
+  </div>
+  <div class="hrow hrow2">
+    <span class="maturity"><button class="meta mbtn" id="maturity" type="button" title="Open the specification view">maturity &#8212;</button><span class="bar" role="img" aria-label="maturity"><i id="bar"></i></span></span>
+    <span class="nav"><button class="btn" id="theme" type="button" aria-label="Colour theme">dark</button><button class="btn" id="syntax" type="button" aria-expanded="false" aria-controls="drawer">syntax</button><button class="btn" id="back" type="button" disabled aria-label="Back">&#8592;<span class="lbl"> back</span></button><button class="btn" id="fwd" type="button" disabled aria-label="Forward"><span class="lbl">forward </span>&#8594;</button></span>
+  </div>
+</header>
+<main>
+  <aside>
+    <input type="file" id="file" accept=".ttl,.json" multiple aria-label="Load spec.ttl or a validation report">
+    <input type="text" id="filter" placeholder="filter by id, label, description..." aria-label="Filter items">
+    <div id="report" class="report" hidden></div>
+    <div id="filterbar" class="filterbar" hidden></div>
+    <div id="list" aria-label="Items"></div>
+  </aside>
+  <section>
+    <div class="tabbar"><button id="panes" type="button" aria-label="Show the item list" aria-controls="list">&#9776; items</button><div class="tabs" role="tablist" aria-label="Views of the selected item"><button role="tab" id="tab-detail" data-tab="detail" class="active" aria-selected="true" aria-controls="panel">Detail</button><button role="tab" id="tab-ttl" data-tab="ttl" aria-selected="false" tabindex="-1" aria-controls="panel">Raw Turtle</button></div></div>
+    <div id="panel" class="empty" role="tabpanel" aria-labelledby="tab-detail" tabindex="0"><p>Open a <code>spec.ttl</code> with the file control, or drop one here.</p><p>A <code>spec.ttl</code> is produced with <code>specl-translate spec.md spec.ttl</code>.</p></div>
+  </section>
+</main>
+<div id="drawer" class="drawer" role="complementary" hidden aria-label="Syntax reference"></div>
+<div class="drop-overlay" id="overlay">Drop spec.ttl to load</div>
+
+<script type="application/json" id="slot-grammar"></script>
+<script type="application/json" id="slot-example"></script>
+<script type="application/json" id="slot-report"></script>
+<script type="application/json" id="slot-score"></script>
+
+<script>
+/* ==========================================================================
+   specl explorer, rewrite. Stage 1: parser, model, report, index.
+   Everything above the DOM guard is pure and is exercised by test/run.mjs.
+   ========================================================================== */
+
+var NS = {
+  specl: 'https://w3id.org/specl/ns#',
+  dct:   'http://purl.org/dc/terms/',
+  rdf:   'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
+  rdfs:  'http://www.w3.org/2000/01/rdf-schema#',
+  skos:  'http://www.w3.org/2004/02/skos/core#',
+  prov:  'http://www.w3.org/ns/prov#',
+  xsd:   'http://www.w3.org/2001/XMLSchema#'
+};
+var RDF_TYPE = NS.rdf + 'type', RDF_FIRST = NS.rdf + 'first', RDF_REST = NS.rdf + 'rest', RDF_NIL = NS.rdf + 'nil';
+var P = {
+  title: NS.dct + 'title', description: NS.dct + 'description', conformsTo: NS.dct + 'conformsTo',
+  hasVersion: NS.dct + 'hasVersion', status: NS.specl + 'status', detail: NS.specl + 'detail',
+  partOf: NS.specl + 'partOf', prefLabel: NS.skos + 'prefLabel', altLabel: NS.skos + 'altLabel',
+  identifier: NS.dct + 'identifier'
+};
+
+/* Contract 2 classes. ITEM classes are listed in the sidebar; NODE classes are
+   known, resolvable through the index, and not listed. Anything else is
+   reported under R2.9. */
+var KNOWN_CONTRACT = 'https://w3id.org/specl/contract/2';
+var ITEM_CLASSES = ['Requirement', 'UserStory', 'OpenIssue', 'DecisionRecord', 'DesignNote',
+                    'Comment', 'AcceptanceQuery', 'Persona', 'Agent'];
+var NODE_CLASSES = ['Specification', 'SourceDocument', 'Test', 'Component',
+                    'MaturityAssessment', 'SpecificationReference'];
+var CLASS_INFO = {
+  Requirement:{cls:'req',label:'Requirements'}, UserStory:{cls:'us',label:'User Stories'},
+  OpenIssue:{cls:'issue',label:'Open Issues'}, DecisionRecord:{cls:'adr',label:'Decisions'},
+  DesignNote:{cls:'note',label:'Design Notes'}, Comment:{cls:'note',label:'Comments'},
+  AcceptanceQuery:{cls:'query',label:'Acceptance Queries'}, Persona:{cls:'persona',label:'Personas'},
+  Agent:{cls:'agent',label:'Agents'}
+};
+
+/* ---------------------------------------------------------------- tokenizer
+   Sufficient for the specl emitter's Turtle and tolerant of damage: an
+   unreadable character becomes an error token rather than an exception, so
+   the statement parser can recover at the next subject. */
+function tokenize(text) {
+  var toks = [], i = 0, n = text.length, line = 1, col = 1;
+  /* Sticky expressions read at position i without slicing the remainder,
+     which keeps the pass linear in the size of the file (R10.1). */
+  var reDT = /([A-Za-z_][\w-]*):([\w-]+(?:\.[\w-]+)*)/y, reDTI = /<([^>]*)>/y, reLang = /@([A-Za-z]+(?:-[A-Za-z0-9]+)*)/y;
+  var reKw = /@(prefix|base)\b/y, rePn = /(?:([A-Za-z_][\w-]*))?:((?:[\w-]+(?:\.[\w-]+)*)?)/y, reA = /a(?=[\s<\[])/y;
+  var reBool = /(true|false)\b/y, reNum = /[+-]?\d+(\.\d+)?([eE][+-]?\d+)?/y, reWord = /\S+/y;
+  function at(re) { re.lastIndex = i; return re.exec(text); }
+  function push(t, v, extra) { var tok = {t:t, v:v, line:line, col:col, pos:i}; if (extra) for (var k in extra) tok[k] = extra[k]; toks.push(tok); }
+  function adv(k) { for (var j = 0; j < k; j++) { if (text.charCodeAt(i) === 10) { line++; col = 1; } else col++; i++; } }
+  while (i < n) {
+    var c = text[i];
+    if (c === '\n' || c === ' ' || c === '\t' || c === '\r') { adv(1); continue; }
+    if (c === '#') { var e = text.indexOf('\n', i); if (e < 0) e = n; adv(e - i); continue; }
+    if (c === '<') {
+      var close = text.indexOf('>', i);
+      if (close < 0) { push('err', text.slice(i, i + 20)); adv(n - i); break; }
+      push('iri', text.slice(i + 1, close)); adv(close - i + 1); continue;
+    }
+    if (c === '"') {
+      if (text.startsWith('"""', i)) {
+        var end3 = text.indexOf('"""', i + 3);
+        while (end3 > 0 && text[end3 - 1] === '\\') end3 = text.indexOf('"""', end3 + 1);
+        if (end3 < 0) { push('err', 'unterminated """'); adv(n - i); break; }
+        push('str', unescapeLit(text.slice(i + 3, end3))); adv(end3 - i + 3);
+      } else {
+        var j = i + 1;
+        /* A single-quoted literal cannot span a line; stopping at the newline
+           keeps an unterminated string from swallowing the next subject. */
+        while (j < n && text[j] !== '"' && text[j] !== '\n') { if (text[j] === '\\') j++; j++; }
+        if (j >= n || text[j] === '\n') { push('err', 'unterminated "'); adv(j - i); continue; }
+        push('str', unescapeLit(text.slice(i + 1, j))); adv(j - i + 1);
+      }
+      if (text.startsWith('^^', i)) { adv(2); var dm = at(reDT), dmi = dm ? null : at(reDTI);
+        if (dm) { toks[toks.length - 1].datatype = {prefix: dm[1], local: dm[2]}; adv(dm[0].length); }
+        else if (dmi) { toks[toks.length - 1].datatype = {iri: dmi[1]}; adv(dmi[0].length); } }
+      else if (text[i] === '@') { var lm = at(reLang); if (lm) { toks[toks.length - 1].lang = lm[1]; adv(lm[0].length); } }
+      continue;
+    }
+    if (c === ';' || c === ',' || c === '.') {
+      if (c === '.' && /[\w-]/.test(text[i + 1] || '')) { push('err', '.' + text[i + 1]); adv(1); continue; }
+      push(c, c); adv(1); continue;
+    }
+    if (c === '@') {
+      var kw = at(reKw);
+      if (kw) { push('kw', kw[1]); adv(kw[0].length); continue; }
+      push('err', text.slice(i, i + 10)); adv(1); continue;
+    }
+    var pn = at(rePn);
+    if (pn && pn[0].length) { push('pn', pn[0], {prefix: pn[1] || '', local: pn[2] || ''}); adv(pn[0].length); continue; }
+    if (c === 'a' && at(reA)) { push('a', 'a'); adv(1); continue; }
+    var bool = at(reBool);
+    if (bool) { push('str', bool[1], {datatype:{iri: NS.xsd + 'boolean'}}); adv(bool[0].length); continue; }
+    var num = at(reNum);
+    if (num) { push('str', num[0], {datatype:{iri: NS.xsd + (num[1] || num[2] ? 'decimal' : 'integer')}}); adv(num[0].length); continue; }
+    var w = at(reWord);
+    push('err', w ? w[0] : c); adv(w ? w[0].length : 1);
+  }
+  push('eof', null);
+  return toks;
+}
+function unescapeLit(s) {
+  return s.replace(/\\(u[0-9A-Fa-f]{4}|U[0-9A-Fa-f]{8}|.)/g, function (_, e) {
+    if (e[0] === 'u' || e[0] === 'U') return String.fromCodePoint(parseInt(e.slice(1), 16));
+    return {n:'\n', t:'\t', r:'\r', '"':'"', '\\':'\\', "'":"'"}[e] || e;
+  });
+}
+
+/* -------------------------------------------------------------------- parser
+   Statements are subject / predicate-object lists terminated by '.'.
+   A statement that cannot be read is reported and skipped; recovery resumes
+   at the next token that begins a line, which in the emitter's layout is
+   always a subject. */
+function parse(text) {
+  var toks = tokenize(text), i = 0;
+  var prefixes = {}, subjects = {}, order = [], report = [];
+  function peek() { return toks[i]; }
+  function next() { return toks[i++]; }
+  function expand(tok) {
+    if (tok.t === 'iri') return tok.v;
+    if (tok.t === 'pn') {
+      if (!(tok.prefix in prefixes)) throw new Error('undeclared prefix ' + tok.prefix + ':');
+      return prefixes[tok.prefix] + tok.local;
+    }
+    throw new Error('expected a name, got ' + tok.t + ' ' + JSON.stringify(tok.v));
+  }
+  function object(tok) {
+    if (tok.t === 'str') {
+      var v = {type:'literal', value: tok.v};
+      if (tok.lang) v.lang = tok.lang;
+      if (tok.datatype) v.datatype = tok.datatype.iri || ((prefixes[tok.datatype.prefix] || (tok.datatype.prefix + ':')) + tok.datatype.local);
+      return v;
+    }
+    return {type:'iri', value: expand(tok)};
+  }
+  function recover(fromTok) {
+    /* skip to the next token that starts a line and looks like a subject */
+    while (peek().t !== 'eof') {
+      var t = peek();
+      if (t.col === 1 && (t.t === 'pn' || t.t === 'iri' || t.t === 'kw') && t !== fromTok) break;
+      next();
+    }
+  }
+  while (peek().t !== 'eof') {
+    var start = peek();
+    try {
+      if (start.t === 'kw') {
+        next();
+        var p = next(); if (p.t !== 'pn') throw new Error('bad @prefix');
+        var u = next(); if (u.t !== 'iri') throw new Error('bad @prefix iri');
+        prefixes[p.prefix] = u.v;
+        if (peek().t === '.') next();
+        continue;
+      }
+      var subj = expand(next());
+      /* Accumulate into a local map and merge only on a clean terminator, so
+         a statement that fails part-way leaves nothing behind (R2.4). */
+      var acc = {};
+      for (;;) {
+        var pt = next();
+        var pred = pt.t === 'a' ? RDF_TYPE : expand(pt);
+        for (;;) {
+          var ot = next();
+          if (ot.t === 'err') throw new Error('unreadable object ' + JSON.stringify(ot.v));
+          (acc[pred] = acc[pred] || []).push(object(ot));
+          if (peek().t === ',') { next(); continue; }
+          break;
+        }
+        var sep = next();
+        if (sep.t === ';') { if (peek().t === '.') { next(); break; } continue; }
+        if (sep.t === '.') break;
+        throw new Error('expected ; or . after object, got ' + sep.t + ' ' + JSON.stringify(sep.v));
+      }
+      var node = subjects[subj];
+      if (!node) { node = subjects[subj] = {iri: subj, props: {}, line: start.line, spans: []}; order.push(subj); }
+      Object.keys(acc).forEach(function (k) { node.props[k] = (node.props[k] || []).concat(acc[k]); });
+      node.spans.push({start: start.pos, end: sep.pos + 1});
+    } catch (e) {
+      var who = null;
+      if (start.t === 'iri') who = start.v;
+      else if (start.t === 'pn') who = (start.prefix in prefixes) ? prefixes[start.prefix] + start.local : start.v;
+      report.push({kind:'malformed-statement', subject: who, line: start.line, detail: e.message});
+      recover(start);
+    }
+  }
+  return buildModel(text, prefixes, subjects, order, report);
+}
+
+/* --------------------------------------------------------------------- model */
+function local(iri) { var k = Math.max(iri.lastIndexOf('#'), iri.lastIndexOf('/')); return k >= 0 ? iri.slice(k + 1) : iri; }
+function typeOf(node) { var t = node.props[RDF_TYPE]; return t && t.length ? t.map(function (v) { return v.value; }) : []; }
+function speclClass(node) {
+  var ts = typeOf(node).filter(function (t) { return t.indexOf(NS.specl) === 0; });
+  return ts.length ? local(ts[0]) : null;
+}
+function readList(subjects, head) {
+  var out = [], seen = {}, cur = head;
+  while (cur && cur !== RDF_NIL && !seen[cur]) {
+    seen[cur] = true;
+    var cell = subjects[cur]; if (!cell) break;
+    var f = cell.props[RDF_FIRST]; if (f && f.length) out.push(f[0].value);
+    var r = cell.props[RDF_REST]; cur = r && r.length ? r[0].value : null;
+  }
+  return out;
+}
+function buildModel(raw, prefixes, subjects, order, report) {
+  var m = {raw: raw, prefixes: prefixes, spec: null, items: [], nodes: {}, report: report,
+           contract: null, contractKnown: false};
+  var consumed = {};
+  order.forEach(function (iri) {
+    var node = subjects[iri], cls = speclClass(node);
+    var item = {iri: iri, id: local(iri), cls: cls, props: node.props, details: [], cells: [], line: node.line, spans: node.spans};
+    if (cls === 'Specification') { if (!m.spec) m.spec = item; else report.push({kind:'duplicate-specification', subject: iri}); }
+    else if (ITEM_CLASSES.indexOf(cls) >= 0) m.items.push(item);
+    else if (NODE_CLASSES.indexOf(cls) >= 0) { /* known, resolvable, not listed */ }
+    else if (cls) report.push({kind:'unrepresented-class', subject: iri, detail: cls});
+    else if (node.props[RDF_FIRST]) consumed[iri] = false; /* cons cell, attached below */
+    else if (typeOf(node).length) report.push({kind:'unrepresented-class', subject: iri, detail: typeOf(node).map(local).join(', ')});
+    else report.push({kind:'untyped-subject', subject: iri});
+    m.nodes[iri] = item;
+  });
+  /* Attach rdf:List details to their owning item (R2.7). */
+  m.items.concat(m.spec ? [m.spec] : []).forEach(function (it) {
+    var d = it.props[P.detail];
+    if (d && d.length) d.forEach(function (v) {
+      var head = v.value; it.details = it.details.concat(readList(subjects, head));
+      var cur = head, seen = {};
+      while (cur && cur !== RDF_NIL && subjects[cur] && !seen[cur]) { seen[cur] = true; consumed[cur] = true; it.cells.push(cur); var r = subjects[cur].props[RDF_REST]; cur = r && r.length ? r[0].value : null; }
+    });
+  });
+  Object.keys(consumed).forEach(function (iri) { if (!consumed[iri]) report.push({kind:'orphan-list-cell', subject: iri}); });
+  if (m.spec) {
+    var c = m.spec.props[P.conformsTo];
+    m.contract = c && c.length ? c[0].value : null;
+    m.contractKnown = m.contract === KNOWN_CONTRACT;
+    if (!m.contract) report.push({kind:'no-contract'});
+    else if (!m.contractKnown) report.push({kind:'unknown-contract', detail: m.contract});
+  } else {
+    report.push({kind:'no-specification'});
+  }
+  m.index = buildIndex(m);
+  return m;
+}
+
+/* --------------------------------------------------------------------- index
+   DN7. One map from IRI to node; the only place a reference is resolved. */
+function buildIndex(m) {
+  var byIri = m.nodes, back = {};
+  Object.keys(byIri).forEach(function (s) {
+    var props = byIri[s].props;
+    Object.keys(props).forEach(function (p) {
+      if (p === RDF_TYPE) return;
+      props[p].forEach(function (v) {
+        if (v.type !== 'iri') return;
+        (back[v.value] = back[v.value] || []).push({from: s, pred: p});
+      });
+    });
+  });
+  return {
+    resolve: function (iri) { return byIri[iri] || null; },
+    isResolvable: function (iri) { return !!byIri[iri]; },
+    referrers: function (iri) { return back[iri] || []; }
+  };
+}
+
+/* ------------------------------------------------------------------- helpers */
+function first(item, pred) { var v = item.props[pred]; return v && v.length ? v[0].value : null; }
+function all(item, pred) { var v = item.props[pred]; return v ? v.map(function (x) { return x.value; }) : []; }
+/* R6.1. The page heading names the item. A truncated description made a poor
+   one. The title still appears as a row unless it is literally a prefix of the
+   description shown beside it, in which case omitting it hides nothing. */
+function headingOf(item) { return item.cls === 'Specification' ? 'Specification' : item.cls + ' ' + item.id; }
+function titleIsDerived(item) {
+  var t = first(item, P.title), d = first(item, P.description);
+  if (!t || !d) return false;
+  return d.indexOf(t.replace(/\u2026$/, '')) === 0;
+}
+function labelOf(item) {
+  /* R4.8 with the R4.2 fallback. */
+  var t = first(item, P.title); if (t) return t;
+  var d = first(item, P.description); return d ? d.slice(0, 70) : item.id;
+}
+function skosLabels(item) { return all(item, P.prefLabel).concat(all(item, P.altLabel)); }
+
+/* ============================================================ view model
+   Stages 3 to 6. Pure: takes the model and interface state, returns plain
+   data or strings. The DOM layer below only paints what these return, so
+   the harness can test selection, filtering, detail rows, raw blocks and
+   addressing without a browser. */
+
+/* Property order per class (R6.2) and the subset the shapes expect (R6.3).
+   Stage 9 replaces both tables with the grammar from the slot. */
+var FIELDS = {
+  Specification: ['title', 'intent', 'purpose', 'status', 'hasVersion', 'identifier', 'created', 'prefix', 'conformsTo'],
+  Requirement: ['description', 'priority', 'acceptanceCriterion', 'verifiedBy', 'constrains', 'rationale', 'implementationStatus', 'itemStatus', 'supersededBy'],
+  UserStory: ['description', 'role', 'capability', 'benefit', 'acceptanceCriterion', 'priority', 'rationale'],
+  OpenIssue: ['description', 'recommendation', 'owner', 'resolutionStatus'],
+  DecisionRecord: ['title', 'description', 'decisionStatus', 'rationale', 'affects'],
+  AcceptanceQuery: ['title', 'description', 'gates'],
+  Persona: ['title', 'description', 'prefLabel', 'altLabel'],
+  Agent: ['title', 'description', 'prefLabel', 'altLabel'],
+  DesignNote: ['description'], Comment: ['description']
+};
+/* Properties rendered elsewhere on the page rather than as rows. */
+var HIDDEN = {};
+[RDF_TYPE, P.detail, P.partOf, NS.prov + 'wasDerivedFrom', NS.specl + 'sourceLine'].forEach(function (p) { HIDDEN[p] = true; });
+var LOCAL_TO_IRI = {
+  intent: NS.specl, purpose: NS.specl, status: NS.specl, hasVersion: NS.dct, identifier: NS.dct, created: NS.dct, prefix: NS.specl, conformsTo: NS.dct,
+  description: NS.dct, priority: NS.specl, acceptanceCriterion: NS.specl, verifiedBy: NS.specl, constrains: NS.specl, rationale: NS.specl,
+  implementationStatus: NS.specl, itemStatus: NS.specl, supersededBy: NS.specl, role: NS.specl, capability: NS.specl, benefit: NS.specl,
+  recommendation: NS.specl, owner: NS.specl, resolutionStatus: NS.specl, decisionStatus: NS.specl, affects: NS.specl, gates: NS.specl,
+  prefLabel: NS.skos, altLabel: NS.skos, title: NS.dct
+};
+function iriOfLocal(k) { return (LOCAL_TO_IRI[k] || NS.specl) + k; }
+var GLYPH = {Specification:'SPEC', Requirement:'REQ', UserStory:'US', OpenIssue:'OQ', DecisionRecord:'DEC', DesignNote:'DN', Comment:'CMT', AcceptanceQuery:'AQ', Persona:'PER', Agent:'AGT'};
+
+function naturalCompare(a, b) { return a.localeCompare(b, undefined, {numeric: true}); }
+function descriptionOf(it) { return first(it, P.description) || ''; }
+function textOf(v) { return v.type === 'iri' ? v.value : v.value; }
+
+/* R4.5. Match against identifier, displayed label, description and every
+   SKOS label. Returns null for no match, or {on, text} naming what matched
+   so the row can show it when it is not otherwise visible. */
+function filterMatch(it, term) {
+  if (!term) return {on: null};
+  var t = term.toLowerCase();
+  var label = labelOf(it);
+  if (it.id.toLowerCase().indexOf(t) >= 0) return {on: 'id'};
+  if (label.toLowerCase().indexOf(t) >= 0) return {on: 'label'};
+  var d = descriptionOf(it);
+  if (d.toLowerCase().indexOf(t) >= 0) return {on: 'description', text: snippet(d, t)};
+  var ls = skosLabels(it);
+  for (var i = 0; i < ls.length; i++) if (ls[i].toLowerCase().indexOf(t) >= 0) return {on: 'label:' + (i < all(it, P.prefLabel).length ? 'pref' : 'alt'), text: ls[i]};
+  return null;
+}
+function snippet(s, t) {
+  var k = s.toLowerCase().indexOf(t), a = Math.max(0, k - 30), b = Math.min(s.length, k + t.length + 30);
+  return (a > 0 ? '\u2026' : '') + s.slice(a, b) + (b < s.length ? '\u2026' : '');
+}
+
+/* R4.7 pinned specification row, R4.1 groups with counts, R4.4 natural sort,
+   R4.2 and R4.8 label, R4.5 filter with match provenance. The specification
+   row is exempt from the filter; a class filter (from a chip) narrows to one
+   class. */
+function sidebarRows(m, term, onlyClass, onlyRetired) {
+  var out = [];
+  if (m.spec) out.push({group: 'Specification', pinned: true, rows: [{iri: m.spec.iri, id: m.spec.id, label: labelOf(m.spec), cls: 'Specification', glyph: GLYPH.Specification, match: null,
+    sub: [first(m.spec, P.hasVersion) ? 'v' + first(m.spec, P.hasVersion) : '', first(m.spec, P.status) || ''].filter(Boolean).join(' \u00b7 ')}]});
+  var groups = {};
+  m.items.forEach(function (it) {
+    if (onlyClass && it.cls !== onlyClass) return;
+    if (onlyRetired != null && isRetired(it) !== onlyRetired) return;
+    var mt = filterMatch(it, term); if (!mt) return;
+    (groups[it.cls] = groups[it.cls] || []).push({iri: it.iri, id: it.id, label: labelOf(it), cls: it.cls, glyph: GLYPH[it.cls], match: mt.on, matchText: mt.text || null, sub: first(it, P.title) ? '' : ''});
+  });
+  ITEM_CLASSES.forEach(function (cls) {
+    var g = groups[cls]; if (!g) return;
+    g.sort(function (a, b) { return naturalCompare(a.id, b.id); });
+    out.push({group: CLASS_INFO[cls].label, cls: cls, count: g.length, rows: g});
+  });
+  return out;
+}
+
+/* Provenance line (R6.8): source document identifier and line. */
+function provenanceOf(m, it) {
+  var src = first(it, NS.prov + 'wasDerivedFrom'), line = first(it, NS.specl + 'sourceLine');
+  if (!src) return null;
+  var node = m.index.resolve(src);
+  var name = node ? (first(node, P.identifier) || node.id) : local(src);
+  return {document: name, line: line ? String(line) : null, resolvable: !!node};
+}
+
+/* Detail rows (R6.1, R6.2, R6.3, R6.6). Every property the item carries, in
+   class order first, then the rest; expected-but-absent properties present
+   as rows with absent:true. Reference values carry resolution state. */
+/* R6.1 to R6.3, R6.6. Display order comes from FIELDS; what counts as
+   expected-but-absent comes from the grammar, through the same conditions
+   the readiness computation applies, so the two cannot disagree. */
+function detailRows(m, it, grammar) {
+  var order = (FIELDS[it.cls] || ['description']).map(iriOfLocal);
+  var hidden = titleIsDerived(it) ? {} : null;
+  if (hidden) hidden[P.title] = true;
+  var expected = {};
+  expectationsFor(grammar, it.cls).forEach(function (e) {
+    if (e.minCount == null || !conditionHolds(m, it, e.condition)) return;
+    expected[e.property] = true;
+  });
+  var seen = {}, rows = [];
+  function row(pred) {
+    var vals = it.props[pred] || [];
+    var r = {pred: pred, key: local(pred), absent: !vals.length, expected: !!expected[pred], values: vals.map(function (v) {
+      if (v.type !== 'iri') return {kind: 'literal', text: v.value, datatype: v.datatype || null};
+      var target = m.index.resolve(v.value);
+      return {kind: 'ref', iri: v.value, resolvable: !!target, id: target ? target.id : null, label: target ? labelOf(target) : local(v.value), isItem: !!target && ITEM_CLASSES.indexOf(target.cls) >= 0 || (target && target.cls === 'Specification')};
+    })};
+    if (pred === P.description && it.details.length) r.details = it.details.slice();
+    return r;
+  }
+  function skip(pred) { return HIDDEN[pred] || (hidden && hidden[pred]); }
+  order.forEach(function (pred) { if (skip(pred)) return; seen[pred] = true; if ((it.props[pred] || []).length || expected[pred]) rows.push(row(pred)); });
+  Object.keys(expected).forEach(function (pred) { if (seen[pred] || skip(pred)) return; seen[pred] = true; rows.push(row(pred)); });
+  Object.keys(it.props).forEach(function (pred) { if (seen[pred] || skip(pred)) return; seen[pred] = true; rows.push(row(pred)); });
+  return rows;
+}
+
+/* Backlinks grouped by predicate (R6.7). */
+function backlinks(m, it) {
+  var groups = {};
+  m.index.referrers(it.iri).forEach(function (ref) {
+    var from = m.index.resolve(ref.from); if (!from) return;
+    if (from.cls !== 'Specification' && ITEM_CLASSES.indexOf(from.cls) < 0) return;
+    if (ref.pred === P.partOf) return;
+    (groups[ref.pred] = groups[ref.pred] || []).push({iri: from.iri, id: from.id, label: labelOf(from), cls: from.cls});
+  });
+  return Object.keys(groups).sort().map(function (p) { groups[p].sort(function (a, b) { return naturalCompare(a.id, b.id); }); return {pred: p, key: local(p), items: groups[p]}; });
+}
+
+/* Specification view counts (R8.1, R8.3). Each count names the class it
+   opens under R5.8. The readiness ratio and the maturity figure are stage 7. */
+function specCounts(m) {
+  var counts = {}, retired = 0;
+  m.items.forEach(function (it) { counts[it.cls] = (counts[it.cls] || 0) + 1; if (isRetired(it)) retired++; });
+  return {total: m.items.length, retired: retired, counted: m.items.length - retired,
+          byClass: ITEM_CLASSES.filter(function (c) { return counts[c]; }).map(function (c) { return {cls: c, label: CLASS_INFO[c].label, count: counts[c]}; })};
+}
+
+/* Raw block (R7.1): the item's statements plus the list cells it owns, in
+   file order; or the whole file (R7.6). */
+function rawSpans(m, it, whole) {
+  if (whole || !it) return [{start: 0, end: m.raw.length}];
+  var spans = (it.spans || []).slice();
+  it.cells.forEach(function (c) { var n = m.nodes[c]; if (n && n.spans) spans = spans.concat(n.spans); });
+  spans.sort(function (a, b) { return a.start - b.start; });
+  return spans;
+}
+function rawBlock(m, it, whole) {
+  return rawSpans(m, it, whole).map(function (s) { return m.raw.slice(s.start, s.end); }).join('\n\n');
+}
+
+/* R7.7. The numbers are the file's, not the block's, so a line shown under an
+   item is the line in the file and matches what any other tool would say. A
+   break between non-contiguous statements is marked rather than closed up. */
+function lineStarts(m) {
+  if (m._lines) return m._lines;
+  var a = [0], i = m.raw.indexOf('\n');
+  while (i >= 0) { a.push(i + 1); i = m.raw.indexOf('\n', i + 1); }
+  return (m._lines = a);
+}
+function lineAt(m, offset) {
+  var a = lineStarts(m), lo = 0, hi = a.length - 1;
+  while (lo < hi) { var mid = (lo + hi + 1) >> 1; if (a[mid] <= offset) lo = mid; else hi = mid - 1; }
+  return lo + 1;
+}
+function rawLines(m, it, whole) {
+  var out = [], spans = rawSpans(m, it, whole), prevEnd = null;
+  spans.forEach(function (sp) {
+    if (prevEnd != null && sp.start > prevEnd) out.push({gap: true});
+    var n = lineAt(m, sp.start);
+    highlightLines(m.raw.slice(sp.start, sp.end)).forEach(function (h) { out.push({n: n++, html: h}); });
+    prevEnd = sp.end;
+  });
+  return out;
+}
+
+/* Highlighting (R7.3, R7.4), one array element per line so a number can sit
+   beside each. A token spanning a newline is split rather than left to
+   straddle two lines, which would leave an element open across the break. */
+var HL_RE = /(#[^\n]*)|("""[\s\S]*?"""|"(?:[^"\\\n]|\\.)*")|(<[^>]*>)|(@prefix|@base)|([A-Za-z_][\w-]*:[\w-]*(?:\.[\w-]+)*)|(\ba\b)/g;
+function highlightLines(text) {
+  var lines = [''], last = 0, mm;
+  function plain(t) {
+    var parts = t.split('\n');
+    lines[lines.length - 1] += esc(parts[0]);
+    for (var i = 1; i < parts.length; i++) lines.push(esc(parts[i]));
+  }
+  function tagged(t, cls) {
+    var parts = t.split('\n');
+    for (var i = 0; i < parts.length; i++) {
+      if (i) lines.push('');
+      if (parts[i] !== '') lines[lines.length - 1] += '<span class="' + cls + '">' + esc(parts[i]) + '</span>';
+    }
+  }
+  HL_RE.lastIndex = 0;
+  while ((mm = HL_RE.exec(text))) {
+    plain(text.slice(last, mm.index));
+    var atLineStart = mm.index === 0 || text[mm.index - 1] === '\n';
+    var cls = mm[1] ? 'c' : mm[2] ? 's' : mm[3] ? 'i' : mm[4] ? 'k' : mm[5] ? (atLineStart ? 'subj' : 'p') : 'p';
+    tagged(mm[0], cls);
+    last = mm.index + mm[0].length;
+  }
+  plain(text.slice(last));
+  return lines;
+}
+function highlight(text) { return highlightLines(text).join('\n'); }
+
+/* Addressing (R11.1): selection and tab in the fragment. */
+function encodeHash(id, tab, whole) { return '#' + encodeURIComponent(id) + (tab && tab !== 'detail' ? '/' + tab + (whole ? '/whole' : '') : ''); }
+function decodeHash(h) {
+  if (!h || h === '#') return null;
+  var parts = h.slice(1).split('/');
+  return {id: decodeURIComponent(parts[0]), tab: parts[1] === 'ttl' ? 'ttl' : 'detail', whole: parts[2] === 'whole'};
+}
+function findById(m, id) {
+  if (m.spec && m.spec.id === id) return m.spec;
+  for (var i = 0; i < m.items.length; i++) if (m.items[i].id === id) return m.items[i];
+  return null;
+}
+function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+
+/* ============================================================ stages 7-10
+   Measurement (R5.x, R6.4, R8.1), findings (R12.x), the syntax reference
+   (R13.1-R13.4) and the composer (R13.5, R13.6). All pure. The grammar and
+   the report are inputs; when absent, each function says what it lacks. */
+
+var MAT_LOW = 50, MAT_HIGH = 85;              /* R5.4 thresholds */
+var RETIRED = ['superseded', 'withdrawn'];    /* specl-validate: items() */
+var SETTLED_ISSUE = ['resolved', 'deferred']; /* specl-validate: SETTLED_ISSUE_STATUSES */
+var DEFAULT_WEIGHTS = {MUST: 4, SHOULD: 3, COULD: 2, WONT: 1, 'default': 2};
+
+/* The built-in fallback when no grammar is present: the shape expectations
+   of specl 1.0.0 at Warning severity and above, as read from shapes.ttl.
+   A grammar in the slot replaces this entirely. */
+var FALLBACK_EXPECTATIONS = {
+  Specification: [{key:'title',severity:'Violation',minCount:1},{key:'hasVersion',severity:'Violation',minCount:1},{key:'status',severity:'Violation',minCount:1,'in':['draft','prototype','review','production']},{key:'intent',severity:'Warning',minCount:1},{key:'purpose',severity:'Warning',minCount:1},{key:'created',severity:'Warning',minCount:1}],
+  Requirement: [{key:'description',severity:'Violation',minCount:1,minLength:10},{key:'partOf',severity:'Violation',minCount:1},{key:'priority',severity:'Warning','in':['MUST','SHOULD','COULD','WONT']},{key:'acceptanceCriterion',severity:'Warning',minCount:1},{key:'itemStatus',severity:'Warning','in':['active','superseded','withdrawn']},{key:'implementationStatus',severity:'Warning','in':['not-started','in-progress','implemented','verified']},{key:'supersededBy',severity:'Warning',minCount:1,condition:{itemStatus:'superseded'}},{key:'supersededBy',severity:'Warning',maxCount:0,condition:{itemStatus:'withdrawn'}},{key:'constrains',severity:'Warning',minCount:1,condition:{graphHasAny:['Component']}},{key:'verifiedBy',severity:'Warning',minCount:1,condition:{graphHasAny:['Test','AcceptanceQuery']}}],
+  UserStory: [{key:'description',severity:'Violation',minCount:1},{key:'partOf',severity:'Violation',minCount:1},{key:'role',severity:'Warning',minCount:1},{key:'benefit',severity:'Warning',minCount:1},{key:'acceptanceCriterion',severity:'Warning',minCount:1}],
+  OpenIssue: [{key:'description',severity:'Violation',minCount:1},{key:'recommendation',severity:'Warning',minCount:1},{key:'owner',severity:'Warning',minCount:1},{key:'resolutionStatus',severity:'Warning','in':['open','in-review','resolved','deferred'],maxCount:1}],
+  DecisionRecord: [{key:'title',severity:'Violation',minCount:1},{key:'decisionStatus',severity:'Warning','in':['proposed','accepted','superseded','rejected']},{key:'rationale',severity:'Warning',minCount:1},{key:'affects',severity:'Warning',minCount:1}],
+  AcceptanceQuery: [{key:'title',severity:'Violation',minCount:1},{key:'gates',severity:'Warning',minCount:1}],
+  Persona: [{key:'title',severity:'Violation',minCount:1}], Agent: [{key:'title',severity:'Violation',minCount:1}],
+  DesignNote: [], Comment: []
+};
+
+function expectationsFor(grammar, cls) {
+  var src = grammar && grammar.expectations ? grammar.expectations : FALLBACK_EXPECTATIONS;
+  return (src[cls] || []).filter(function (e) { return e.key; }).map(function (e) { return e.property ? e : Object.assign({property: iriOfLocal(e.key)}, e); });
+}
+function weightsOf(grammar) { return grammar && grammar.score && grammar.score.weights ? grammar.score.weights : DEFAULT_WEIGHTS; }
+function isRetired(it) { var s = first(it, NS.specl + 'itemStatus'); return !!s && RETIRED.indexOf(String(s).toLowerCase()) >= 0; }
+function unresolvedIssue(it) {
+  if (it.cls !== 'OpenIssue') return false;
+  var s = first(it, NS.specl + 'resolutionStatus');
+  return !s || SETTLED_ISSUE.indexOf(String(s).toLowerCase()) < 0;
+}
+function classesPresent(m) {
+  if (m._classes) return m._classes;
+  var seen = {};
+  Object.keys(m.nodes).forEach(function (iri) { typeOf(m.nodes[iri]).forEach(function (t) { seen[t] = true; }); });
+  return (m._classes = seen);
+}
+function graphHasAny(m, classes) {
+  var have = classesPresent(m);
+  return classes.some(function (c) { return !!have[NS.specl + c]; });
+}
+function conditionHolds(m, it, cond) {
+  if (!cond) return true;
+  if (cond.itemStatus) return String(first(it, NS.specl + 'itemStatus') || 'active').toLowerCase() === cond.itemStatus;
+  if (cond.graphHasAny) return graphHasAny(m, cond.graphHasAny);
+  if (cond.graphHas) return graphHasAny(m, [cond.graphHas]);
+  return true;
+}
+
+/* What the shapes would say about one item, evaluated locally. Returns a
+   list of misses; empty means the item would be the focus of no result. */
+function evaluateItem(m, grammar, it) {
+  var misses = [];
+  expectationsFor(grammar, it.cls).forEach(function (e) {
+    if (!conditionHolds(m, it, e.condition)) return;
+    var vals = it.props[e.property] || [];
+    if (e.minCount != null && vals.length < e.minCount) { misses.push({key: e.key, severity: e.severity, why: 'missing', message: e.message || ''}); return; }
+    if (e.maxCount != null && vals.length > e.maxCount) { misses.push({key: e.key, severity: e.severity, why: 'too many', message: e.message || ''}); return; }
+    if (e.minLength != null && vals.length && String(vals[0].value).length < e.minLength) misses.push({key: e.key, severity: e.severity, why: 'too short', message: e.message || ''});
+    if (e['in'] && vals.length && vals.some(function (v) { return e['in'].indexOf(String(v.value)) < 0; })) misses.push({key: e.key, severity: e.severity, why: 'not an allowed value', message: e.message || ''});
+  });
+  return misses;
+}
+
+/* Readiness (R5.6): the supplied score if any; otherwise computed from a
+   supplied validation report under specl-validate's definition; otherwise
+   estimated from the grammar's expectations. Every mode states its
+   definition (R5.7) and its population, and lists the contributors to the
+   shortfall in order of contribution (R5.9). */
+function readiness(m, grammar, report, score) {
+  var W = weightsOf(grammar);
+  var pop = m.items.filter(function (it) { return !isRetired(it); });
+  var flagged = null;
+  if (report && report.results) { flagged = {}; report.results.forEach(function (r) { flagged[r.focus] = (flagged[r.focus] || []).concat([r]); }); }
+  var rows = pop.map(function (it) {
+    var pr = first(it, NS.specl + 'priority'), w = pr && W[String(pr).toUpperCase()] != null ? W[String(pr).toUpperCase()] : W['default'];
+    var reasons = [];
+    if (flagged) (flagged[it.iri] || []).forEach(function (r) { reasons.push({key: local(r.path || ''), severity: r.severity, why: 'flagged', message: r.message}); });
+    else reasons = evaluateItem(m, grammar, it);
+    if (unresolvedIssue(it)) reasons.push({key: 'resolutionStatus', severity: 'Warning', why: 'unresolved', message: 'An open issue nobody has decided anything about is never clean.'});
+    return {item: it, weight: w, clean: !reasons.length, reasons: reasons};
+  });
+  var cleanW = 0, totalW = 0, cleanN = 0, sub = {};
+  rows.forEach(function (r) {
+    totalW += r.weight; if (r.clean) { cleanW += r.weight; cleanN++; }
+    var s = sub[r.item.cls] = sub[r.item.cls] || {clean: 0, total: 0}; s.total++; if (r.clean) s.clean++;
+  });
+  var mode = score ? 'supplied' : flagged ? 'report' : 'estimate';
+  /* specl-validate reports no figure when the gate fails: any Violation, or at
+     status production any Warning. Evaluate the same rule from whatever the
+     explorer was given, so a failing graph never shows a figure here that the
+     CLI would withhold. */
+  var gate = false, gateWhy = '';
+  if (score && score.gate_failed) { gate = true; gateWhy = 'the score reports a failed gate'; }
+  else if (report && report.results) {
+    var v = report.results.filter(function (x) { return x.severity === 'Violation'; }).length;
+    var w = report.results.length - v;
+    var st = report.status || (m.spec ? first(m.spec, P.status) : null);
+    if (v) { gate = true; gateWhy = v + ' violation' + (v === 1 ? '' : 's'); }
+    else if (st === 'production' && w) { gate = true; gateWhy = w + ' warning' + (w === 1 ? '' : 's') + ' at status production'; }
+  } else if (!score) {
+    var vio = 0; /* counted below, from the local evaluation */
+  }
+  var figure = score ? score.score : (pop.length ? Math.round(100 * cleanW / totalW) : null);
+  if (gate) figure = null;
+  if (!score && !flagged) {
+    var vcount = 0;
+    rows.forEach(function (r) { r.reasons.forEach(function (x) { if (x.severity === 'Violation') vcount++; }); });
+    var st2 = m.spec ? first(m.spec, P.status) : null;
+    if (vcount) { gate = true; gateWhy = vcount + ' violation' + (vcount === 1 ? '' : 's') + ' found here'; figure = null; }
+    else if (st2 === 'production' && rows.some(function (r) { return !r.clean; })) { gate = true; gateWhy = 'warnings at status production'; figure = null; }
+  }
+  var contributors = rows.filter(function (r) { return !r.clean; }).sort(function (a, b) { return b.weight - a.weight || naturalCompare(a.item.id, b.item.id); });
+  var def = grammar && grammar.score ? grammar.score : null;
+  var definition = {
+    population: def ? def.population : 'items of every item class, excluding itemStatus superseded or withdrawn',
+    clean: def ? def.clean : 'the item is the focus of no validation result at any severity, and an OpenIssue is not clean unless resolutionStatus is resolved or deferred',
+    weights: W,
+    figure: def ? def.figure : 'round(100 * sum(weight of clean items) / sum(weight of all items))',
+    mode: mode === 'supplied' ? 'The figure shown is the one specl-validate reported for this graph.'
+        : mode === 'report' ? 'Computed here from the supplied validation report, under specl-validate\u2019s definition; the gate is not evaluated, so a failing graph would still show a figure.'
+        : 'An estimate. No validation report was supplied, so each item is checked here against the shape expectations the explorer knows; shapes expressed as SPARQL are not evaluated. Supply a report or a score to replace it.',
+    exclusions: pop.length === m.items.length ? 'none' : (m.items.length - pop.length) + ' retired item' + (m.items.length - pop.length === 1 ? '' : 's') + ' excluded',
+    gate: gate ? 'No figure: the gate fails (' + gateWhy + '). specl-validate withholds a figure in this case, and so does this.' : 'The gate passes.'
+  };
+  return {mode: mode, score: figure, gateFailed: gate, gateWhy: gateWhy, clean: score ? score.clean : cleanN, total: score ? score.total : pop.length, subscores: score && score.subscores ? score.subscores : sub,
+          rows: rows, contributors: contributors, definition: definition};
+}
+function barColor(v) { return v == null ? 'var(--border)' : v < MAT_LOW ? 'var(--bad)' : v < MAT_HIGH ? 'var(--warn)' : 'var(--good)'; }
+
+/* Findings (R12.1, R12.2). */
+function findingsFor(report, iri) { return report && report.results ? report.results.filter(function (r) { return r.focus === iri; }) : []; }
+function findingCounts(report) { var c = {}; if (report && report.results) report.results.forEach(function (r) { c[r.focus] = (c[r.focus] || 0) + 1; }); return c; }
+
+/* Syntax reference (R13.1, R13.3). Everything comes from the grammar; the
+   item, when given, marks which keys its class expects and which it lacks. */
+function referenceModel(m, grammar, it) {
+  if (!grammar) return null;
+  var out = {specl: grammar.specl, contract: grammar.contract, generated: grammar.generated, generator: grammar.generator,
+             frontMatter: Object.assign({comment: grammar.documentComment}, grammar.frontMatter), sections: grammar.sections, prose: grammar.proseSections, markers: grammar.markers, itemForm: grammar.itemForm,
+             keys: grammar.keys, classes: []};
+  var classes = ['Specification'].concat(grammar.itemClasses || []);
+  classes.forEach(function (cls) {
+    var exp = (grammar.expectations && grammar.expectations[cls] || []).filter(function (e) { return e.key; });
+    var entry = {cls: cls, selected: !!it && it.cls === cls, expects: exp.map(function (e) {
+      var row = {key: e.key, severity: e.severity, message: e.message, condition: e.condition || null, allowed: e['in'] || null, required: e.minCount != null};
+      if (it && it.cls === cls) { var applies = conditionHolds(m, it, e.condition); row.applies = applies; row.present = !!(it.props[e.property || iriOfLocal(e.key)] || []).length; }
+      return row;
+    })};
+    var sec = (grammar.sections || []).filter(function (s) { return s['class'] === cls; });
+    entry.headings = sec.map(function (s) { return s.heading; }); entry.prefixes = sec.length ? sec[0].prefixes : [];
+    out.classes.push(entry);
+  });
+  return out;
+}
+/* ================================================================== DOM
+   Paints what the view model returns. Selection never rebuilds the list
+   (R4.9); only the active row changes. */
+if (typeof document !== 'undefined') {
+  var S = {model: null, selected: null, tab: 'detail', whole: false, filter: '', onlyClass: null, onlyState: null,
+           trail: [], pos: -1, listKey: '', grammar: null, report: null, score: null, drawer: false};
+  var $ = function (id) { return document.getElementById(id); };
+  /* Narrow screens show one pane at a time. The stylesheet decides what
+     "narrow" is; the script only records which pane was asked for, as a
+     class on <main>, and never consults matchMedia. With no class the
+     narrow layout shows the selection, which is the right default when
+     nothing is loaded (the empty state) and when something is. */
+  function setPane(mode) { document.querySelector('main').classList.toggle('mode-list', mode === 'list'); }
+  function currentPane() { return document.querySelector('main').classList.contains('mode-list') ? 'list' : 'detail'; }
+  function paneForSelection() { setPane('detail'); }
+  function slot(id) { var el = $(id); if (!el) return null; var t = el.textContent.trim(); if (!t) return null; try { return JSON.parse(t); } catch (e) { return null; } }
+  S.grammar = slot('slot-grammar');
+  var EXAMPLE = slot('slot-example'), SLOT_REPORT = slot('slot-report'), SLOT_SCORE = slot('slot-score');
+
+  /* ---------------------------------------------------------- header */
+  function renderHeader() {
+    var m = S.model;
+    var title = $('title');
+    title.textContent = m && m.spec ? (first(m.spec, P.title) || 'Untitled') : 'specl explorer';
+    title.disabled = !(m && m.spec);
+    $('status').textContent = m && m.spec ? (first(m.spec, P.status) || '\u2014') : 'no spec';
+    $('version').textContent = m && m.spec && first(m.spec, P.hasVersion) ? 'v' + first(m.spec, P.hasVersion) : '';
+    var c = $('contract');
+    c.textContent = m && m.contract ? 'contract ' + local(m.contract) + (m.contractKnown ? '' : ' \u00b7 not implemented by this explorer') : '';
+    c.className = 'meta' + (m && m.contract && !m.contractKnown ? ' bad' : '');
+    var mat = $('maturity'), bar = $('bar');
+    if (!m || !m.spec) { mat.textContent = 'maturity \u2014'; mat.title = ''; bar.style.width = '0'; bar.style.background = barColor(null); return; }
+    var r = currentReadiness();
+    mat.textContent = r.gateFailed ? 'no figure \u00b7 gate fails' : 'maturity ' + (r.score == null ? '\u2014' : r.score + '%') + (r.mode === 'estimate' ? ' (estimate)' : r.mode === 'report' ? ' (from report)' : '');
+    mat.title = r.definition.mode;
+    bar.style.width = (r.score || 0) + '%'; bar.style.background = barColor(r.score);
+    bar.parentNode.setAttribute('aria-label', 'maturity ' + (r.score == null ? 'undefined' : r.score + ' percent'));
+  }
+
+  /* ---------------------------------------------------------- report banner */
+  function renderReport() {
+    var m = S.model, el = $('report');
+    if (!m || !m.report.length) { el.hidden = true; el.innerHTML = ''; return; }
+    var severe = m.report.some(function (r) { return r.kind === 'no-specification' || r.kind === 'unknown-contract' || r.kind === 'malformed-statement'; });
+    el.className = 'report' + (severe ? ' bad' : '');
+    var n = m.report.length;
+    el.innerHTML = '<strong>' + n + ' thing' + (n === 1 ? '' : 's') + ' in this file ' + (n === 1 ? 'is' : 'are') + ' not shown</strong><ul>' +
+      m.report.map(function (r) {
+        var who = r.subject ? local(r.subject) : '';
+        var what = {'unrepresented-class': 'class not represented', 'malformed-statement': 'statement could not be read', 'untyped-subject': 'subject with no class',
+                    'orphan-list-cell': 'list cell with no owner', 'unknown-contract': 'contract not implemented', 'no-contract': 'no contract declared',
+                    'no-specification': 'no specification individual', 'duplicate-specification': 'second specification individual',
+                    'report-mismatch': 'validation report does not match', 'rejected-file': 'file not loaded'}[r.kind] || r.kind;
+        return '<li>' + esc(what) + (who ? ': <code>' + esc(who) + '</code>' : '') + (r.detail ? ' (' + esc(r.detail) + ')' : '') + (r.line ? ', line ' + r.line : '') + '</li>';
+      }).join('') + '</ul>';
+    el.hidden = false;
+  }
+
+  /* ---------------------------------------------------------- list */
+  function renderList() {
+    var m = S.model, list = $('list');
+    var key = m ? [S.filter, S.onlyClass || '', S.onlyState || '', S.report ? 'r' : ''].join('\u0000') : '';
+    if (!m) {
+      S.listKey = '';
+      list.innerHTML = '<div class="empty">No specification loaded. Use the file control above' + (EXAMPLE ? ', or <button class="btn" id="load-example-rail">load the example</button>' : '') + '.</div>';
+      var lb = $('load-example-rail'); if (lb) lb.onclick = loadExample;
+      return;
+    }
+    if (key === S.listKey && list.children.length) { paintActive(); return; }
+    S.listKey = key;
+    var groups = sidebarRows(m, S.filter, S.onlyClass, S.onlyState === 'retired' ? true : null);
+    var counts = findingCounts(S.report);
+    var fb = $('filterbar'), parts = [];
+    if (S.onlyClass) parts.push(CLASS_INFO[S.onlyClass] ? CLASS_INFO[S.onlyClass].label : S.onlyClass);
+    if (S.onlyState) parts.push(S.onlyState === 'clean' ? 'clean items' : S.onlyState === 'retired' ? 'retired items, excluded from the figure' : 'items not clean');
+    if (S.filter) parts.push('matching \u201c' + S.filter + '\u201d');
+    if (parts.length) { fb.hidden = false; fb.innerHTML = '<span>Showing ' + esc(parts.join(', ')) + '</span><button class="btn" id="clearfilter" type="button">show all</button>'; $('clearfilter').onclick = function () { S.onlyClass = null; S.onlyState = null; S.filter = ''; $('filter').value = ''; renderList(); renderPanel(); pushView(); }; }
+    else { fb.hidden = true; fb.innerHTML = ''; }
+    var cleanSet = null;
+    if (S.onlyState === 'clean' || S.onlyState === 'unclean') { cleanSet = {}; currentReadiness().rows.forEach(function (r) { cleanSet[r.item.iri] = r.clean; }); }
+    list.innerHTML = '';
+    if (!m.spec) return;
+    var shown = 0;
+    groups.forEach(function (g) {
+      var rows = g.pinned ? g.rows : g.rows.filter(function (r) { return !cleanSet || (S.onlyState === 'clean' ? cleanSet[r.iri] === true : cleanSet[r.iri] === false); });
+      if (!rows.length) return;
+      var gd = document.createElement('div'); gd.className = 'group' + (g.pinned ? ' pinned' : '');
+      gd.innerHTML = '<div class="group-label">' + esc(g.group) + (g.count != null ? ' <span class="n">' + rows.length + '</span>' : '') + '</div>';
+      rows.forEach(function (r) {
+        var d = document.createElement('div');
+        d.className = 'item ' + (CLASS_INFO[r.cls] ? CLASS_INFO[r.cls].cls : 'spec'); d.tabIndex = 0; d.dataset.iri = r.iri;
+        var why = r.match === 'description' || (r.match && r.match.indexOf('label:') === 0) ? '<div class="why">' + esc(r.match === 'description' ? 'matches description: ' : 'matches label: ') + esc(r.matchText || '') + '</div>' : '';
+        var fc = counts[r.iri] ? '<span class="fmark" title="' + counts[r.iri] + ' finding' + (counts[r.iri] === 1 ? '' : 's') + '">!' + counts[r.iri] + '</span>' : '';
+        d.innerHTML = '<div class="row"><span class="glyph">' + esc(r.glyph) + '</span><span class="id">' + esc(r.id) + '</span>' + (r.sub ? '<span class="sub">' + esc(r.sub) + '</span>' : '') + fc + '</div><div class="preview">' + esc(r.label) + '</div>' + why;
+        d.onclick = function () { select(r.iri, S.tab, false); };
+        d.onkeydown = function (e) {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); select(r.iri, S.tab, false); }
+          else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); var all = Array.prototype.slice.call(list.querySelectorAll('.item')); var i = all.indexOf(d) + (e.key === 'ArrowDown' ? 1 : -1); if (i >= 0 && i < all.length) all[i].focus(); }
+        };
+        gd.appendChild(d); if (!g.pinned) shown++;
+      });
+      list.appendChild(gd);
+    });
+    if (!m.items.length) { var e = document.createElement('div'); e.className = 'empty'; e.textContent = 'This file contains a specification and no items.'; list.appendChild(e); }
+    else if (!shown) { var e2 = document.createElement('div'); e2.className = 'empty'; e2.textContent = 'No items match.'; list.appendChild(e2); }
+    paintActive();
+  }
+  function paintActive() {
+    var list = $('list'), sel = S.selected;
+    Array.prototype.forEach.call(list.querySelectorAll('.item'), function (d) {
+      var on = sel && d.dataset.iri === sel.iri;
+      d.classList.toggle('active', !!on); if (on) d.setAttribute('aria-current', 'true'); else d.removeAttribute('aria-current');
+    });
+  }
+
+  /* ---------------------------------------------------------- panel */
+  function refHtml(v) {
+    if (!v.resolvable) return '<span class="ref unresolved" title="' + esc(v.iri) + '">' + esc(v.label) + ' <em>(unresolved)</em></span>';
+    if (!v.isItem) return '<span class="ref node" title="' + esc(v.iri) + '">' + esc(v.label) + '</span>';
+    return '<a class="ref" href="' + esc(encodeHash(v.id, 'detail')) + '" data-iri="' + esc(v.iri) + '">' + esc(v.id) + '</a> <span class="reflabel">' + esc(v.label) + '</span>';
+  }
+  function itemLink(it) { return '<a class="ref" href="' + esc(encodeHash(it.id, 'detail')) + '" data-iri="' + esc(it.iri) + '">' + esc(it.id) + '</a> <span class="reflabel">' + esc(labelOf(it)) + '</span>'; }
+  function reasonsHtml(reasons) { return reasons.map(function (r) { return '<li><code>' + esc(r.key) + '</code> ' + esc(r.why) + (r.message ? ' <span class="muted">\u2014 ' + esc(r.message) + '</span>' : '') + '</li>'; }).join(''); }
+  function definitionHtml(r) {
+    var d = r.definition;
+    return '<details class="def"><summary>How this figure is computed</summary><dl class="tight">' +
+      '<dt>counted</dt><dd>' + esc(d.population) + '</dd><dt>clean means</dt><dd>' + esc(d.clean) + '</dd>' +
+      '<dt>weights</dt><dd>' + esc(Object.keys(d.weights).map(function (k) { return k + ' ' + d.weights[k]; }).join(', ')) + '</dd>' +
+      '<dt>figure</dt><dd>' + esc(d.figure) + '</dd><dt>exclusions</dt><dd>' + esc(d.exclusions) + '</dd><dt>gate</dt><dd>' + esc(d.gate) + '</dd><dt>this run</dt><dd>' + esc(d.mode) + '</dd></dl></details>';
+  }
+
+  function renderPanel() {
+    var m = S.model, panel = $('panel');
+    if (!m) {
+      panel.className = 'empty';
+      panel.innerHTML = '<p>Open a <code>spec.ttl</code>, drop one here, or load the example.</p>' +
+        '<p>A <code>spec.ttl</code> is produced from a specl markdown specification with <code>specl-translate spec.md spec.ttl</code>. A validation report from <code>specl-validate validate --json</code> can be dropped alongside it.</p>' +
+        '<p><label class="btn file-btn">Open a spec.ttl\u2026<input type="file" id="file2" accept=".ttl,.json" multiple aria-label="Load spec.ttl"></label></p>' +
+        (EXAMPLE ? '<p><button class="btn" id="load-example">Load the example: ' + esc(EXAMPLE.title || 'the explorer\u2019s own specification') + (EXAMPLE.version ? ' v' + esc(EXAMPLE.version) : '') + '</button></p>' : '<p class="muted">No example is embedded in this copy of the explorer.</p>');
+      var b = $('load-example'); if (b) b.onclick = loadExample;
+      $('file2').onchange = onFiles;
+      setPane('detail');
+      return;
+    }
+    if (!m.spec) { panel.className = 'empty error'; panel.innerHTML = '<p>No <code>specl:Specification</code> individual was found in this file.</p><p>The explorer reads the Turtle that <code>specl-translate</code> emits; a file it produces always carries one. Check that the right file was loaded.</p>'; return; }
+    var it = S.selected || m.spec;
+    panel.className = '';
+    var head = '<h2><span class="glyph">' + esc(GLYPH[it.cls] || it.cls) + '</span> ' + esc(headingOf(it)) + '</h2><div class="type"><span class="iri" title="' + esc(it.iri) + '">' + esc(it.iri) + '</span></div>';
+    var prov = provenanceOf(m, it);
+    if (prov) head += '<div class="prov">from ' + esc(prov.document) + (prov.line ? ':' + esc(prov.line) : '') + '</div>';
+    if (S.tab === 'ttl') {
+      var whole = S.whole;
+      panel.innerHTML = head + '<div class="rawbar"><button class="btn' + (!whole ? ' on' : '') + '" data-whole="0" aria-pressed="' + !whole + '">This item</button><button class="btn' + (whole ? ' on' : '') + '" data-whole="1" aria-pressed="' + whole + '">Whole file</button><span class="meta">' + (whole ? 'the file as loaded' : 'this item\u2019s statements, and the list cells it owns') + '</span></div><pre class="numbered">' + rawLines(m, it, whole).map(function (l) { return l.gap ? '<span class="line gap" data-n="\u22ef"></span>' : '<span class="line" data-n="' + l.n + '">' + l.html + '</span>'; }).join('\n') + '</pre>';
+      Array.prototype.forEach.call(panel.querySelectorAll('[data-whole]'), function (b) { b.onclick = function () { S.whole = b.dataset.whole === '1'; writeHash(); renderPanel(); pushView(); }; });
+      return;
+    }
+    var html = head;
+    var r = currentReadiness();
+    var mine = null; r.rows.forEach(function (x) { if (x.item === it) mine = x; });
+    if (it.cls === 'Specification') {
+      var c = specCounts(m), notClean = r.total - r.clean;
+      html += '<div class="chips"><button class="chip' + (!S.onlyClass && !S.onlyState ? ' on' : '') + '" data-all="1">' + c.total + ' items</button>' +
+        (c.retired ? '<button class="chip' + (S.onlyState === 'retired' ? ' on' : '') + '" data-state="retired" title="Retired items are excluded from the figure below">' + c.retired + ' retired</button>' : '') +
+        c.byClass.map(function (b) { return '<button class="chip' + (S.onlyClass === b.cls ? ' on' : '') + '" data-cls="' + esc(b.cls) + '">' + b.count + ' ' + esc(b.label) + '</button>'; }).join('') +
+        '</div><div class="chips">' +
+        '<button class="chip figure" data-raise="1" style="border-color:' + barColor(r.score) + '" title="' + esc(r.definition.gate) + '">' + (r.gateFailed ? 'no figure \u00b7 gate fails (' + esc(r.gateWhy) + ')' : 'maturity ' + (r.score == null ? '\u2014' : r.score + '%') + (r.mode !== 'supplied' ? ' \u00b7 ' + (r.mode === 'report' ? 'from report' : 'estimate') : '')) + '</button>' +
+        '<button class="chip' + (S.onlyState === 'clean' ? ' on' : '') + '" data-state="clean">' + r.clean + ' clean</button>' +
+        '<button class="chip' + (S.onlyState === 'unclean' ? ' on' : '') + '" data-state="unclean">' + notClean + ' not clean</button>' +
+        '<span class="chip muted">of ' + c.counted + ' counted' + (c.retired ? ', ' + c.retired + ' retired excluded' : '') + '</span>' +
+        '<span class="chip muted">' + (S.report ? (S.report.results || []).length + ' findings loaded' : 'no validation report loaded') + '</span></div>' + definitionHtml(r);
+      if (r.contributors.length) {
+        html += '<h3 id="raise">What would raise the figure</h3><p class="muted">Items not clean, heaviest first. Each names what the shapes want and it lacks.</p><ol class="contrib">' +
+          r.contributors.slice(0, 40).map(function (x) { return '<li>' + itemLink(x.item) + ' <span class="muted">(weight ' + x.weight + ')</span><ul>' + reasonsHtml(x.reasons) + '</ul></li>'; }).join('') +
+          (r.contributors.length > 40 ? '<li class="muted">and ' + (r.contributors.length - 40) + ' more; the \u201cnot clean\u201d chip lists them all</li>' : '') + '</ol>';
+      }
+    } else if (mine) {
+      html += '<div class="chips"><span class="chip ' + (mine.clean ? 'good' : 'warn') + '" title="' + esc(r.definition.mode) + '">' + (mine.clean ? 'clean' : 'not clean') + ' \u00b7 ' + (r.mode === 'estimate' ? 'estimate' : 'specl-validate') + '</span></div>';
+    } else if (isRetired(it)) {
+      html += '<div class="chips"><span class="chip muted">retired; not counted</span></div>';
+    }
+    var rows = detailRows(m, it, S.grammar);
+    html += '<dl>' + rows.map(function (rr) {
+      var dd;
+      if (rr.absent) dd = '<span class="missing">not set</span>';
+      else dd = rr.values.map(function (v) { return '<span class="v">' + (v.kind === 'ref' ? refHtml(v) : esc(v.text)) + '</span>'; }).join('');
+      if (rr.details) dd += '<ul class="details">' + rr.details.map(function (d) { return '<li>' + esc(d) + '</li>'; }).join('') + '</ul>';
+      return '<dt' + (rr.absent ? ' class="absent"' : '') + '>' + esc(rr.key) + '</dt><dd>' + dd + '</dd>';
+    }).join('') + '</dl>';
+    if (mine && mine.reasons.length) html += '<h3>Not clean because</h3><ul class="contrib">' + reasonsHtml(mine.reasons) + '</ul>';
+    if (it.cls !== 'Specification') {
+      var fs = findingsFor(S.report, it.iri);
+      if (S.report) html += '<h3>Findings</h3>' + (fs.length ? '<ul class="contrib">' + fs.map(function (f) { return '<li><span class="sev ' + esc(f.severity) + '">' + esc(f.severity) + '</span> <code>' + esc(local(f.path || '')) + '</code> ' + esc(f.message) + '</li>'; }).join('') + '</ul>' : '<p class="muted">None against this item.</p>');
+      else html += '<p class="muted small">Findings unavailable: no validation report loaded.</p>';
+    }
+    var bl = backlinks(m, it);
+    if (bl.length) html += '<h3>Referenced by</h3><dl>' + bl.map(function (g) { return '<dt>' + esc(g.key) + '</dt><dd>' + g.items.map(function (x) { return '<span class="v"><a class="ref" href="' + esc(encodeHash(x.id, 'detail')) + '" data-iri="' + esc(x.iri) + '">' + esc(x.id) + '</a> <span class="reflabel">' + esc(x.label) + '</span></span>'; }).join('') + '</dd>'; }).join('') + '</dl>';
+    panel.innerHTML = html;
+    Array.prototype.forEach.call(panel.querySelectorAll('a.ref'), function (a) { a.onclick = function (e) { e.preventDefault(); select(a.dataset.iri, 'detail', false); }; });
+    Array.prototype.forEach.call(panel.querySelectorAll('button.chip'), function (b) { b.onclick = function () {
+      if (b.dataset.raise) { var h = $('raise') || panel.querySelector('details.def'); if (h) { if (h.tagName === 'DETAILS') h.open = true; h.scrollIntoView({block: 'start'}); } return; }
+      if (b.dataset.all) { S.onlyClass = null; S.onlyState = null; }
+      else if (b.dataset.cls !== undefined) { S.onlyClass = S.onlyClass === b.dataset.cls ? null : b.dataset.cls; }
+      else if (b.dataset.state !== undefined) { S.onlyState = S.onlyState === b.dataset.state ? null : b.dataset.state; }
+      renderList(); renderPanel();
+      /* Open the population: on a phone the list is the other pane. No effect on a wide screen, where the list is already beside. */
+      setPane('list'); pushView();
+      var row = $('list').querySelector('.group:not(.pinned) .item'); if (row && row.focus) row.focus();
+    }; });
+  }
+
+  /* ---------------------------------------------------------- reference drawer (R13) */
+  function renderDrawer() {
+    var dr = $('drawer'); dr.hidden = !S.drawer; $('syntax').setAttribute('aria-expanded', S.drawer ? 'true' : 'false');
+    if (!S.drawer) return;
+    var it = S.selected || null;
+    var ref = referenceModel(S.model || {nodes: {}}, S.grammar, it);
+    if (!ref) { dr.innerHTML = '<div class="drawer-head"><strong>Syntax reference</strong><button class="btn" id="drawer-close">close</button></div><p class="muted">This copy of the explorer was not built with a grammar, so the reference is unavailable. The built file carries one generated from the specl version it was built against.</p>'; $('drawer-close').onclick = toggleDrawer; return; }
+    var h = '<div class="drawer-head"><strong>Syntax reference</strong><span class="muted">specl ' + esc(ref.specl) + ' \u00b7 contract ' + esc(local(ref.contract)) + ' \u00b7 generated ' + esc(ref.generated) + '</span><button class="btn" id="drawer-close">close</button></div>';
+    var FM_NOTE = {
+      spec_base: 'IRI every item hangs off. The only required key.',
+      prefix: 'Short label for the specification.',
+      spec_id: 'Stable identifier for the specification.',
+      title: 'Human-readable name.',
+      version: 'Version of the specification, not of what it describes.',
+      status: 'One of ' + ref.frontMatter.statusValues.join(', ') + '.',
+      item_prefix: 'Override the identifier prefix a section mints.',
+      references: 'Bases that a CURIE in a reference key resolves against.',
+      vocabularies: 'Extra namespaces an annotation value may use.',
+      sections: 'Map a heading of your own onto a class.',
+      companion_files: 'Files that travel with the specification.',
+      dependsOn: 'Another specification this one depends on.',
+      upstreamOf: 'Another specification downstream of this one.',
+      refines: 'Another specification this one refines.'
+    };
+    h += '<h4>Front matter</h4><table><tr><th>Key</th><th></th><th>Note</th></tr>' +
+      ref.frontMatter.recognised.map(function (k) {
+        var req = ref.frontMatter.required.indexOf(k) >= 0;
+        return '<tr><td><code>' + esc(k) + '</code></td><td class="muted">' + (req ? 'required' : 'optional') + '</td><td class="muted">' + esc(FM_NOTE[k] || '') + '</td></tr>';
+      }).join('') + '</table>' +
+      '<p class="muted">A document comment may follow the front matter: <code>' + esc(ref.frontMatter.comment || '<!--specl\ncreated: YYYY-MM-DD\n-->') + '</code></p>';
+    h += '<h4>Sections</h4><table><tr><th>Heading</th><th>Class</th><th>ID prefix</th></tr>' + ref.sections.map(function (s) { return '<tr><td>' + esc(s.heading) + '</td><td>' + esc(s['class']) + '</td><td><code>' + esc(s.prefixes.join(', ')) + '</code></td></tr>'; }).join('') + '<tr><td>' + esc(ref.prose.join(', ')) + '</td><td colspan="2" class="muted">prose; no items</td></tr></table>';
+    h += '<p class="muted">Markers: <code>' + esc(ref.markers.parked) + '</code> parks a heading no class models yet; <code>' + esc(ref.markers.prose) + '</code> declares prose under an item heading deliberate.</p>';
+    h += '<h4>Item form</h4><pre>' + esc(ref.itemForm) + '</pre>';
+    h += '<h4>Annotation keys</h4><table><tr><th>Key</th><th>Property</th><th></th></tr>' + ref.keys.map(function (k) { return '<tr><td><code>' + esc(k.key) + '</code></td><td class="muted small">' + esc(k.property || (k.resolvesTo ? 'decisionStatus on a decision, resolutionStatus otherwise' : '')) + '</td><td class="muted">' + (k.reference ? 'reference' + (k.range ? ' to ' + esc(local(k.range)) : '') : k.contextual ? 'context-sensitive' : 'literal') + '</td></tr>'; }).join('') + '</table>';
+    h += '<h4>What each class expects</h4>';
+    ref.classes.forEach(function (c) {
+      if (!c.expects.length && !c.selected) return;
+      h += '<details' + (c.selected ? ' open class="sel"' : '') + '><summary>' + esc(c.cls) + (c.headings.length ? ' <span class="muted">under \u201c' + esc(c.headings[0]) + '\u201d, prefix ' + esc(c.prefixes[0] || '') + '</span>' : '') + (c.selected ? ' <span class="tag">selected item</span>' : '') + '</summary><ul class="expect">' +
+        c.expects.map(function (e) {
+          var state = c.selected ? (e.applies === false ? 'n/a' : e.present ? 'present' : e.required ? 'absent' : 'optional') : '';
+          return '<li class="' + state + '"><code>' + esc(e.key) + '</code> <span class="sev ' + esc(e.severity) + '">' + esc(e.severity) + '</span>' + (state ? ' <span class="state">' + state + '</span>' : '') + (e.allowed ? ' <span class="muted">one of ' + esc(e.allowed.join(', ')) + '</span>' : '') + (e.condition ? ' <span class="muted">when ' + esc(JSON.stringify(e.condition)) + '</span>' : '') + '<div class="muted small">' + esc(e.message) + '</div></li>';
+        }).join('') + '</ul></details>';
+    });
+    dr.innerHTML = h;
+    $('drawer-close').onclick = toggleDrawer;
+  }
+  function toggleDrawer() { S.drawer = !S.drawer; renderDrawer(); }
+
+  function renderTabs() {
+    document.querySelector('.tabbar').hidden = !S.model;
+    $('panel').setAttribute('aria-labelledby', 'tab-' + S.tab);
+    Array.prototype.forEach.call(document.querySelectorAll('.tabs [role=tab]'), function (b) { var on = b.dataset.tab === S.tab; b.classList.toggle('active', on); b.setAttribute('aria-selected', on ? 'true' : 'false'); b.tabIndex = on ? 0 : -1; });
+    $('back').disabled = S.pos <= 0; $('fwd').disabled = S.pos >= S.trail.length - 1;
+  }
+  function renderAll() { renderHeader(); renderReport(); renderList(); renderTabs(); renderPanel(); renderDrawer(); }
+  /* One readiness per paint: the header, the list filter and the panel all read it. */
+  function currentReadiness() { if (!S._r || S._rk !== (S.report ? 'r' : '') + (S.score ? 's' : '')) { S._r = readiness(S.model, S.grammar, S.report, S.score); S._rk = (S.report ? 'r' : '') + (S.score ? 's' : ''); } return S._r; }
+
+  /* ---------------------------------------------------------- selection, trail, fragment */
+  /* A trail entry is a view, not a selection: which item, which tab, which
+     pane, and how the list was narrowed. Going back from an item reached
+     through a chip therefore returns to that narrowed list, which is what
+     "back" means to someone who got there by tapping. Typing in the filter
+     box does not push; discrete navigations do. */
+  function snapshot() { return {iri: S.selected ? S.selected.iri : null, tab: S.tab, whole: S.whole, pane: currentPane(), onlyClass: S.onlyClass, onlyState: S.onlyState, filter: S.filter}; }
+  function sameView(a, b) { return a && b && a.iri === b.iri && a.tab === b.tab && a.whole === b.whole && a.pane === b.pane && a.onlyClass === b.onlyClass && a.onlyState === b.onlyState && a.filter === b.filter; }
+  function pushView() {
+    var v = snapshot();
+    if (sameView(S.trail[S.pos], v)) return;
+    S.trail = S.trail.slice(0, S.pos + 1); S.trail.push(v); S.pos = S.trail.length - 1;
+    renderTabs();
+  }
+  function restore(v) {
+    S.tab = v.tab; S.whole = v.whole; S.onlyClass = v.onlyClass; S.onlyState = v.onlyState; S.filter = v.filter;
+    $('filter').value = v.filter || '';
+    S.selected = v.iri && S.model ? (v.iri === (S.model.spec && S.model.spec.iri) ? S.model.spec : S.model.index.resolve(v.iri)) : null;
+    renderList(); setPane(v.pane); writeHash(); renderTabs(); renderPanel(); if (S.drawer) renderDrawer();
+    scrollToActive();
+  }
+  function scrollToActive() {
+    if (!S.selected) return;
+    var row = $('list').querySelector('.item[data-iri="' + S.selected.iri.replace(/"/g, '\\"') + '"]');
+    if (row && row.scrollIntoView) row.scrollIntoView({block: 'nearest'});
+  }
+  function select(iri, tab, fromTrail) {
+    var m = S.model; if (!m) return;
+    var it = iri === (m.spec && m.spec.iri) ? m.spec : m.index.resolve(iri);
+    if (!it || (it.cls !== 'Specification' && ITEM_CLASSES.indexOf(it.cls) < 0)) return;
+    S.selected = it; if (tab) S.tab = tab;
+    if (!fromTrail) paneForSelection();
+    writeHash(); paintActive(); renderTabs(); renderPanel(); if (S.drawer) renderDrawer();
+    if (!fromTrail) pushView();
+    scrollToActive();
+  }
+  function writeHash() {
+    if (!S.selected) return;
+    var h = encodeHash(S.selected.id, S.tab, S.whole); if (location.hash === h) return;
+    try { history.replaceState(null, '', h); } catch (e) { location.hash = h; }
+  }
+  function applyHash() {
+    var h = decodeHash(location.hash); if (!h || !S.model) return false;
+    var it = findById(S.model, h.id); if (!it) return false;
+    if (S.selected === it && S.tab === h.tab && S.whole === h.whole) return true;
+    S.whole = h.whole; select(it.iri, h.tab, false); return true;
+  }
+
+  /* ---------------------------------------------------------- loading */
+  function loadGraph(text, meta) {
+    S.model = parse(text); S.selected = null; S.trail = []; S.pos = -1; S.filter = ''; S.onlyClass = null; S.onlyState = null; S.listKey = ''; $('filter').value = '';
+    S.report = meta && meta.report || null; S.score = meta && meta.score || null; S._r = null;
+    renderAll();
+    if (S.model.spec && !applyHash()) select(S.model.spec.iri, 'detail', false);
+    setPane(S.model.spec ? 'detail' : 'list');
+  }
+  function loadExample() { if (EXAMPLE) loadGraph(EXAMPLE.turtle || '', {report: SLOT_REPORT, score: SLOT_SCORE}); }
+  async function onFiles(e) { var fs = e.target.files; for (var i = 0; i < fs.length; i++) await loadFile(fs[i]); try { e.target.value = ''; } catch (x) {} }
+  $('file').onchange = onFiles;
+  function note(kind, detail) { if (S.model) { S.model.report.push({kind: kind, detail: detail}); renderReport(); } else { $('panel').className = 'empty error'; $('panel').textContent = detail; } }
+  function loadJson(text) {
+    var j; try { j = JSON.parse(text); } catch (e) { note('rejected-file', 'a dropped file was not JSON and not Turtle; nothing loaded'); return; }
+    if (j && Array.isArray(j.results)) {
+      S.report = j; S.listKey = ''; S._r = null;
+      if (S.model && j.results.length && !j.results.some(function (r) { return S.model.index.isResolvable(r.focus); }))
+        S.model.report.push({kind: 'report-mismatch', detail: 'the validation report names no subject in this graph; it may belong to another specification'});
+      renderAll(); return;
+    }
+    if (j && ('score' in j) && ('total' in j)) { S.score = j; S._r = null; renderAll(); return; }
+    if (j && j.keys && j.expectations) { S.grammar = j; S.listKey = ''; S._r = null; renderAll(); return; }
+    note('rejected-file', 'a dropped JSON file was not a validation report, a score, or a grammar; nothing loaded');
+  }
+  async function loadFile(f) {
+    if (!f) return; var text = await f.text();
+    if (/\.json$/i.test(f.name || '') || /^\s*\{/.test(text)) loadJson(text); else loadGraph(text, null);
+  }
+
+  $('filter').oninput = function (e) { S.filter = e.target.value.trim(); renderList(); };
+  $('title').onclick = function () { if (S.model && S.model.spec) select(S.model.spec.iri, S.tab, false); };
+  $('syntax').onclick = toggleDrawer;
+  /* Dark, light, or follow the system. Not persisted: the file holds no state
+     between openings, and a theme is one tap to set. */
+  var THEMES = ['dark', 'light', 'auto'];
+  $('theme').onclick = function () {
+    var el = document.documentElement;
+    var next = THEMES[(THEMES.indexOf(el.getAttribute('data-theme')) + 1) % THEMES.length];
+    el.setAttribute('data-theme', next); $('theme').textContent = next;
+  };
+  $('panes').onclick = function () { setPane('list'); var row = $('list').querySelector('.item.active') || $('list').querySelector('.item'); if (row) row.focus(); };
+  $('maturity').onclick = function () { if (S.model && S.model.spec) select(S.model.spec.iri, 'detail', false); };
+  Array.prototype.forEach.call(document.querySelectorAll('.tabs [role=tab]'), function (b) {
+    b.onclick = function () { S.tab = b.dataset.tab; writeHash(); renderTabs(); renderPanel(); pushView(); };
+    b.onkeydown = function (e) { if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') { var tabs = Array.prototype.slice.call(document.querySelectorAll('.tabs [role=tab]')); var i = tabs.indexOf(b) + (e.key === 'ArrowRight' ? 1 : -1); if (i >= 0 && i < tabs.length) { tabs[i].click(); tabs[i].focus(); } } };
+  });
+  $('back').onclick = function () { if (S.pos > 0) { S.pos--; restore(S.trail[S.pos]); } };
+  $('fwd').onclick = function () { if (S.pos < S.trail.length - 1) { S.pos++; restore(S.trail[S.pos]); } };
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && S.drawer) toggleDrawer(); });
+  window.addEventListener('hashchange', function () { applyHash(); });
+  var ov = $('overlay'), dc = 0;
+  window.addEventListener('dragenter', function (e) { e.preventDefault(); dc++; ov.classList.add('active'); });
+  window.addEventListener('dragleave', function (e) { e.preventDefault(); if (--dc <= 0) ov.classList.remove('active'); });
+  window.addEventListener('dragover', function (e) { e.preventDefault(); });
+  window.addEventListener('drop', async function (e) { e.preventDefault(); dc = 0; ov.classList.remove('active'); var fs = e.dataTransfer.files; for (var i = 0; i < fs.length; i++) await loadFile(fs[i]); });
+  renderAll();
+  /* A composed copy carries a bundled graph marked autoload (S4): open on it. */
+  if (EXAMPLE && EXAMPLE.autoload) loadExample();
+}
+</script></body></html>

@@ -1,0 +1,144 @@
+{
+ "spec": "specl Spec Explorer — review round 2, acceptance criteria",
+ "version": "1.0.0",
+ "scope": "whole specification",
+ "exported": "2026-08-30T21:29:06.090Z",
+ "filter": "needs review only",
+ "answered": 43,
+ "total": 43,
+ "items": {
+  "R1.1": {
+   "verdict": "keep"
+  },
+  "R1.2": {
+   "verdict": "keep"
+  },
+  "R1.3": {
+   "verdict": "change",
+   "comment": "I don't know that it has to. Alternatively the explorer can be shipped via CI artifact and downloadable via the hosted page. "
+  },
+  "R1.5": {
+   "verdict": "keep"
+  },
+  "R2.1": {
+   "verdict": "keep"
+  },
+  "R2.2": {
+   "verdict": "keep",
+   "comment": "Turtle parser and likely lsp /syntax highlighter"
+  },
+  "R2.3": {
+   "verdict": "keep"
+  },
+  "R2.4": {
+   "verdict": "keep"
+  },
+  "R2.5": {
+   "verdict": "keep"
+  },
+  "R3.1": {
+   "verdict": "keep"
+  },
+  "R3.2": {
+   "verdict": "keep"
+  },
+  "R3.3": {
+   "verdict": "keep"
+  },
+  "R3.4": {
+   "verdict": "keep"
+  },
+  "R3.5": {
+   "verdict": "keep"
+  },
+  "R4.1": {
+   "verdict": "keep"
+  },
+  "R4.2": {
+   "verdict": "keep"
+  },
+  "R4.3": {
+   "verdict": "keep"
+  },
+  "R4.4": {
+   "verdict": "keep"
+  },
+  "R4.5": {
+   "verdict": "change",
+   "comment": "Item id, label, and description"
+  },
+  "R5.1": {
+   "verdict": "keep"
+  },
+  "R5.2": {
+   "verdict": "keep"
+  },
+  "R5.3": {
+   "verdict": "keep"
+  },
+  "R5.4": {
+   "verdict": "keep"
+  },
+  "R5.5": {
+   "verdict": "keep"
+  },
+  "R6.1": {
+   "verdict": "keep"
+  },
+  "R6.2": {
+   "verdict": "keep"
+  },
+  "R6.3": {
+   "verdict": "keep"
+  },
+  "R6.4": {
+   "verdict": "keep"
+  },
+  "R6.5": {
+   "verdict": "keep"
+  },
+  "R7.1": {
+   "verdict": "keep"
+  },
+  "R7.3": {
+   "verdict": "keep"
+  },
+  "R7.4": {
+   "verdict": "keep"
+  },
+  "R7.5": {
+   "verdict": "keep"
+  },
+  "R8.2": {
+   "verdict": "keep"
+  },
+  "R8.3": {
+   "verdict": "keep"
+  },
+  "R9.1": {
+   "verdict": "keep"
+  },
+  "R9.2": {
+   "verdict": "keep"
+  },
+  "R9.3": {
+   "verdict": "keep"
+  },
+  "R9.4": {
+   "verdict": "keep"
+  },
+  "R10.1": {
+   "verdict": "keep"
+  },
+  "R10.2": {
+   "verdict": "keep"
+  },
+  "R10.3": {
+   "verdict": "keep"
+  },
+  "R10.4": {
+   "verdict": "keep"
+  }
+ },
+ "proposals": {}
+}

@@ -1,0 +1,750 @@
+{
+ "specl": "1.0.0",
+ "contract": "https://w3id.org/specl/contract/2",
+ "generated": "2026-09-01T13:10:17+00:00",
+ "generator": "explorer/build/grammar.py (interim; see UP-3)",
+ "frontMatter": {
+  "required": [
+   "spec_base"
+  ],
+  "recognised": [
+   "spec_base",
+   "prefix",
+   "spec_id",
+   "title",
+   "version",
+   "status",
+   "item_prefix",
+   "references",
+   "vocabularies",
+   "sections",
+   "companion_files",
+   "dependsOn",
+   "upstreamOf",
+   "refines"
+  ],
+  "statusValues": [
+   "draft",
+   "prototype",
+   "review",
+   "production"
+  ]
+ },
+ "documentComment": "<!--specl created: YYYY-MM-DD -->",
+ "sections": [
+  {
+   "heading": "Requirements",
+   "class": "Requirement",
+   "prefixes": [
+    "R"
+   ]
+  },
+  {
+   "heading": "User Stories",
+   "class": "UserStory",
+   "prefixes": [
+    "US"
+   ]
+  },
+  {
+   "heading": "Open Questions and Gaps (flag for follow-up)",
+   "class": "OpenIssue",
+   "prefixes": [
+    "OQ"
+   ]
+  },
+  {
+   "heading": "Open Questions and Gaps",
+   "class": "OpenIssue",
+   "prefixes": [
+    "OQ"
+   ]
+  },
+  {
+   "heading": "Open Questions",
+   "class": "OpenIssue",
+   "prefixes": [
+    "OQ"
+   ]
+  },
+  {
+   "heading": "Open Issues",
+   "class": "OpenIssue",
+   "prefixes": [
+    "OQ"
+   ]
+  },
+  {
+   "heading": "Decisions",
+   "class": "DecisionRecord",
+   "prefixes": [
+    "D"
+   ]
+  },
+  {
+   "heading": "Design Considerations",
+   "class": "DesignNote",
+   "prefixes": [
+    "DN"
+   ]
+  },
+  {
+   "heading": "Comments",
+   "class": "Comment",
+   "prefixes": [
+    "C"
+   ]
+  },
+  {
+   "heading": "Acceptance Queries",
+   "class": "AcceptanceQuery",
+   "prefixes": [
+    "Q"
+   ]
+  },
+  {
+   "heading": "Personas",
+   "class": "Persona",
+   "prefixes": [
+    "P"
+   ]
+  },
+  {
+   "heading": "Agents",
+   "class": "Agent",
+   "prefixes": [
+    "AG"
+   ]
+  }
+ ],
+ "proseSections": [
+  "Intent",
+  "Purpose"
+ ],
+ "mappableClasses": {
+  "Requirement": [
+   "R"
+  ],
+  "UserStory": [
+   "US"
+  ],
+  "OpenIssue": [
+   "OQ"
+  ],
+  "DecisionRecord": [
+   "D"
+  ],
+  "AcceptanceQuery": [
+   "Q"
+  ],
+  "DesignNote": [
+   "DN"
+  ],
+  "Comment": [
+   "C"
+  ]
+ },
+ "markers": {
+  "parked": "<!--specl: parked-->",
+  "prose": "<!--specl: prose-->"
+ },
+ "itemForm": "- <PREFIX><n>[.<n>] <description>\n  - <key>: <value>\n    - <detail line>",
+ "keys": [
+  {
+   "key": "title",
+   "property": "http://purl.org/dc/terms/title"
+  },
+  {
+   "key": "priority",
+   "property": "https://w3id.org/specl/ns#priority"
+  },
+  {
+   "key": "acceptance",
+   "property": "https://w3id.org/specl/ns#acceptanceCriterion"
+  },
+  {
+   "key": "verifiedBy",
+   "property": "https://w3id.org/specl/ns#verifiedBy",
+   "reference": true,
+   "range": "https://w3id.org/specl/ns#Test"
+  },
+  {
+   "key": "constrains",
+   "property": "https://w3id.org/specl/ns#constrains",
+   "reference": true,
+   "range": "https://w3id.org/specl/ns#Component"
+  },
+  {
+   "key": "role",
+   "property": "https://w3id.org/specl/ns#role",
+   "reference": true
+  },
+  {
+   "key": "capability",
+   "property": "https://w3id.org/specl/ns#capability"
+  },
+  {
+   "key": "benefit",
+   "property": "https://w3id.org/specl/ns#benefit"
+  },
+  {
+   "key": "altLabel",
+   "property": "http://www.w3.org/2004/02/skos/core#altLabel"
+  },
+  {
+   "key": "prefLabel",
+   "property": "http://www.w3.org/2004/02/skos/core#prefLabel"
+  },
+  {
+   "key": "owner",
+   "property": "https://w3id.org/specl/ns#owner",
+   "reference": true
+  },
+  {
+   "key": "recommendation",
+   "property": "https://w3id.org/specl/ns#recommendation"
+  },
+  {
+   "key": "rationale",
+   "property": "https://w3id.org/specl/ns#rationale"
+  },
+  {
+   "key": "affects",
+   "property": "https://w3id.org/specl/ns#affects",
+   "reference": true
+  },
+  {
+   "key": "supersededBy",
+   "property": "https://w3id.org/specl/ns#supersededBy",
+   "reference": true
+  },
+  {
+   "key": "gates",
+   "property": "https://w3id.org/specl/ns#gates",
+   "reference": true
+  },
+  {
+   "key": "governs",
+   "property": "https://w3id.org/specl/ns#governs",
+   "reference": true,
+   "range": "https://w3id.org/specl/ns#vocabulary"
+  },
+  {
+   "key": "itemStatus",
+   "property": "https://w3id.org/specl/ns#itemStatus"
+  },
+  {
+   "key": "implementation",
+   "property": "https://w3id.org/specl/ns#implementationStatus"
+  },
+  {
+   "key": "status",
+   "contextual": true,
+   "resolvesTo": {
+    "DecisionRecord": "https://w3id.org/specl/ns#decisionStatus",
+    "*": "https://w3id.org/specl/ns#resolutionStatus"
+   }
+  },
+  {
+   "key": "decisionStatus",
+   "property": "https://w3id.org/specl/ns#decisionStatus",
+   "contextual": true
+  },
+  {
+   "key": "resolutionStatus",
+   "property": "https://w3id.org/specl/ns#resolutionStatus",
+   "contextual": true
+  }
+ ],
+ "itemClasses": [
+  "AcceptanceQuery",
+  "Agent",
+  "Comment",
+  "DecisionRecord",
+  "DesignNote",
+  "OpenIssue",
+  "Persona",
+  "Requirement",
+  "UserStory"
+ ],
+ "expectations": {
+  "Specification": [
+   {
+    "property": "http://purl.org/dc/terms/title",
+    "key": "title",
+    "severity": "Violation",
+    "message": "Specification must have a dct:title.",
+    "minCount": 1
+   },
+   {
+    "property": "http://purl.org/dc/terms/hasVersion",
+    "key": "hasVersion",
+    "severity": "Violation",
+    "message": "Specification must declare a version.",
+    "minCount": 1
+   },
+   {
+    "property": "https://w3id.org/specl/ns#status",
+    "key": "status",
+    "severity": "Violation",
+    "message": "Specification status must be one of: draft, prototype, review, production.",
+    "minCount": 1,
+    "in": [
+     "draft",
+     "prototype",
+     "review",
+     "production"
+    ]
+   },
+   {
+    "property": "https://w3id.org/specl/ns#intent",
+    "key": "intent",
+    "severity": "Warning",
+    "message": "Specification should declare its intent.",
+    "minCount": 1
+   },
+   {
+    "property": "https://w3id.org/specl/ns#purpose",
+    "key": "purpose",
+    "severity": "Warning",
+    "message": "Specification should declare the application purpose.",
+    "minCount": 1
+   },
+   {
+    "property": "http://purl.org/dc/terms/created",
+    "key": "created",
+    "severity": "Warning",
+    "message": "Specification should record a creation date.",
+    "minCount": 1
+   }
+  ],
+  "Requirement": [
+   {
+    "property": "http://purl.org/dc/terms/description",
+    "key": "description",
+    "severity": "Violation",
+    "message": "Requirement needs a description of at least 10 characters.",
+    "minCount": 1,
+    "minLength": 10
+   },
+   {
+    "property": "https://w3id.org/specl/ns#partOf",
+    "key": "partOf",
+    "severity": "Violation",
+    "message": "Requirement must be linked to its parent Specification via specl:partOf.",
+    "minCount": 1
+   },
+   {
+    "property": "https://w3id.org/specl/ns#priority",
+    "key": "priority",
+    "severity": "Warning",
+    "message": "Requirement should carry a MoSCoW priority (MUST/SHOULD/COULD/WONT).",
+    "maxCount": 1,
+    "in": [
+     "MUST",
+     "SHOULD",
+     "COULD",
+     "WONT"
+    ]
+   },
+   {
+    "property": "https://w3id.org/specl/ns#acceptanceCriterion",
+    "key": "acceptanceCriterion",
+    "severity": "Warning",
+    "message": "Requirement should have at least one acceptance criterion.",
+    "minCount": 1
+   },
+   {
+    "property": "https://w3id.org/specl/ns#itemStatus",
+    "key": "itemStatus",
+    "severity": "Warning",
+    "message": "itemStatus must be active, superseded, or withdrawn.",
+    "maxCount": 1,
+    "in": [
+     "active",
+     "superseded",
+     "withdrawn"
+    ]
+   },
+   {
+    "property": "https://w3id.org/specl/ns#implementationStatus",
+    "key": "implementationStatus",
+    "severity": "Warning",
+    "message": "implementation must be not-started, in-progress, implemented, or verified.",
+    "maxCount": 1,
+    "in": [
+     "not-started",
+     "in-progress",
+     "implemented",
+     "verified"
+    ]
+   },
+   {
+    "property": "https://w3id.org/specl/ns#supersededBy",
+    "key": "supersededBy",
+    "severity": "Warning",
+    "message": "An item marked superseded should name the item that replaces it.",
+    "minCount": 1,
+    "condition": {
+     "itemStatus": "superseded"
+    }
+   },
+   {
+    "property": "https://w3id.org/specl/ns#supersededBy",
+    "key": "supersededBy",
+    "severity": "Warning",
+    "message": "A withdrawn item is struck rather than replaced; use superseded if a successor exists.",
+    "maxCount": 0,
+    "condition": {
+     "itemStatus": "withdrawn"
+    }
+   },
+   {
+    "property": "https://w3id.org/specl/ns#constrains",
+    "key": "constrains",
+    "severity": "Warning",
+    "message": "Requirement should link to at least one component it constrains.",
+    "minCount": 1,
+    "condition": {
+     "graphHasAny": [
+      "Component"
+     ]
+    }
+   },
+   {
+    "property": "https://w3id.org/specl/ns#verifiedBy",
+    "key": "verifiedBy",
+    "severity": "Warning",
+    "message": "Requirement should point to a test or verification artifact via specl:verifiedBy.",
+    "minCount": 1,
+    "condition": {
+     "graphHasAny": [
+      "Test",
+      "AcceptanceQuery"
+     ]
+    }
+   }
+  ],
+  "AcceptanceQuery": [
+   {
+    "property": "https://w3id.org/specl/ns#supersededBy",
+    "key": "supersededBy",
+    "severity": "Warning",
+    "message": "An item marked superseded should name the item that replaces it.",
+    "minCount": 1,
+    "condition": {
+     "itemStatus": "superseded"
+    }
+   },
+   {
+    "property": "https://w3id.org/specl/ns#supersededBy",
+    "key": "supersededBy",
+    "severity": "Warning",
+    "message": "A withdrawn item is struck rather than replaced; use superseded if a successor exists.",
+    "maxCount": 0,
+    "condition": {
+     "itemStatus": "withdrawn"
+    }
+   },
+   {
+    "property": "http://purl.org/dc/terms/title",
+    "key": "title",
+    "severity": "Violation",
+    "message": "Acceptance query must have a dct:title.",
+    "minCount": 1
+   },
+   {
+    "property": "https://w3id.org/specl/ns#gates",
+    "key": "gates",
+    "severity": "Warning",
+    "message": "An acceptance query should gate at least one requirement; one that gates nothing verifies nothing.",
+    "minCount": 1
+   }
+  ],
+  "Agent": [
+   {
+    "property": "https://w3id.org/specl/ns#supersededBy",
+    "key": "supersededBy",
+    "severity": "Warning",
+    "message": "An item marked superseded should name the item that replaces it.",
+    "minCount": 1,
+    "condition": {
+     "itemStatus": "superseded"
+    }
+   },
+   {
+    "property": "https://w3id.org/specl/ns#supersededBy",
+    "key": "supersededBy",
+    "severity": "Warning",
+    "message": "A withdrawn item is struck rather than replaced; use superseded if a successor exists.",
+    "maxCount": 0,
+    "condition": {
+     "itemStatus": "withdrawn"
+    }
+   },
+   {
+    "property": "http://purl.org/dc/terms/title",
+    "key": "title",
+    "severity": "Violation",
+    "message": "Agent must have a dct:title.",
+    "minCount": 1
+   }
+  ],
+  "Comment": [
+   {
+    "property": "https://w3id.org/specl/ns#supersededBy",
+    "key": "supersededBy",
+    "severity": "Warning",
+    "message": "An item marked superseded should name the item that replaces it.",
+    "minCount": 1,
+    "condition": {
+     "itemStatus": "superseded"
+    }
+   },
+   {
+    "property": "https://w3id.org/specl/ns#supersededBy",
+    "key": "supersededBy",
+    "severity": "Warning",
+    "message": "A withdrawn item is struck rather than replaced; use superseded if a successor exists.",
+    "maxCount": 0,
+    "condition": {
+     "itemStatus": "withdrawn"
+    }
+   }
+  ],
+  "DecisionRecord": [
+   {
+    "property": "https://w3id.org/specl/ns#supersededBy",
+    "key": "supersededBy",
+    "severity": "Warning",
+    "message": "An item marked superseded should name the item that replaces it.",
+    "minCount": 1,
+    "condition": {
+     "itemStatus": "superseded"
+    }
+   },
+   {
+    "property": "https://w3id.org/specl/ns#supersededBy",
+    "key": "supersededBy",
+    "severity": "Warning",
+    "message": "A withdrawn item is struck rather than replaced; use superseded if a successor exists.",
+    "maxCount": 0,
+    "condition": {
+     "itemStatus": "withdrawn"
+    }
+   },
+   {
+    "property": "http://purl.org/dc/terms/title",
+    "key": "title",
+    "severity": "Violation",
+    "message": "Decision record needs a title.",
+    "minCount": 1
+   },
+   {
+    "property": "https://w3id.org/specl/ns#decisionStatus",
+    "key": "decisionStatus",
+    "severity": "Warning",
+    "message": "Decision record should declare status.",
+    "maxCount": 1,
+    "in": [
+     "proposed",
+     "accepted",
+     "superseded",
+     "rejected"
+    ]
+   },
+   {
+    "property": "https://w3id.org/specl/ns#rationale",
+    "key": "rationale",
+    "severity": "Warning",
+    "message": "Decision record should capture rationale.",
+    "minCount": 1
+   },
+   {
+    "property": "https://w3id.org/specl/ns#affects",
+    "key": "affects",
+    "severity": "Warning",
+    "message": "Decision record should link to the requirements or components it affects.",
+    "minCount": 1
+   }
+  ],
+  "DesignNote": [
+   {
+    "property": "https://w3id.org/specl/ns#supersededBy",
+    "key": "supersededBy",
+    "severity": "Warning",
+    "message": "An item marked superseded should name the item that replaces it.",
+    "minCount": 1,
+    "condition": {
+     "itemStatus": "superseded"
+    }
+   },
+   {
+    "property": "https://w3id.org/specl/ns#supersededBy",
+    "key": "supersededBy",
+    "severity": "Warning",
+    "message": "A withdrawn item is struck rather than replaced; use superseded if a successor exists.",
+    "maxCount": 0,
+    "condition": {
+     "itemStatus": "withdrawn"
+    }
+   }
+  ],
+  "OpenIssue": [
+   {
+    "property": "https://w3id.org/specl/ns#supersededBy",
+    "key": "supersededBy",
+    "severity": "Warning",
+    "message": "An item marked superseded should name the item that replaces it.",
+    "minCount": 1,
+    "condition": {
+     "itemStatus": "superseded"
+    }
+   },
+   {
+    "property": "https://w3id.org/specl/ns#supersededBy",
+    "key": "supersededBy",
+    "severity": "Warning",
+    "message": "A withdrawn item is struck rather than replaced; use superseded if a successor exists.",
+    "maxCount": 0,
+    "condition": {
+     "itemStatus": "withdrawn"
+    }
+   },
+   {
+    "property": "http://purl.org/dc/terms/description",
+    "key": "description",
+    "severity": "Violation",
+    "message": "Open issue needs a description.",
+    "minCount": 1
+   },
+   {
+    "property": "https://w3id.org/specl/ns#recommendation",
+    "key": "recommendation",
+    "severity": "Warning",
+    "message": "Open issue should carry a recommendation.",
+    "minCount": 1
+   },
+   {
+    "property": "https://w3id.org/specl/ns#owner",
+    "key": "owner",
+    "severity": "Warning",
+    "message": "Open issue should name an accountable agent via specl:owner.",
+    "minCount": 1
+   },
+   {
+    "property": "https://w3id.org/specl/ns#resolutionStatus",
+    "key": "resolutionStatus",
+    "severity": "Warning",
+    "message": "Open issue should track resolution status.",
+    "maxCount": 1,
+    "in": [
+     "open",
+     "in-review",
+     "resolved",
+     "deferred"
+    ]
+   }
+  ],
+  "Persona": [
+   {
+    "property": "https://w3id.org/specl/ns#supersededBy",
+    "key": "supersededBy",
+    "severity": "Warning",
+    "message": "An item marked superseded should name the item that replaces it.",
+    "minCount": 1,
+    "condition": {
+     "itemStatus": "superseded"
+    }
+   },
+   {
+    "property": "https://w3id.org/specl/ns#supersededBy",
+    "key": "supersededBy",
+    "severity": "Warning",
+    "message": "A withdrawn item is struck rather than replaced; use superseded if a successor exists.",
+    "maxCount": 0,
+    "condition": {
+     "itemStatus": "withdrawn"
+    }
+   },
+   {
+    "property": "http://purl.org/dc/terms/title",
+    "key": "title",
+    "severity": "Violation",
+    "message": "Persona must have a dct:title.",
+    "minCount": 1
+   }
+  ],
+  "UserStory": [
+   {
+    "property": "https://w3id.org/specl/ns#supersededBy",
+    "key": "supersededBy",
+    "severity": "Warning",
+    "message": "An item marked superseded should name the item that replaces it.",
+    "minCount": 1,
+    "condition": {
+     "itemStatus": "superseded"
+    }
+   },
+   {
+    "property": "https://w3id.org/specl/ns#supersededBy",
+    "key": "supersededBy",
+    "severity": "Warning",
+    "message": "A withdrawn item is struck rather than replaced; use superseded if a successor exists.",
+    "maxCount": 0,
+    "condition": {
+     "itemStatus": "withdrawn"
+    }
+   },
+   {
+    "property": "http://purl.org/dc/terms/description",
+    "key": "description",
+    "severity": "Violation",
+    "message": "User story needs a description.",
+    "minCount": 1
+   },
+   {
+    "property": "https://w3id.org/specl/ns#partOf",
+    "key": "partOf",
+    "severity": "Violation",
+    "message": "User story must be linked to its parent Specification.",
+    "minCount": 1
+   },
+   {
+    "property": "https://w3id.org/specl/ns#role",
+    "key": "role",
+    "severity": "Warning",
+    "message": "User story should declare who it is about via specl:role, naming a declared persona.",
+    "minCount": 1
+   },
+   {
+    "property": "https://w3id.org/specl/ns#benefit",
+    "key": "benefit",
+    "severity": "Warning",
+    "message": "User story should declare why it matters via specl:benefit.",
+    "minCount": 1
+   },
+   {
+    "property": "https://w3id.org/specl/ns#acceptanceCriterion",
+    "key": "acceptanceCriterion",
+    "severity": "Warning",
+    "message": "User story should have at least one Given/When/Then acceptance criterion.",
+    "minCount": 1
+   }
+  ]
+ },
+ "score": {
+  "population": "items of every item class, excluding itemStatus superseded or withdrawn",
+  "clean": "the item is the focus of no validation result at any severity, and an OpenIssue is not clean unless resolutionStatus is resolved or deferred",
+  "weights": {
+   "MUST": 4,
+   "SHOULD": 3,
+   "COULD": 2,
+   "WONT": 1,
+   "default": 2
+  },
+  "figure": "round(100 * sum(weight of clean items) / sum(weight of all items)); none when the gate fails",
+  "gate": "any Violation fails; at status production, any Warning fails too",
+  "source": "specl.validate_spec.score_graph, read from the installed version; not yet published by specl (UP-2)"
+ }
+}

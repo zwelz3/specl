@@ -1,0 +1,116 @@
+{
+ "spec": "specl Spec Explorer — review round 1",
+ "version": "1.0.0",
+ "scope": "whole specification",
+ "exported": "2026-08-30T20:59:22.269Z",
+ "filter": "needs review only",
+ "answered": 33,
+ "total": 33,
+ "items": {
+  "P5": {
+   "verdict": "keep"
+  },
+  "R1.4": {
+   "verdict": "keep"
+  },
+  "R1.5": {
+   "verdict": "keep"
+  },
+  "R2.3": {
+   "verdict": "keep"
+  },
+  "R2.4": {
+   "verdict": "keep"
+  },
+  "R3.3": {
+   "verdict": "keep",
+   "comment": "Do we need to word this for future tab expansion?"
+  },
+  "R4.2": {
+   "verdict": "keep"
+  },
+  "R4.3": {
+   "verdict": "keep"
+  },
+  "R4.6": {
+   "verdict": "keep"
+  },
+  "R5.2": {
+   "verdict": "keep"
+  },
+  "R5.6": {
+   "verdict": "keep"
+  },
+  "R6.4": {
+   "verdict": "keep"
+  },
+  "R7.2": {
+   "verdict": "keep"
+  },
+  "R8.1": {
+   "verdict": "keep"
+  },
+  "R8.4": {
+   "verdict": "keep"
+  },
+  "R13.5": {
+   "verdict": "keep"
+  },
+  "D1": {
+   "verdict": "keep"
+  },
+  "D2": {
+   "verdict": "keep"
+  },
+  "D3": {
+   "verdict": "keep"
+  },
+  "D4": {
+   "verdict": "keep"
+  },
+  "D5": {
+   "verdict": "keep"
+  },
+  "D6": {
+   "verdict": "keep"
+  },
+  "D7": {
+   "verdict": "keep"
+  },
+  "OQ2": {
+   "verdict": "keep"
+  },
+  "OQ4": {
+   "verdict": "keep"
+  },
+  "OQ6": {
+   "verdict": "keep"
+  },
+  "OQ7": {
+   "verdict": "keep",
+   "comment": "Keep open. "
+  },
+  "OQ8": {
+   "verdict": "keep",
+   "comment": "Keep open"
+  }
+ },
+ "proposals": {
+  "PR1": {
+   "verdict": "keep"
+  },
+  "PR2": {
+   "verdict": "keep",
+   "comment": "The default should be the specl explorer's own spec"
+  },
+  "PR3": {
+   "verdict": "keep"
+  },
+  "PR4": {
+   "verdict": "keep"
+  },
+  "PR5": {
+   "verdict": "keep"
+  }
+ }
+}

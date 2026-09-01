@@ -109,12 +109,13 @@ Give SPECL a maturity signal of its own. Every capability the tool exposes to co
   - verifiedBy: tests/test_spec_base.py::test_no_node_is_minted_under_the_retired_namespace
 
 ## R4 Explorer
-- R4.1 The explorer must be a single self-contained HTML file under 30 KB.
+- R4.1 The explorer must be a single self-contained HTML file with no external runtime dependency and no build step required to run it.
   - implementation: verified
-  - verifiedBy: tests/test_explorer.py::test_the_explorer_is_one_self_contained_file_under_30_kb
+  - verifiedBy: tests/test_explorer.py::test_the_explorer_is_one_self_contained_file
   - priority: MUST
   - constrains: explorer
-  - acceptance: explorer.html file size is under 30720 bytes and contains no external resource references.
+  - acceptance: explorer.html references no external script, stylesheet or import, and opens from the filesystem without fetching anything.
+  - rationale: The bound was 30720 bytes while the file was 14 KB and the size stood in for the property that matters. The explorer's own R1.4 was restated the same way when the rewritten file embedded its example graph: what makes the artifact droppable is that it carries everything it needs, not that it is small.
 
 ## R5 LLM Assistant
 - R5.1 `specl-assist gaps` must read SHACL warnings and draft remediation prompts via Ollama.

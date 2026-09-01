@@ -190,22 +190,23 @@ spec:R3.1 a specl:Requirement ;
 
 spec:R4.1 a specl:Requirement ;
     specl:partOf <https://w3id.org/specl/tool/spec> ;
-    dct:title "The explorer must be a single self-contained HTML file under 30 KB" ;
-    dct:description "The explorer must be a single self-contained HTML file under 30 KB." ;
+    dct:title "The explorer must be a single self-contained HTML file with no external runtime…" ;
+    dct:description "The explorer must be a single self-contained HTML file with no external runtime dependency and no build step required to run it." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
     specl:sourceLine "112"^^xsd:integer ;
     specl:implementationStatus "verified" ;
-    specl:verifiedBy spec:test-94401fb8 ;
+    specl:verifiedBy spec:test-fef420df ;
     specl:priority "MUST" ;
     specl:constrains spec:component-explorer ;
-    specl:acceptanceCriterion "explorer.html file size is under 30720 bytes and contains no external resource references." .
+    specl:acceptanceCriterion "explorer.html references no external script, stylesheet or import, and opens from the filesystem without fetching anything." ;
+    specl:rationale "The bound was 30720 bytes while the file was 14 KB and the size stood in for the property that matters. The explorer's own R1.4 was restated the same way when the rewritten file embedded its example graph: what makes the artifact droppable is that it carries everything it needs, not that it is small." .
 
 spec:R5.1 a specl:Requirement ;
     specl:partOf <https://w3id.org/specl/tool/spec> ;
     dct:title "`specl-assist gaps` must read SHACL warnings and draft remediation prompts via…" ;
     dct:description "`specl-assist gaps` must read SHACL warnings and draft remediation prompts via Ollama." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "120"^^xsd:integer ;
+    specl:sourceLine "121"^^xsd:integer ;
     specl:implementationStatus "in-progress" ;
     specl:priority "SHOULD" ;
     specl:constrains spec:component-spec_assistant ;
@@ -216,7 +217,7 @@ spec:R5.2 a specl:Requirement ;
     dct:title "`specl-assist check` must flag contradictions and duplications across…" ;
     dct:description "`specl-assist check` must flag contradictions and duplications across requirements." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "125"^^xsd:integer ;
+    specl:sourceLine "126"^^xsd:integer ;
     specl:implementationStatus "in-progress" ;
     specl:priority "SHOULD" ;
     specl:constrains spec:component-spec_assistant ;
@@ -227,7 +228,7 @@ spec:R6.1 a specl:Requirement ;
     dct:title "The package must be installable via `pip install specl` and register three…" ;
     dct:description "The package must be installable via `pip install specl` and register three console scripts." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "132"^^xsd:integer ;
+    specl:sourceLine "133"^^xsd:integer ;
     specl:implementationStatus "implemented" ;
     specl:priority "MUST" ;
     specl:constrains spec:component-pyproject ;
@@ -238,7 +239,7 @@ spec:R6.2 a specl:Requirement ;
     dct:title "shapes.ttl, core.ttl, and explorer.html must be included as package data" ;
     dct:description "shapes.ttl, core.ttl, and explorer.html must be included as package data." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "137"^^xsd:integer ;
+    specl:sourceLine "138"^^xsd:integer ;
     specl:implementationStatus "verified" ;
     specl:verifiedBy spec:test-f20a4e93 ;
     specl:priority "MUST" ;
@@ -250,7 +251,7 @@ spec:US1 a specl:UserStory ;
     dct:title "As a spec author, I run specl-translate on my markdown, specl-validate to check…" ;
     dct:description "As a spec author, I run specl-translate on my markdown, specl-validate to check it, and see a maturity score that climbs as I add annotations." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "161"^^xsd:integer ;
+    specl:sourceLine "162"^^xsd:integer ;
     specl:role spec:P1 ;
     specl:capability "translate, validate, and see a maturity score" ;
     specl:benefit "the specification's completeness is visible rather than guessed at" ;
@@ -261,7 +262,7 @@ spec:US2 a specl:UserStory ;
     dct:title "As a CI pipeline, I run specl-validate on every PR and fail the build if a…" ;
     dct:description "As a CI pipeline, I run specl-validate on every PR and fail the build if a production-status spec has violations or warnings." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "166"^^xsd:integer ;
+    specl:sourceLine "167"^^xsd:integer ;
     specl:role spec:P2 ;
     specl:capability "fail a build when a production specification carries warnings" ;
     specl:benefit "a specification cannot regress silently once it claims to be production ready" ;
@@ -272,7 +273,7 @@ spec:US3 a specl:UserStory ;
     dct:title "As an AI agent, I read the translated spec.ttl to understand what a system…" ;
     dct:description "As an AI agent, I read the translated spec.ttl to understand what a system should do before generating code." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "171"^^xsd:integer ;
+    specl:sourceLine "172"^^xsd:integer ;
     specl:role spec:P3 ;
     specl:capability "read the translated graph before writing code" ;
     specl:benefit "the specification rather than a summary of it is what the code is written against" ;
@@ -283,7 +284,7 @@ spec:OQ1 a specl:OpenIssue ;
     dct:title "Whether to add a scaffolding command that creates a new spec directory with a…" ;
     dct:description "Whether to add a scaffolding command that creates a new spec directory with a template spec.md. Its CLI surface is undecided and follows `docs/decisions/0001-cli-surface.md`; there is no umbrella `specl` command to hang it on." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "179"^^xsd:integer ;
+    specl:sourceLine "180"^^xsd:integer ;
     specl:owner spec:AG1 ;
     specl:recommendation "Deferred. It was recommended for 0.4.0 and nine releases passed without it being wanted, which is evidence that it is not needed. `docs/SYNTAX.md` shows the front matter and copying an existing specification is the path people actually take. From 1.0 adding a command is additive and ungoverned, so it can arrive whenever someone asks" ;
     specl:resolutionStatus "deferred" .
@@ -293,7 +294,7 @@ spec:OQ2 a specl:OpenIssue ;
     dct:title "Whether specl-validate should default to the bundled shapes.ttl via…" ;
     dct:description "Whether specl-validate should default to the bundled shapes.ttl via importlib.resources when no shapes path is given." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "183"^^xsd:integer ;
+    specl:sourceLine "184"^^xsd:integer ;
     specl:owner spec:AG1 ;
     specl:recommendation "Implemented. It was the first command an adopter runs and it failed, because nothing tells someone who pip installed the package where the bundled file lives" ;
     specl:resolutionStatus "resolved" .
@@ -303,7 +304,7 @@ spec:OQ3 a specl:OpenIssue ;
     dct:title "Whether to support a `namespace_style: hash | slash` front-matter key for specs…" ;
     dct:description "Whether to support a `namespace_style: hash | slash` front-matter key for specs that want per-element slash URIs (Schema.org pattern)." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "187"^^xsd:integer ;
+    specl:sourceLine "188"^^xsd:integer ;
     specl:owner spec:AG1 ;
     specl:recommendation "Declined. Hash namespaces are what every emitted graph and both published contracts use, and a per-specification choice would make two specifications with the same items produce different IRIs. That is a contract-level change and would need the 2.0 window, not a front-matter key" ;
     specl:resolutionStatus "resolved" .
@@ -313,7 +314,7 @@ spec:P1 a specl:Persona ;
     dct:title "Someone writing a specification in markdown and wanting to know whether it is…" ;
     dct:description "Someone writing a specification in markdown and wanting to know whether it is complete." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "151"^^xsd:integer ;
+    specl:sourceLine "152"^^xsd:integer ;
     skos:prefLabel "Spec author" .
 
 spec:P2 a specl:Persona ;
@@ -321,7 +322,7 @@ spec:P2 a specl:Persona ;
     dct:title "A continuous integration pipeline validating a specification on every change" ;
     dct:description "A continuous integration pipeline validating a specification on every change." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "153"^^xsd:integer ;
+    specl:sourceLine "154"^^xsd:integer ;
     skos:prefLabel "CI pipeline" .
 
 spec:P3 a specl:Persona ;
@@ -329,7 +330,7 @@ spec:P3 a specl:Persona ;
     dct:title "A coding agent reading a translated specification before writing code against it" ;
     dct:description "A coding agent reading a translated specification before writing code against it." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "155"^^xsd:integer ;
+    specl:sourceLine "156"^^xsd:integer ;
     skos:prefLabel "AI agent" ;
     skos:altLabel "coding agent" .
 
@@ -338,7 +339,7 @@ spec:AG1 a specl:Agent ;
     dct:title "The maintainer accountable for specl's specification and releases" ;
     dct:description "The maintainer accountable for specl's specification and releases." ;
     prov:wasDerivedFrom spec:source-e9e453bf ;
-    specl:sourceLine "146"^^xsd:integer ;
+    specl:sourceLine "147"^^xsd:integer ;
     skos:prefLabel "Maintainer" .
 
 spec:component-core_ttl a specl:Component ;
@@ -380,9 +381,6 @@ spec:test-8213dfec a specl:Test ;
 spec:test-8521bcd5 a specl:Test ;
     dct:identifier "tests/test_migrate.py::test_diff_ignore_base_sees_a_rebased_graph_as_the_same_items" .
 
-spec:test-94401fb8 a specl:Test ;
-    dct:identifier "tests/test_explorer.py::test_the_explorer_is_one_self_contained_file_under_30_kb" .
-
 spec:test-9b0013ce a specl:Test ;
     dct:identifier "tests/test_exit_criteria.py::test_criterion_3_a_decisions_section_validates" .
 
@@ -403,4 +401,7 @@ spec:test-f20a4e93 a specl:Test ;
 
 spec:test-f4605846 a specl:Test ;
     dct:identifier "tests/test_references.py::test_external_artifacts_become_typed_nodes_with_readable_iris" .
+
+spec:test-fef420df a specl:Test ;
+    dct:identifier "tests/test_explorer.py::test_the_explorer_is_one_self_contained_file" .
 

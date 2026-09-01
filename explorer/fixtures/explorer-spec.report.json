@@ -1,0 +1,59 @@
+{
+  "status": "prototype",
+  "results": [
+    {
+      "severity": "Warning",
+      "focus": "https://w3id.org/specl/explorer/spec#OQ6",
+      "path": "https://w3id.org/specl/ns#owner",
+      "message": "Open issue should name an accountable agent via specl:owner."
+    },
+    {
+      "severity": "Warning",
+      "focus": "https://w3id.org/specl/explorer/spec#OQ4",
+      "path": "https://w3id.org/specl/ns#owner",
+      "message": "Open issue should name an accountable agent via specl:owner."
+    },
+    {
+      "severity": "Warning",
+      "focus": "https://w3id.org/specl/explorer/spec#OQ3",
+      "path": "https://w3id.org/specl/ns#owner",
+      "message": "Open issue should name an accountable agent via specl:owner."
+    },
+    {
+      "severity": "Warning",
+      "focus": "https://w3id.org/specl/explorer/spec#OQ5",
+      "path": "https://w3id.org/specl/ns#owner",
+      "message": "Open issue should name an accountable agent via specl:owner."
+    },
+    {
+      "severity": "Warning",
+      "focus": "https://w3id.org/specl/explorer/spec#OQ8",
+      "path": "https://w3id.org/specl/ns#owner",
+      "message": "Open issue should name an accountable agent via specl:owner."
+    },
+    {
+      "severity": "Warning",
+      "focus": "https://w3id.org/specl/explorer/spec#OQ2",
+      "path": "https://w3id.org/specl/ns#owner",
+      "message": "Open issue should name an accountable agent via specl:owner."
+    },
+    {
+      "severity": "Warning",
+      "focus": "https://w3id.org/specl/explorer/spec#OQ1",
+      "path": "https://w3id.org/specl/ns#owner",
+      "message": "Open issue should name an accountable agent via specl:owner."
+    },
+    {
+      "severity": "Warning",
+      "focus": "https://w3id.org/specl/explorer/spec#OQ9",
+      "path": "https://w3id.org/specl/ns#owner",
+      "message": "Open issue should name an accountable agent via specl:owner."
+    },
+    {
+      "severity": "Warning",
+      "focus": "https://w3id.org/specl/explorer/spec#OQ7",
+      "path": "https://w3id.org/specl/ns#owner",
+      "message": "Open issue should name an accountable agent via specl:owner."
+    }
+  ]
+}

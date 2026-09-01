@@ -1,0 +1,25 @@
+{
+ "spec": "specl Spec Explorer — review round 3",
+ "version": "1.0.0",
+ "scope": "whole specification",
+ "exported": "2026-08-30T21:35:42.838Z",
+ "filter": "needs review only",
+ "answered": 4,
+ "total": 4,
+ "items": {
+  "R1.3": {
+   "verdict": "keep"
+  },
+  "R1.6": {
+   "verdict": "keep"
+  },
+  "R4.5": {
+   "verdict": "keep"
+  },
+  "OQ9": {
+   "verdict": "keep",
+   "comment": "Agreed "
+  }
+ },
+ "proposals": {}
+}

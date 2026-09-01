@@ -20,83 +20,443 @@ Replace the current drag-and-drop viewer (which only lists subject IDs and short
 # Requirements
 
 ## R1 Packaging and Runtime
+
 - R1.1 The explorer must be a single self-contained `.html` file with no external runtime dependencies (no CDN scripts, no fonts, no network calls).
+  - acceptance: Given the built file, when it is opened with network access blocked, then it renders and operates with no failed or attempted external request.
+
 - R1.2 It must open and function correctly from the local filesystem (`file://`) in modern Chromium, Firefox, and Safari.
-- R1.3 It must ship as `src/specl/explorer.html` inside the specl Python package and be included as package data in `pyproject.toml`.
-- R1.4 Total file size should stay under 30 KB uncompressed.
-- R1.5 No build step. Vanilla HTML, CSS, and JavaScript only.
+  - acceptance: Given the file opened over file:// in current Chromium, Firefox and Safari, when a specification is loaded in each, then the item list, both tabs and the syntax reference render in all three with no console error.
+
+- R1.3 The explorer must be obtainable without a build step and without an installation, from at least one published channel, and every channel that publishes it must serve an identical file for a given release. Inclusion in the Python distribution is one such channel and is not required where another channel satisfies R1.6 and R10.4.
+  - priority: MUST
+  - acceptance: Given a release, when the explorer is obtained from each channel that publishes it, then the files are identical; and given a reader with no toolchain installed, when they seek the explorer, then at least one channel serves it to them directly.
+  - rationale: The original wording made the Python distribution the only route, which is the inversion PR1 identifies: seeing the tool required installing the thing the tool exists to demonstrate. What matters is that a reader can obtain it without building or installing anything and that two channels never serve two different explorers.
+
+- R1.4 The explorer must remain one file with no build step, no bundler, and no external runtime dependency, and must render its first view without waiting on anything it does not already contain.
+  - priority: MUST
+  - acceptance: Given the built file, when it is opened with network access blocked, then it renders with no failed requests and no deferred load.
+  - rationale: The byte cap was a proxy for keeping the tool dependency-free and instantly loadable. Stated as a number it now forbids capabilities that cost nothing against the property it was protecting.
+
+- R1.5 No build step is required to run the explorer. The file is authored HTML, CSS and JavaScript with no bundler, transpiler or module loader. A generation step that produces embedded reference data under R13.2 is permitted, and its output is committed alongside the file.
+  - acceptance: Given the repository, when the explorer is produced, then the only generated content in the file is the reference data of R13.2, and running the file requires no bundler, transpiler or module loader.
+
+- R1.6 Where the toolchain provides a command that composes the explorer with a specification, that command must resolve a copy of the explorer locally and must not require network access.
+  - priority: MUST
+  - acceptance: Given a deployment with no network egress and specl installed from a local distribution, when the compose command is run, then it resolves the explorer without a fetch and completes.
+  - rationale: This is the obligation R1.3 previously met by accident. A command that assembles the explorer in an air-gapped deployment needs the file present; whether it arrives in the distribution or beside it is a packaging choice, and this states the property that choice has to preserve.
 
 ## R2 Input and Parsing
+
 - R2.1 The explorer must accept a `spec.ttl` file via a file input control and via drag-and-drop onto the window.
+  - acceptance: Given a spec.ttl, when it is chosen through the file control and, separately, dropped onto the window, then both paths load the same graph and produce the same item list.
+
 - R2.2 It must include a minimal Turtle parser sufficient for the specl output format (subject + indented predicates, `@prefix` declarations, `"..."` and `"""..."""` string literals, IRIs with `spec:` and `specl:` prefixes).
-- R2.3 The parser must extract all `specl:Specification`, `specl:Requirement`, `specl:UserStory`, `specl:OpenIssue`, `specl:DecisionRecord`, `specl:DesignNote`, and `specl:Comment` individuals with their full property sets.
-- R2.4 Parse failures on individual statements must not crash the tool; log to console and skip the malformed statement.
+  - acceptance: Given each form the current graph contract emits, being prefixed and absolute subjects, single- and triple-quoted literals, typed literals and derived list nodes, when a file containing all of them is loaded, then every subject and every property value is represented.
+
+- R2.3 The parser must extract every item class the graph contract declares, currently Specification, Requirement, UserStory, OpenIssue, DecisionRecord, DesignNote, Comment, AcceptanceQuery, Persona, Agent and SourceDocument, with their full property sets, and must report any class it encounters that it does not represent per R2.9.
+  - acceptance: Given a file containing an individual of every class the contract declares, when it is loaded, then every individual is represented with its full property set, and any class the explorer does not represent is reported under R2.9.
+
+- R2.4 A parse failure on an individual statement must not stop the tool. The statement is skipped and reported in the interface under R2.9.
+  - acceptance: Given a file containing a malformed statement, when it is loaded, then the remaining statements load, the tool remains operable, and the malformed statement is reported in the interface rather than only to the console.
+
 - R2.5 The raw file text must be retained in memory so the Raw Turtle tab can display it exactly as loaded.
+  - acceptance: Given a loaded file, when the whole-file raw view is displayed, then the text shown is identical to the file as read, including whitespace and prefix declarations.
+
+- R2.6 A predicate appearing more than once on a subject must be retained as an ordered collection of all its values, and every value must be rendered.
+  - priority: MUST
+  - acceptance: Given an item carrying three values for one predicate, when its detail view is opened, then three values are shown for that property.
+  - rationale: The translator emits one triple per annotation value. Assigning each value over the last discards content the reader has no way to know was there, and it does so in the properties the maturity figure is computed from.
+
+- R2.7 Values held as an rdf:List of derived cons cells must be resolved and rendered in list order as part of the owning item.
+  - priority: MUST
+  - acceptance: Given an item carrying specl:detail, when its detail view is opened, then every rdf:first value in the list is shown in order under the item that owns the list.
+  - rationale: Sub-bullets carry the substance of any item whose top line is a heading. A viewer that drops them renders such an item as an empty label.
+
+- R2.8 Properties must be keyed by the full IRI the prefix resolves to, not by the local name of the term.
+  - priority: MUST
+  - acceptance: Given two terms from different namespaces sharing a local name, when both are present on one subject, then both are retained and each is attributed to its namespace.
+  - rationale: Keying by local name makes a namespace collision resolve silently to whichever term was parsed last. No collision exists under the current contract, which is the reason to fix the mechanism before one does.
+
+- R2.9 Any statement, class or property the parser cannot represent must be reported in the interface with a count and the subjects concerned, and must not be discarded silently.
+  - priority: MUST
+  - acceptance: Given a file containing statements the parser does not recognise, when it is loaded, then the interface reports how many were not represented and which subjects they belong to.
+  - rationale: A viewer that quietly renders a subset of a file teaches the reader that what is on screen is the file. Reporting the shortfall costs one line of interface and is the difference between an incomplete view and a misleading one.
+
+- R2.10 The graph contract version declared by dct:conformsTo must be read and reported, and a contract the explorer does not recognise must be stated as unrecognised before the content is rendered.
+  - priority: MUST
+  - acceptance: Given a file declaring a contract version the explorer does not implement, when it is loaded, then the declared version is displayed and the rendering is marked as possibly incomplete.
+  - rationale: The contract version exists so that a consumer can tell whether it understands what it is holding. A consumer that ignores it converts a detectable mismatch into a silent misreading.
 
 ## R3 Layout
+
 - R3.1 A fixed header shows spec title, version, status badge, and a maturity progress bar.
+  - acceptance: Given a loaded specification, when the header renders, then title, version, status and the maturity figure of R5.6 are all present.
+
 - R3.2 A left sidebar (approximately 320 px wide) contains the file input, a live text filter, and the grouped item list.
-- R3.3 A main panel to the right of the sidebar contains tabbed content (Detail, Raw Turtle, Summary).
+  - acceptance: Given a viewport at least 1000 px wide, when the interface renders, then the sidebar holds the file control, the filter and the grouped item list, and the main panel occupies the remaining width.
+
+- R3.3 A main panel to the right of the sidebar contains exactly two tabs, Detail and Raw Turtle, both scoped to the current selection. The tab set does not vary with what is selected.
+  - priority: MUST
+  - acceptance: Given any selection including the specification, when the tab strip is inspected, then it offers the same set of tabs as for every other selection and every tab in it addresses the selected item.
+  - rationale: A tab strip whose membership changes with selection costs the reader more attention than a constant third tab would. Making the specification selectable removes the need for a variable tab set rather than creating one.
+
 - R3.4 The layout must use CSS Grid or Flexbox so the sidebar and main panel scroll independently.
+  - acceptance: Given content longer than the viewport in both regions, when one region is scrolled to its end, then the scroll position of the other is unchanged.
+
 - R3.5 A dark theme is the default. Color tokens must be declared as CSS custom properties at `:root` so a future light theme can be added without rewriting the stylesheet.
+  - acceptance: Given the stylesheet, when it is inspected, then every colour in use resolves to a custom property declared at :root and no colour literal appears outside that block.
+
+- R3.7 The explorer must offer a light and a dark presentation, defaulting to dark, with a control to switch and an option to follow the system setting. Each presentation must be a single block of token declarations, and no rule outside those blocks may depend on which is applied.
+  - priority: SHOULD
+  - acceptance: Given the light presentation, when any view is rendered, then every element is legible and no colour literal outside the token blocks is in use.
+  - acceptance: Given the control, when it is operated, then the presentation changes between dark, light and following the system, and the current choice is stated.
+  - rationale: Reading a specification on paper-white and reading it at night are different tasks. R3.5 already required every colour to be a token, which makes a second presentation one block rather than a second stylesheet.
+
+- R3.6 Item type and item status must be conveyed through a channel other than colour alone wherever they are displayed.
+  - priority: MUST
+  - acceptance: Given the interface rendered in greyscale, when a list containing several item types is displayed, then the type of each item remains distinguishable.
+  - rationale: The type indicator is currently a coloured dot and nothing else, which conveys nothing in greyscale, in print, or to a reader who does not distinguish those hues. The specification already requires the colours to be themeable tokens, which is the wrong half of the problem to have solved.
 
 ## R4 Sidebar Behavior
+
 - R4.1 Items are grouped by type, with group headers showing the type label and count (e.g., "Requirements (8)").
-- R4.2 Each item row shows its short ID (e.g., `R1.2`, `US3`) and a truncated preview of its description.
-- R4.3 Each type has a distinct color dot indicator. Colors must be defined as CSS variables so they can be themed.
+  - acceptance: Given a specification containing more than one item class, when the list renders, then each class appears under a header carrying its label and the count of items shown beneath it.
+
+- R4.2 Each item row shows its short identifier and its title per R4.8, falling back to a truncated preview of the description only where the item carries no title.
+  - acceptance: Given an item carrying a title and an item carrying none, when both rows render, then the first shows its identifier and title and the second shows its identifier and a description preview.
+
+- R4.3 Each item class carries a distinct indicator combining a glyph or letterform with colour, per R3.6. Colours are declared as CSS variables so they can be themed, and the indicator remains legible when they are not applied.
+  - acceptance: Given the item list rendered with no colour applied, when it is read, then the class of every row remains identifiable from its indicator.
+
 - R4.4 Items must sort naturally within their group, so `R1.10` follows `R1.9`, not `R1.1`.
-- R4.5 The filter input must match against item ID and description, case-insensitive, updating the list on every keystroke.
-- R4.6 Clicking a sidebar item selects it, highlights the row, and updates the main panel. The selection must persist across tab changes.
+  - acceptance: Given items identified R1.1, R1.9 and R1.10, when their group renders, then they appear in that order.
+
+- R4.5 The filter input must match against item identifier, displayed label, description, and any SKOS label the item carries, case-insensitive, updating the list on every keystroke. Where an item matches on text its row does not show, the matching text must be shown with it.
+  - priority: MUST
+  - acceptance: Given a filter term, when it is typed, then the list updates on each keystroke and contains every item whose identifier, displayed label per R4.8, description, or any SKOS label it carries contains the term, matched without regard to case.
+  - acceptance: Given an item carrying an alternative label that differs from its displayed label, when that alternative label is entered as a filter term, then the item is listed.
+  - acceptance: Given an item listed because of a match on text its row does not display, when the row renders, then the text that caused the match is shown with it.
+  - rationale: The label is what the reader is looking at under R4.8, so a filter that does not match it fails against the only text on most rows. Matching labels the row does not display then creates the opposite problem, a result the reader cannot account for, which is the condition D3 excludes; showing the matched text is what keeps the result set explicable.
+
+- R4.6 Clicking a sidebar item selects it, highlights the row, and updates the main panel. The selection persists across tab changes, and the specification row is selected when a file finishes loading.
+  - priority: MUST
+  - acceptance: Given a loaded file, when the interface first paints, then the specification row is selected and the Detail tab shows its content, and when another row is selected and the tab is changed, then the selection is unchanged.
+  - rationale: Defaulting to the specification removes the empty-detail state that currently follows a successful load, in which the tool asks the reader to make a selection immediately after being given a file.
+
+- R4.7 The specification must appear as a selectable row in a pinned group at the head of the item list, above the type groups and exempt from the text filter.
+  - priority: MUST
+  - acceptance: Given a loaded file, when the item list is rendered, then a specification row is present at the head of the list, and when a filter term matching no part of the specification is entered, then the row remains present.
+  - rationale: The specification is a node of the graph like every other node. Presenting it as a tab rather than an item was the only place in the interface where that was not true, and it is the source of the scope confusion the tab arrangement produced.
+
+- R4.8 Where an item declares dct:title, the title must be used as its display label, with the identifier shown alongside and the full IRI reachable from the item.
+  - priority: MUST
+  - acceptance: Given an item carrying a title, when it is shown in the list and in the detail view, then the title is the label displayed and the identifier and IRI are both obtainable.
+  - rationale: Titles are emitted on every item for this purpose. Displaying a truncation of the description in their place discards a field the format supplies and produces a worse label than the one available.
+
+- R4.9 Changing the selection must not rebuild the item list, and keyboard focus must survive selection.
+  - priority: MUST
+  - acceptance: Given focus on an item row, when that row is selected by keyboard and an arrow key is then pressed, then focus moves to the adjacent row.
+  - rationale: Rebuilding the list on selection destroys the focused element, so the arrow-key navigation the specification requires stops working at the first keyboard selection.
 
 ## R5 Header and Maturity
+
 - R5.1 The header must display the spec's `dct:title`, `dct:hasVersion`, and `specl:status` properties.
-- R5.2 A maturity score must be computed client-side as the percentage of `specl:Requirement` individuals that carry all four production properties: `specl:priority`, `specl:acceptanceCriterion`, `specl:verifiedBy`, and `specl:constrains`.
+  - acceptance: Given a loaded specification, when the header renders, then dct:title, dct:hasVersion and specl:status are displayed as they appear in the graph.
+
+- R5.2 A maturity figure must be reported under the definition R5.6 establishes, over the population that definition names.
+  - acceptance: Given a loaded specification, when the maturity figure is displayed, then it equals the figure specl-validate score reports for the same graph, or is labelled as an estimate under R5.6.
+
 - R5.3 The score must render as both a numeric percentage and a horizontal progress bar.
+  - acceptance: Given a maturity figure, when the header renders, then the figure appears as a percentage and as a bar whose filled proportion equals it.
+
 - R5.4 The bar color must shift: red below 50%, amber from 50% to 84%, green at 85% and above. Thresholds must be declared as constants at the top of the script for easy tuning.
+  - acceptance: Given figures of 49, 50, 84 and 85 percent, when each is rendered, then the bar is red, amber, amber and green respectively, and the thresholds are declared as named constants in one place.
+
 - R5.5 If the loaded spec has zero requirements, the maturity score displays as "—" and the bar is empty, not zero.
+  - acceptance: Given a specification whose population for the figure is empty, when the header renders, then the figure is reported as undefined rather than as zero and the bar is unfilled.
+
+- R5.6 The explorer must not compute a maturity figure under a definition of its own. Where a score produced by specl-validate accompanies the file, that figure must be displayed. Where none accompanies it, the explorer must compute the published definition, or must label the figure as an unverified estimate and state the definition it used.
+  - priority: MUST
+  - acceptance: Given a file accompanied by a score report, when the header is rendered, then the figure displayed equals the figure the report carries; and given a file with no report, when the header is rendered, then the figure is labelled as an estimate and its definition is obtainable.
+  - rationale: The explorer currently reports zero for a specification the CLI scores at eight percent, using a different population, a different property set and no weighting. Two authoritative-looking figures for one artifact is worse than one figure with a stated limitation, and the reader has no way to discover which is canonical.
+
+- R5.7 The definition of any figure the explorer displays must be resolvable from the point at which the figure appears, stating what is counted, over what population, and with what exclusions.
+  - priority: MUST
+  - acceptance: Given any displayed figure, when its definition is requested, then the count, the population and the exclusions are returned.
+
+- R5.8 Every aggregate figure must make the population it counts obtainable, by opening that population in the item list or by reporting its members.
+  - priority: MUST
+  - acceptance: Given any count or ratio displayed by the explorer, when its population is requested, then every item the figure counted is obtained, whether by the item list being narrowed to them or by their being listed.
+  - rationale: A figure that cannot be opened is a claim the reader has to take or leave. The per-type chips and the maturity ratio are both currently dead ends, and both already know their own membership.
+
+- R5.9 Where a figure reports a shortfall, the items contributing to that shortfall must be obtainable in order of contribution.
+  - priority: SHOULD
+  - acceptance: Given a maturity figure below one hundred percent, when its contributors are requested, then the items reducing it are listed with the property each is missing, ordered by contribution.
+  - rationale: The figure states that work remains. Ordering the contributors states where to start, which is the only action the figure supports.
 
 ## R6 Detail Tab
-- R6.1 When an item is selected, the Detail tab shows its ID as a heading, its type as a subtitle, and all known properties as a definition list.
+
+- R6.1 When an item is selected, the Detail tab heads the view with the item's class and identifier, shows its IRI, and lists every property it carries as a definition list. A title the description already contains is not repeated as a row.
+  - priority: MUST
+  - acceptance: Given a selected item, when the detail tab renders, then the heading is the item's class followed by its identifier, the IRI is shown, and every property the item carries appears once.
+  - rationale: The heading was the title, which for most items is a truncation of the description that then appears in full immediately below it. Naming the class and the identifier says what the reader is looking at, and removes the separate line that used to repeat both.
+
 - R6.2 Type-specific fields must render in a sensible order:
     - Requirement: description, priority, acceptance criterion, verified by, constrains
     - UserStory: description, as a, I want, so that, acceptance criterion
     - OpenIssue: description, recommendation, owner, resolution status
     - DecisionRecord: description, status, rationale, affects
+  - acceptance: Given a selected item of each class, when the detail view renders, then the properties appear in the order declared for that class, and a property outside that order appears after it rather than being omitted.
+
 - R6.3 Properties that exist in the expected set but are absent in the data must render as an italic "not set" placeholder in a muted warning color, so gaps are visually obvious.
-- R6.4 For requirements specifically, the tab must show a "production-ready" chip in green when all four production properties are present, or a "needs work" chip in amber otherwise.
+  - acceptance: Given an item whose class accepts a property it does not carry, when the detail view renders, then that property is shown with an absence marker distinguishable from an empty value.
+
+- R6.4 For requirements, the tab must show a readiness chip derived from the same definition as the header figure per R5.6, and the chip must state which definition it used.
+  - acceptance: Given a requirement, when its readiness chip renders, then the chip states the definition it was derived from and that definition is the one the header figure used.
+
 - R6.5 Long text values must wrap cleanly and remain selectable for copy.
+  - acceptance: Given a property value wider than the panel, when it renders, then it wraps within the panel, is selectable as continuous text, and copies without inserted line breaks.
+
+- R6.6 A property whose value is a reference to another item in the graph must render as a control that selects the referenced item, and a reference that resolves to nothing must be marked as unresolved rather than rendered as text.
+  - priority: MUST
+  - acceptance: Given an item carrying a reference-valued property, when the value is selected, then the referenced item becomes the current selection; and given a reference with no corresponding subject in the loaded graph, when the item is displayed, then the value is marked unresolved.
+  - rationale: Reference-valued properties are IRIs under the current contract. Rendering them as inert text presents a graph as a set of disconnected records and leaves the reader without the one capability the format exists to provide.
+
+- R6.7 An item's detail view must list the items that reference it, grouped by the property through which the reference is made.
+  - priority: SHOULD
+  - acceptance: Given an item referenced by two others, when its detail view is opened, then both referring items are listed under the property that names it.
+  - rationale: Forward references answer what an item depends on. The question asked more often of a requirement is what depends on it, and the graph already contains the answer.
+
+- R6.8 An item's detail view must state the source document and line it was derived from.
+  - priority: SHOULD
+  - acceptance: Given an item carrying prov:wasDerivedFrom and specl:sourceLine, when its detail view is opened, then the source document identifier and the line number are shown.
+  - rationale: The reader who finds a defect in the explorer fixes it in the markdown. Carrying the line number removes a search from every such correction.
 
 ## R7 Raw Turtle Tab
-- R7.1 When an item is selected, the tab shows that item's Turtle statement block, extracted from the raw text by locating the subject IRI and taking characters through the next statement terminator (`\n.` or ` .\n`).
-- R7.2 When no item is selected, the tab shows the full raw file.
-- R7.3 The displayed Turtle must be syntax-highlighted: distinct colors for prefixes, IRIs, predicates, string literals, and comments.
-- R7.4 Highlighting must be implemented with a small inline function (regex-based is acceptable); no external highlighter library.
-- R7.5 The Turtle block must render in a monospace font and allow horizontal scrolling for long lines.
 
-## R8 Summary Tab
-- R8.1 Shows total item count, requirement count, and production-ready ratio (e.g., "3/8 production-ready") as chips.
+- R7.1 When an item is selected, the tab shows that item's Turtle statement block, extracted from the raw text by locating the subject IRI and taking characters through the next statement terminator (`\n.` or ` .\n`).
+  - acceptance: Given a selected item, when the raw tab renders, then the block shown begins at that item's subject, ends at its terminator, and includes any derived nodes the item owns.
+
+- R7.2 Withdrawn. Superseded by R7.6; the no-selection state no longer occurs.
+  - itemStatus: withdrawn
+
+- R7.3 The displayed Turtle must be syntax-highlighted: distinct colors for prefixes, IRIs, predicates, string literals, and comments.
+  - acceptance: Given a raw block containing a prefix declaration, an IRI, a predicate, a string literal and a comment, when it renders, then each is visually distinguished and the distinction does not rest on colour alone.
+
+- R7.4 Highlighting must be implemented with a small inline function (regex-based is acceptable); no external highlighter library.
+  - acceptance: Given the implementation, when it is inventoried, then highlighting is performed by a function within the file and no highlighting library is loaded.
+
+- R7.5 The Turtle block must render in a monospace font and allow horizontal scrolling for long lines.
+  - acceptance: Given a raw block containing a line wider than the panel, when it renders, then the line is not wrapped and the block scrolls horizontally.
+
+- R7.6 The Raw Turtle tab must offer the whole file as an alternative to the selected item's statement block, and must state which of the two is displayed.
+  - priority: MUST
+  - acceptance: Given a selected item, when the whole-file view is chosen, then the complete file as loaded is displayed and the view identifies itself as the whole file rather than the item.
+  - rationale: The whole-file view was previously reached by having no selection, which the default selection in R4.6 removes. The view is worth keeping and now needs a control of its own.
+
+- R7.7 The Raw Turtle tab must number every line with its line in the loaded file, in both the item view and the whole-file view, and must mark a break where an item's statements are not contiguous. A number must not be included when the block is copied.
+  - priority: SHOULD
+  - acceptance: Given an item whose statements do not begin at the start of the file, when its block is displayed, then the first number is that statement's line in the file, and where the block skips lines the break is marked.
+  - acceptance: Given a displayed block, when it is selected and copied, then the copied text is the Turtle without the numbers.
+  - rationale: A block shown without numbers cannot be pointed at. Numbering it from one would give a reader a number no other tool would agree with, so the numbers are the file's; provenance under R6.8 names the markdown line, and this names the graph line.
+
+## R8 Specification View
+
+- R8.1 The specification view shows total item count, per-class counts and the readiness ratio, each of which makes the items it counts obtainable per R5.8.
+  - acceptance: Given a loaded specification, when the specification view renders, then the total item count, a count per class and the readiness ratio are all shown, and the items behind each are obtainable under R5.8.
+
 - R8.2 Shows the spec's `specl:intent` and `specl:purpose` prose in full.
+  - acceptance: Given a specification carrying intent and purpose, when the specification view renders, then both are shown in full and neither is truncated.
+
 - R8.3 Shows a per-type breakdown (how many requirements, stories, open issues, etc.).
-- R8.4 Must render regardless of whether a sidebar item is selected.
+  - acceptance: Given a specification containing several classes, when the specification view renders, then a count is shown per class and the items behind each count are obtainable under R5.8.
+
+- R8.4 Withdrawn. The specification view is reached by selecting the specification row.
+  - itemStatus: withdrawn
 
 ## R9 Empty and Error States
+
 - R9.1 Before any file is loaded, the main panel shows a centered "Drop a spec.ttl file to begin" message.
+  - acceptance: Given no loaded file, when the interface renders, then it states what to provide, how to produce it, and offers the embedded example of R9.4.
+
 - R9.2 If the dropped file fails to parse (no Specification individual found), show an error message explaining the expected format and linking to the specl README convention.
+  - acceptance: Given a file containing no specl:Specification, when it is loaded, then the interface states what was expected, what was found instead, and how a conforming file is produced.
+
 - R9.3 If the file is empty or contains no recognized items, show "No items found in this file."
+  - acceptance: Given a file containing a specification and no items, when it is loaded, then the specification remains selectable and the item list states that the file contains no items.
+
+- R9.4 An example specification must be embedded in the file and loadable without a file of the reader's own. The example is this specification's own emitted graph, and the embedded copy must state the version it was generated from.
+  - priority: MUST
+  - acceptance: Given no loaded file, when the example is chosen, then this specification's own graph is loaded, every capability operates on it as it would on a supplied file, and the version the embedded copy was generated from is stated.
+  - acceptance: Given a build, when the embedded example is compared with the graph emitted from this specification, then they are identical, and when they are not, the build fails.
+  - rationale: The tool that reads specl specifications should open on the specification that defines it. That makes the first encounter a demonstration rather than an instruction, and it puts this specification's own maturity figure in front of every new reader. The embedded copy is a self-reference and goes stale silently, which is why the build guards it.
 
 ## R10 Non-Functional
+
 - R10.1 First paint after file drop must complete in under 200 ms for specs up to 500 items on mid-tier hardware.
+  - acceptance: Given a specification of 500 items on mid-tier hardware, when the file is read, then the first rendered view appears within 200 ms.
+
 - R10.2 No data leaves the browser. No telemetry, no network requests, no external resource loads.
+  - acceptance: Given a full session covering load, filter, selection, navigation, reference and export, when network activity is observed throughout, then no request leaves the browser.
+
 - R10.3 The tool must be keyboard accessible: tab to the file input, filter, and sidebar items; arrow keys to navigate the item list.
+  - acceptance: Given keyboard input alone, when the tool is operated from load through selection, tab change, reference and export, then every control is reachable and the focused element is visible at every step.
+
 - R10.4 Must function offline. Opening the HTML file from a USB drive on an air-gapped machine is a supported use case.
+  - acceptance: Given an air-gapped machine with no specl installation, when the file is opened from removable media, then every capability either functions or states the dependency it lacks.
+
+## R11 Addressing and Navigation
+
+- R11.1 The current selection and tab must be encoded in the document fragment, and opening a fragment must restore that selection and tab against the same file.
+  - priority: SHOULD
+  - acceptance: Given a selected item and tab, when the address is copied and opened again against the same file, then the same item and tab are restored.
+  - rationale: A reviewer citing a requirement currently has to describe where to click. Fragment addressing is local to the document and does not weaken the offline guarantee.
+
+- R11.2 Visited selections must be navigable backward and forward.
+  - priority: SHOULD
+  - acceptance: Given a sequence of selections, when backward navigation is invoked, then the prior selection and tab are restored.
+  - rationale: Following a reference under R6.6 is only useful if returning from it is one action.
+
+## R12 Findings
+
+- R12.1 The explorer must accept a validation report produced by specl-validate alongside the Turtle, and must not implement shape evaluation of its own.
+  - priority: SHOULD
+  - acceptance: Given a validation report loaded alongside a specification, when it is present, then findings are attributed to items by focus node; and given no report, when the interface is rendered, then findings are reported as unavailable rather than as absent.
+  - rationale: The validator already emits severity, focus node, path and message as JSON keyed by IRI. Reimplementing SHACL in the browser would produce a second definition of conformance, which is the failure R5.6 exists to prevent.
+
+- R12.2 An item carrying findings must indicate this in the item list, and must present its findings in its detail view.
+  - priority: SHOULD
+  - acceptance: Given an item with one or more findings, when the list is rendered, then the item is marked, and when its detail view is opened, then each finding's severity, path and message are shown.
+  - rationale: This is the change that moves the tool from displaying what an author wrote to showing what remains to be fixed, which is the reason a reader opens it a second time.
+
+## R13 Syntax Reference
+
+- R13.1 The explorer must carry a reference to the specl source syntax, reachable from any selection, covering the recognised section headings and the item class each produces, the annotation keys and the property each maps to, which keys take a reference rather than a literal, the recognised front-matter keys, and the markers that park or exempt a section.
+  - priority: MUST
+  - acceptance: Given any selection, when the reference is opened, then the sections, classes, annotation keys, reference-valued keys, front-matter keys and section markers the translator recognises are all listed.
+  - rationale: The reader most likely to be looking the syntax up is the author who is at that moment looking at what their specification is missing. Requiring them to leave for a separate document to find the key that fixes it is the point at which the correction does not get made.
+
+- R13.2 The reference must be generated from the translator's own tables and the bundled shapes when the explorer is built, and must state the specl version and graph contract it was generated from.
+  - priority: MUST
+  - acceptance: Given the built explorer, when the reference is inspected, then every annotation key the translator accepts is present, no key the translator does not accept is present, and the version and contract the reference was generated from are stated.
+  - rationale: The translator's own source records that this key set was once held as two hardcoded copies, and that adding a key to one and not the other made a valid annotation parse as unknown. A hand-maintained reference is a third copy of the same set, with the same failure and a slower path to discovering it.
+
+- R13.3 Where an item is selected, the reference must indicate which annotation keys the item's class accepts and which of those the item does not carry.
+  - priority: SHOULD
+  - acceptance: Given a selected item, when the reference is opened, then the keys its class accepts are distinguished from the rest, and those absent from the item are marked.
+  - rationale: This is the same information the detail view already renders as "not set" placeholders, expressed as the syntax needed to fill them. Connecting the two makes the reference part of the correction rather than a document beside it.
+
+- R13.4 The reference must be held in the single file and must not require a network request or a second document.
+  - priority: MUST
+  - acceptance: Given a machine with no network access, when the reference is opened, then it renders in full.
+
+- R13.5 The explorer may generate specl source. It must not interpret it.
+  - priority: MUST
+  - acceptance: Given the explorer's implementation, when it is inventoried, then it contains no parser for specl markdown, and any source it produces is offered to the user rather than loaded back into the graph it holds.
+  - rationale: A markdown parser in the browser is a second implementation of the translator's grammar and will diverge from it, which is the reason OQ2 was resolved as it was. Emitting source requires only the key tables the reference already carries, so the two directions have different costs and are governed separately.
+
+- R13.6 Withdrawn. Composition was built and removed: markdown emitted by a viewer that cannot translate, validate or score it puts the author in front of text nothing has checked, which costs more attention than it saves. R13.5 continues to govern anything that would emit source later.
+  - itemStatus: withdrawn
+  - priority: WONT
+  - acceptance: Given the implementation, when it is inventoried, then it contains nothing that emits specl source.
+
+# Personas
+
+- P1. A specification author who writes the markdown, runs the translator, and uses the explorer to find what their own specification is missing before anyone else reads it. Knows the syntax unevenly and is the reader most likely to be looking something up while working.
+  - title: Specification author
+
+- P2. A reviewer reading a specification they did not write, who needs to reach any item's full statement and judge whether the set is coherent, whether its decisions are recorded, and where it is thin.
+  - title: Reviewer
+
+- P3. An integrator, human or automated, consuming the emitted graph, who needs to confirm that what the translator produced matches what a downstream tool expects before it is consumed.
+  - title: Downstream integrator
+
+- P4. A programme or engineering lead who consumes the judgement a specification supports rather than its individual items, and who needs to know how far that judgement can be relied on and what would improve it.
+  - title: Programme lead
+
+- P5. A reader who must be able to state that what the interface showed them is what the file says, and who has no tooling of their own to check it against.
+  - title: Attesting reader
 
 # User Stories
 
-- US1 As a spec author, I open the explorer, drop my spec.ttl, and immediately see which requirements are missing acceptance criteria so I know where to focus.
-- US2 As a reviewer, I filter the sidebar by a keyword to find all requirements touching authentication, click through each one, and read their full detail without opening the markdown file.
-- US3 As an AI agent integrator, I open the explorer to verify that the Turtle generated by `spec_to_rdf.py` matches what I expect before feeding it to a downstream tool.
-- US4 As a program manager, I glance at the maturity bar to gauge how close the spec is to production-ready without asking the author.
-- US5 As an auditor with no development tools installed, I open the explorer from a USB drive on a locked-down workstation and read the spec.
+- US1 As a specification author, I open the explorer, drop my spec.ttl, and immediately see which requirements are missing acceptance criteria so I know where to focus.
+  - role: P1
+  - capability: Per-item reporting of absent properties, aggregated into a figure that opens the items producing it
+  - benefit: Revision effort is directed by what the specification is missing rather than by rereading it
+  - acceptance: Given a loaded specification, when the maturity figure is opened, then the items reducing it are listed with the property each is missing.
+  - priority: MUST
+
+- US2 As a reviewer, I filter the sidebar by a keyword to find all requirements touching one subject, click through each one, and read their full detail without opening the markdown file.
+  - role: P2
+  - capability: Text filtering across identifier, title and description, with full item detail on selection
+  - benefit: A specification can be reviewed without the source or a toolchain
+  - acceptance: Given a filter term, when it is entered, then every item whose identifier, title or description contains it is listed, and when one is selected, then every property it carries is shown.
+  - priority: MUST
+
+- US3 As a downstream integrator, I open the explorer to verify that the emitted Turtle matches what I expect before feeding it to another tool.
+  - role: P3
+  - capability: Raw serialisation for any item and for the whole file, alongside the rendered presentation of the same content
+  - benefit: The presentation layer is checkable against the graph rather than trusted
+  - acceptance: Given a selected item, when its raw statement block is displayed, then it contains every property the detail view rendered and any derived nodes the item owns.
+  - priority: MUST
+
+- US4 As a programme lead, I read the maturity figure to gauge how close a specification is to production-ready without asking its author.
+  - role: P4
+  - capability: A single reported figure with its definition and its contributors reachable from where it appears
+  - benefit: A judgement about a specification's state is formed from a stated definition rather than an impression
+  - acceptance: Given the maturity figure, when its definition is requested, then what is counted, over what population, and with what exclusions is returned.
+  - priority: MUST
+
+- US5 As an attesting reader with no development tools installed, I open the explorer from removable media and read the specification in full.
+  - role: P5
+  - capability: Complete offline operation from a single file, with every item and the whole source reachable
+  - benefit: A specification can be read and attested to in an environment that permits no installation
+  - acceptance: Given a machine with no network access and no specl installation, when the file is opened from removable media, then every item in the loaded specification is reachable and the raw source is displayable.
+  - priority: MUST
+
+# Decisions
+
+- D1 The specification is presented as an item in the list rather than as a tab in the panel.
+  - title: The specification is an item
+  - status: accepted
+  - rationale: It is a node of the emitted graph like any other node, and the interface was the only place it was treated otherwise. Making it selectable removes the mixed-scope tab strip without introducing a tab set that varies with selection.
+  - affects: R3.3, R4.6, R4.7, R8.4
+
+- D2 The explorer does not hold a definition of maturity. It displays the figure the toolchain produces, or labels its own as an estimate.
+  - title: One definition of every figure
+  - status: accepted
+  - rationale: Two independently computed figures for one artifact, both rendered as authoritative, is a defect in the toolchain rather than in either tool.
+  - affects: R5.6, R5.7, R12.1
+
+- D3 Anything the explorer cannot represent is reported. Silent omission is excluded.
+  - title: Silence is excluded
+  - status: accepted
+  - rationale: Repeated predicates, list-valued details and unrecognised classes are currently dropped without notice, so the reader cannot distinguish a sparse specification from an incompletely rendered one.
+  - affects: R2.6, R2.7, R2.9, R2.10
+
+- D4 Type and status are encoded through shape or text with colour as a secondary channel.
+  - title: Encoding is not colour alone
+  - status: accepted
+  - rationale: The current dots carry no information in greyscale, in print, or for a reader who does not distinguish the hues, and the specification's existing requirement that the colours be themeable addresses the wrong half of the problem.
+  - affects: R3.6, R4.3
+
+- D5 The explorer remains a single self-contained read-only file. Capabilities requiring evaluation, network access or a build step are supplied to it rather than implemented in it.
+  - title: Single file, supplied inputs
+  - status: accepted
+  - rationale: Offline operation from removable media is a stated use case. Every capability added under this plan is either pure presentation of the loaded graph or the presentation of an artifact the CLI already produces.
+  - affects: R1.1, R10.4, R12.1
+
+- D6 The syntax reference is generated from the toolchain rather than written alongside it.
+  - title: The reference is generated
+  - status: accepted
+  - rationale: The annotation key set already drifted once inside the translator when it was held as two copies. A reference maintained by hand is a third copy, in a different repository artifact, with no test that would catch the divergence.
+  - affects: R13.1, R13.2
+
+- D7 The explorer generates specl source and does not interpret it.
+  - title: Emit, do not parse
+  - status: accepted
+  - rationale: Interpreting markdown in the browser is a second implementation of the translator's grammar, which OQ2 was resolved against. Emitting it requires only the key tables the syntax reference already carries. The asymmetry is what makes composition affordable and round-trip editing not.
+  - affects: R13.5, R13.6
 
 # Design Considerations
 
@@ -106,23 +466,43 @@ Replace the current drag-and-drop viewer (which only lists subject IDs and short
 - DN4 Treat the explorer as read-only. Editing, saving, or uploading is explicitly out of scope for v1.
 - DN5 The existing broken `explorer.html` placeholder in the package should be replaced wholesale, not patched.
 
+- DN6 Acceptance criteria in this specification state what must be obtainable rather than what must be on screen. Where a criterion says a value is reported or returned on request, an implementation satisfies it by making the value reachable; where a criterion requires something to be visible without being asked for, it says so.
+
+- DN7 Several capabilities depend on one structure: an index from IRI to item, built once at parse time. Reference navigation (R6.6), backlinks (R6.7), finding attribution (R12.2) and unresolved-reference marking all read from it. Building it as a distinct step rather than as a side effect of rendering is what keeps those capabilities from each carrying their own resolution logic.
+
+- DN8 The explorer and specl-validate must not disagree about a number. Where the CLI computes a figure, the explorer displays that figure or states that it is estimating. Where the CLI computes nothing, the explorer's figure carries its own definition. This is the same obligation the format places on a specification: a number whose derivation is not recoverable is not evidence.
+
+- DN9 The ODT Operational Console specification is the reference for authoring style in this specification: priority and acceptance on every requirement, rationale where a requirement encodes a judgement, decisions recorded with what they affect, and open questions that record their disposition when they close.
+
 # Open Questions and Gaps
 
 - OQ1 Whether to support slash namespaces (`/`) as an alternative to the current hash namespaces (`#`) for spec instances. Hash namespaces resolve all terms to a single document and are the right default for specs authored as a unit. Slash namespaces (as used by Schema.org, where `https://schema.org/Person` returns a dedicated page) would let specs host each requirement, story, or decision at its own dereferenceable URL. This matters for large, multi-team specs where individual elements need independent linking, versioning, or API-driven resolution.
   - recommendation: support a `namespace_style: hash | slash` front-matter key in a future release; default to `hash`; document the tradeoffs in SYNTAX.md
   - status: open
 - OQ2 Whether to support loading the companion `spec.md` alongside the `.ttl` for side-by-side reading.
-  - recommendation: defer to v2
-  - status: open
+  - recommendation: Resolved as no. A markdown parser in the explorer would be a second implementation of the translator and would diverge from it. The need it addresses is met instead by carrying prov:wasDerivedFrom and specl:sourceLine into the detail view (R6.8), and by a CLI command that inlines the Turtle into a copy of the explorer.
+  - status: resolved
 - OQ3 Whether to render Mermaid diagrams embedded in description strings.
   - recommendation: defer; out of scope for a read-only viewer
   - status: open
 - OQ4 Whether to show SHACL validation results inline by also loading a `shapes.ttl`.
-  - recommendation: defer to v2 as a separate "Validation" tab
-  - status: open
+  - recommendation: Resolved as yes, with the mechanism inverted. Shapes are not evaluated in the browser. The explorer consumes the JSON report specl-validate already emits, keyed by focus node. Specified as R12.1 and R12.2.
+  - status: resolved
 - OQ5 Light theme toggle.
-  - recommendation: defer, but ensure CSS variables are structured to support it
-  - status: open
+  - recommendation: Resolved as yes and specified as R3.7. Dark stays the default, light and follow-the-system are one control away, and each presentation is one block of tokens. Structuring the colours as variables, which this question asked for, is what made the second presentation one block rather than a second stylesheet; D4 already prevented a theme from breaking the type indicator.
+  - status: resolved
 - OQ6 Export of the current view (selected item as PDF or HTML snippet).
-  - recommendation: defer; browser print is sufficient for v1
+  - recommendation: Resolved. Fragment addressing (R11.1) covers sharing and a print stylesheet covers the paper case. A dedicated export path is not added.
+  - status: resolved
+
+- OQ7 Is the attesting reader (P5) a distinct persona from the reviewer (P2)? Both read a specification they did not write and both need every item reachable. What separates them is that P5 must be able to assert that the presentation matches the file, which P2 may take on trust.
+  - recommendation: Gated on implementation. If the raw view and the reporting of anything the parser could not represent are built for everyone, then P5 asks for nothing P2 does not already have, and it collapses. Keep the persona until those two capabilities exist and then test whether any requirement still names P5 alone.
+  - status: open
+
+- OQ8 Does authoring belong in the explorer, and if so how much of it?
+  - recommendation: Resolved as none, in this artifact. Composition was built under R13.6 and then withdrawn on use: source emitted by a viewer that cannot translate, validate or score it hands the author text nothing has checked, which is worse than sending them back to the file. Editing was never in scope, since parsing markdown in the browser is the second grammar implementation D7 excludes. Authoring belongs in a served mode where the toolchain is present, which is a separate artifact sharing this one's presentation.
+  - status: resolved
+
+- OQ9 Are the explorer's Turtle parser and syntax highlighter the seed of a reusable component? R2.2 requires a parser sufficient for the emitted format and R7.4 requires highlighting by a small function held in the file. Editor support, a language server or a shared highlighter would want the same grammar handled once and to a higher standard than either requirement sets, and the original design note calling a thirty-line parser sufficient was written before that was in view.
+  - recommendation: Agreed at round 3. Hold both requirements as written for this artifact, and treat a reusable parser as a specl-level component if one is wanted. What stays open is whether specl wants that component; a committed consumer beyond the explorer is the trigger to raise it, since a grammar maintained for one read-only viewer is the thirty-line convenience the original design note described and a grammar maintained for an editor is not. A parser shared between the explorer and an editor is no longer a convenience inside a single-file read-only viewer, and pulling one in is constrained by R1.1 and R1.5. What would change here is only that the explorer consumes the shared grammar where that is possible without a build step or a fetch.
   - status: open

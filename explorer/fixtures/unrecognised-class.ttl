@@ -1,0 +1,25 @@
+# HAND-AUTHORED FIXTURE. Not translator output and must not be regenerated.
+# Condition under test: R2.9, a class the explorer does not represent
+@prefix specl: <https://w3id.org/specl/ns#> .
+@prefix spec: <https://w3id.org/specl/fixtures/unrecognised-class#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+<https://w3id.org/specl/fixtures/unrecognised-class> a specl:Specification ;
+    dct:conformsTo <https://w3id.org/specl/contract/2> ;
+    dct:title "Fixture unrecognised-class" ;
+    dct:hasVersion "0.0.1" ;
+    specl:status "draft" ;
+    specl:intent """Hand-authored fixture.""" ;
+    specl:purpose """Stage 0.""" .
+
+spec:R1 a specl:Requirement ;
+    specl:partOf <https://w3id.org/specl/fixtures/unrecognised-class> ;
+    dct:title "An ordinary requirement" ;
+    dct:description "Present so the file is not empty." .
+
+spec:W1 a specl:Widget ;
+    specl:partOf <https://w3id.org/specl/fixtures/unrecognised-class> ;
+    dct:title "A widget" ;
+    dct:description "specl:Widget is not a class the explorer represents." .
